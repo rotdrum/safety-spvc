@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบบริหารจัดการพฤติกรรมนักเรียน</title>
+  <link rel="stylesheet" href="../systems/shared.css">
+  <style>
+    :root { --brand:#b45309; --brand-dark:#2d2118; --brand-soft:#fff2dc; --accent:#dc2626; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../student-late-system/web-dashboard/assets/protection-logo.jpg" alt="">
+        <div><strong>ระบบบริหารจัดการ<br>พฤติกรรมนักเรียน</strong><small>งานปกครองและความปลอดภัยฯ</small></div>
+      </div>
+      <nav class="nav">
+        <button class="active" data-view="overview">ภาพรวมและเคสเร่งด่วน</button>
+        <button data-view="cases">ทะเบียนและติดตามเคส</button>
+        <button data-view="owners">KPI ครูผู้รับผิดชอบ</button>
+        <button data-view="report">รายงานรายเคส</button>
+      </nav>
+      <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><span class="eyebrow">Student Conduct Management</span><h1>เปิดเคสก่อน แล้วติดตามจนจบ</h1><p class="lead">เริ่มจากบันทึกข้อเท็จจริงและระดับความร้ายแรง จากนั้นค่อยเพิ่มประวัติการติดต่อผู้ปกครอง ส่งโรงพยาบาล ประสานตำรวจ แนบเอกสาร และปิดเคส</p></div>
+        <div class="actions"><button class="btn" data-open="cases">ทะเบียนเคส</button><button class="btn primary" data-open="record">+ เปิดเคสใหม่</button></div>
+      </header>
+      <div class="privacy-note"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>ข้อมูลวินัยเป็นข้อมูลจำกัดสิทธิ์ ใช้เพื่อการดูแล แก้ไข และคุ้มครองนักเรียน ไม่ใช้เพื่อประจานหรือตีตรา</div>
+      <div class="master-status" id="behaviorApiStatus">กำลังโหลดข้อมูลจริงจาก Google Sheets...</div>
+
+      <section class="view active" id="view-overview">
+        <div class="grid kpis">
+          <article class="card kpi"><div class="kpi-label">เหตุการณ์เดือนนี้</div><div class="kpi-value" id="behaviorMonthlyCount">0</div><div class="kpi-note">คำนวณจากทะเบียนเคสจริง</div></article>
+          <article class="card kpi"><div class="kpi-label">เคสร้ายแรงต้องติดตาม</div><div class="kpi-value" id="behaviorSevereOpen">0</div><div class="kpi-note">ไม่นับเคสที่ปิดแล้ว</div></article>
+          <article class="card kpi"><div class="kpi-label">คะแนนหักที่ผ่านการพิจารณา</div><div class="kpi-value" id="behaviorScoreTotal">0</div><div class="kpi-note">ไม่นับคะแนนก่อนมีมติ</div></article>
+          <article class="card kpi"><div class="kpi-label">เอกสารรอดำเนินการ</div><div class="kpi-value" id="behaviorPendingDocs">0</div><div class="kpi-note">อ้างอิงสถานะรอเอกสาร</div></article>
+        </div>
+        <div class="grid two-col" style="margin-top:16px">
+          <article class="panel"><div class="panel-head"><h2>เคสที่ต้องดำเนินการ</h2><span class="pill red" id="behaviorUrgentBadge">0 เคส</span></div>
+            <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>เหตุการณ์</th><th>ระดับ</th><th>ขั้นตอนถัดไป</th></tr></thead><tbody id="behaviorUrgentRows"><tr><td colspan="4">ยังไม่มีเคสในทะเบียนจริง</td></tr></tbody></table></div>
+          </article>
+          <article class="panel"><div class="panel-head"><h3>ภารกิจวันนี้</h3><span class="pill amber">Action list</span></div><div class="list">
+            <div class="list-item"><span class="list-icon" id="behaviorParentTasks">0</span><div><strong>ติดตามผู้ปกครอง</strong><small>เคสสถานะรอผู้ปกครอง</small></div></div>
+            <div class="list-item"><span class="list-icon" id="behaviorDocumentTasks">0</span><div><strong>เอกสารของเคส</strong><small>เคสสถานะรอเอกสาร</small></div></div>
+            <div class="list-item"><span class="list-icon" id="behaviorPoliceTasks">0</span><div><strong>ประสานสถานีตำรวจ</strong><small>นับจาก Timeline ของเคสที่ยังไม่ปิด</small></div></div>
+          </div></article>
+        </div>
+        <div class="grid three-col" style="margin-top:16px">
+          <article class="panel"><div class="panel-head"><h3>ประเภทเหตุการณ์</h3></div>
+            <div class="bar-row"><span>บุหรี่/บุหรี่ไฟฟ้า</span><div class="bar-track"><div class="bar-fill" id="behaviorTypeVapeBar" style="width:0%"></div></div><b id="behaviorTypeVape">0</b></div>
+            <div class="bar-row"><span>ทะเลาะวิวาท</span><div class="bar-track"><div class="bar-fill" id="behaviorTypeFightBar" style="width:0%"></div></div><b id="behaviorTypeFight">0</b></div>
+            <div class="bar-row"><span>ผิดระเบียบ</span><div class="bar-track"><div class="bar-fill" id="behaviorTypeRulesBar" style="width:0%"></div></div><b id="behaviorTypeRules">0</b></div>
+          </article>
+          <article class="panel"><div class="panel-head"><h3>ระดับความร้ายแรง</h3></div><div class="list">
+            <div class="list-item"><span class="severity high">ร้ายแรง</span><div><strong id="behaviorSeverityHigh">0 เหตุการณ์</strong><small>รวมระดับร้ายแรงและวิกฤต</small></div></div>
+            <div class="list-item"><span class="severity mid">ปานกลาง</span><div><strong id="behaviorSeverityMid">0 เหตุการณ์</strong><small>ติดตามและปรับพฤติกรรม</small></div></div>
+            <div class="list-item"><span class="severity low">เล็กน้อย</span><div><strong id="behaviorSeverityLow">0 เหตุการณ์</strong><small>ตักเตือนและบันทึกไว้</small></div></div>
+          </div></article>
+          <article class="panel"><div class="panel-head"><h3>ผลการติดตาม</h3></div><div class="list">
+            <div class="list-item"><span class="list-icon">✓</span><div><strong id="behaviorClosedCount">ปิดเคสแล้ว 0</strong><small>ดำเนินการครบและประเมินซ้ำแล้ว</small></div></div>
+            <div class="list-item"><span class="list-icon">↻</span><div><strong id="behaviorOpenCount">กำลังติดตาม 0</strong><small>รวมทุกสถานะที่ยังไม่ปิด</small></div></div>
+          </div></article>
+        </div>
+      </section>
+
+      <section class="view" id="view-cases"><article class="panel"><div class="panel-head"><h2>ทะเบียนและติดตามเคส</h2><div class="case-tools"><span class="pill" id="caseCount">0 รายการ</span><button class="btn primary" type="button" data-open="record">+ เปิดเคสใหม่</button></div></div>
+        <div class="filter-panel-compact"><div class="filter-grid">
+          <div class="field"><label>ค้นหาเลขเคส / นักเรียน / เหตุการณ์</label><input id="caseFilterSearch" type="search" placeholder="พิมพ์คำค้น"></div>
+          <div class="field"><label>สถานะ</label><select id="caseFilterStatus"><option value="">ทุกสถานะ</option><option>เปิดเคสใหม่</option><option>กำลังติดตาม</option><option>รอผู้ปกครอง</option><option>รอเอกสาร</option><option>ให้คำปรึกษา</option><option>ส่งต่อหน่วยงานแล้ว</option><option>เคลียร์เรียบร้อย</option><option>ปิดเคส</option></select></div>
+          <div class="field"><label>ความร้ายแรง</label><select id="caseFilterSeverity"><option value="">ทุกระดับ</option><option>เล็กน้อย</option><option>ปานกลาง</option><option>ร้ายแรง</option><option>วิกฤต</option></select></div>
+          <div class="field"><label>ครูผู้รับผิดชอบ</label><select id="caseFilterOwner"><option value="">ทุกคน</option></select></div>
+        </div></div>
+        <div class="table-wrap"><table><thead><tr><th>เลขที่เคส</th><th>วันที่</th><th>นักเรียน</th><th>ข้อหา/เหตุการณ์</th><th>ความร้ายแรง</th><th>ครูผู้รับผิดชอบ</th><th>สถานะล่าสุด</th><th></th></tr></thead><tbody id="caseRows"></tbody></table></div>
+        <div class="notice" id="behaviorEmptyState">ยังไม่มีเคสใน Google Sheets กด “เปิดเคสใหม่” เพื่อเริ่มทะเบียนจริง</div>
+      </article></section>
+
+      <section class="view" id="view-owners">
+        <div class="grid kpis">
+          <article class="card kpi"><div class="kpi-label">ครูที่รับผิดชอบเคส</div><div class="kpi-value" id="ownerKpiTeachers">0</div><div class="kpi-note">นับจากทะเบียนปัจจุบัน</div></article>
+          <article class="card kpi"><div class="kpi-label">เคสที่ยังไม่ปิด</div><div class="kpi-value" id="ownerKpiOpen">0</div><div class="kpi-note">รวมเคสที่กำลังติดตาม</div></article>
+          <article class="card kpi"><div class="kpi-label">ภาระงานเฉลี่ย</div><div class="kpi-value" id="ownerKpiAverage">0</div><div class="kpi-note">เคสต่อครูหนึ่งคน</div></article>
+          <article class="card kpi"><div class="kpi-label">ภาระงานสูงสุด</div><div class="kpi-value" id="ownerKpiMax">0</div><div class="kpi-note" id="ownerKpiMaxName">ยังไม่มีข้อมูล</div></article>
+        </div>
+        <article class="panel" style="margin-top:16px"><div class="panel-head"><h2>KPI การรับผิดชอบและติดตามเคส</h2><span class="pill">หนึ่งเคสมีผู้รับผิดชอบร่วมได้</span></div>
+          <div class="table-wrap"><table><thead><tr><th>ครูผู้รับผิดชอบ</th><th>เคสทั้งหมด</th><th>กำลังติดตาม</th><th>ปิดแล้ว</th><th>เคสร้ายแรง</th><th>อัตราปิดเคส</th></tr></thead><tbody id="ownerKpiRows"></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="view" id="view-record"><article class="panel"><div class="panel-head"><h2>เปิดเคสพฤติกรรมใหม่</h2><span class="pill amber">บันทึกข้อมูลตั้งต้นก่อน</span></div>
+        <form id="behaviorForm" class="form-grid">
+          <div class="field full"><label>ค้นหาและเลือกนักเรียนจาก Master Student</label>
+            <div class="search-select" id="behaviorStudentPicker">
+              <input id="behaviorStudentSearch" type="search" autocomplete="off" placeholder="ค้นหาด้วยรหัส ชื่อ นามสกุล หรือห้องเรียน">
+              <div class="search-options" id="behaviorStudentOptions"></div>
+            </div>
+            <div class="master-status" id="behaviorMasterStatus">กำลังเตรียมข้อมูล Master Student...</div>
+          </div>
+          <div class="field"><label>รหัสนักเรียน</label><input id="studentId" required readonly></div>
+          <div class="field"><label>ชื่อ-นามสกุล</label><input id="studentName" required readonly></div>
+          <div class="field"><label>ระดับชั้น / ห้อง</label><input id="studentRoom" required readonly></div>
+          <div class="field"><label>ประเภทเหตุการณ์</label><select id="incidentType" required><option value="">เลือกข้อหา/เหตุการณ์</option><option>บุหรี่หรือบุหรี่ไฟฟ้า</option><option>ทะเลาะวิวาท / ทำร้ายร่างกาย</option><option>การคุกคามหรือประพฤติไม่เหมาะสมทางเพศ</option><option>กลั่นแกล้ง / กลั่นแกล้งออนไลน์</option><option>สารเสพติดหรือของมึนเมา</option><option>ลักทรัพย์ / ทำลายทรัพย์สิน</option><option>พกพาอาวุธหรือวัตถุอันตราย</option><option>หนีเรียน / ออกจากสถานศึกษาโดยไม่ได้รับอนุญาต</option><option>แต่งกายหรือทรงผมผิดระเบียบ</option><option>อื่น ๆ</option></select></div>
+          <div class="field"><label>ระดับความร้ายแรงเบื้องต้น</label><select id="severity" required><option>เล็กน้อย</option><option selected>ปานกลาง</option><option>ร้ายแรง</option><option>วิกฤต / ต้องส่งต่อทันที</option></select></div>
+          <div class="field"><label>วันที่และเวลาเกิดเหตุ</label><input id="incidentDate" type="datetime-local" required></div>
+          <div class="field"><label>สถานที่เกิดเหตุ</label><input id="incidentPlace" placeholder="อาคาร ห้อง หรือบริเวณ"></div>
+          <div class="field full"><label>ครูรับผิดชอบแก้ไขเคส (เลือกได้มากกว่า 1 คน)</label>
+            <div class="search-select" id="behaviorTeacherPicker">
+              <input id="behaviorTeacherSearch" type="search" autocomplete="off" placeholder="ค้นหาแล้วเลือกครูเพิ่มในทีมรับผิดชอบ">
+              <div class="search-options" id="behaviorTeacherOptions"></div>
+            </div>
+            <div class="selection-chips" id="behaviorTeacherChips"></div>
+          </div>
+          <div class="field full"><label>รายละเอียดข้อเท็จจริงตั้งต้น</label><textarea id="incidentDetail" required placeholder="บันทึกว่าเกิดอะไรขึ้น เมื่อใด ที่ไหน และมีใครเกี่ยวข้อง โดยยังไม่จำเป็นต้องสรุปผลการดำเนินการ"></textarea></div>
+          <div class="field full"><button class="btn primary" type="submit">สร้างเคสและไปหน้าติดตาม</button></div>
+        </form><div class="notice">ขั้นเปิดเคสยังไม่หักคะแนน ระบบจะบันทึกคะแนนภายหลังเมื่อพิจารณาข้อเท็จจริงและมีมติแล้ว พร้อมเก็บการติดต่อผู้ปกครอง การส่งต่อ และเอกสารไว้ใน Timeline เดียวกัน</div>
+      </article></section>
+
+      <div class="modal" id="caseModal" aria-hidden="true">
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle">
+          <div class="modal-head"><h2 id="caseModalTitle">รายละเอียดและ Timeline ของเคส</h2><button class="modal-close" type="button" id="closeCaseModal" aria-label="ปิด">×</button></div>
+          <div class="modal-body">
+          <div class="panel-head"><h3>ข้อมูลเคสที่เลือก</h3><span class="pill amber" id="selectedCaseStatus">ยังไม่ได้เลือกเคส</span></div>
+          <div class="case-summary">
+            <div><span>เลขที่เคส</span><strong id="selectedCaseId">-</strong></div>
+            <div><span>นักเรียน</span><strong id="selectedStudent">-</strong></div>
+            <div><span>เหตุการณ์</span><strong id="selectedIncident">-</strong></div>
+            <div><span>คะแนนที่หัก</span><strong id="selectedScore">-</strong></div>
+          </div>
+          <div class="grid two-col">
+            <div>
+              <div class="panel-head"><h3>ประวัติการดำเนินงาน</h3><span class="pill">เรียงตามเวลา</span></div>
+              <div class="timeline" id="caseTimeline"><div class="notice">เลือกเคสจากทะเบียนเพื่อดูประวัติ</div></div>
+            </div>
+            <form id="followupForm">
+              <div class="panel-head"><h3>เพิ่มความคืบหน้า</h3><span class="pill">Follow update</span></div>
+              <div class="form-grid">
+                <div class="field"><label>การดำเนินการ</label><select id="followupAction" required><option value="">เลือกการดำเนินการ</option><option>ติดต่อผู้ปกครอง</option><option>นัดผู้ปกครองเข้าพบ</option><option>พิจารณาโทษและตัดคะแนน</option><option>ส่งโรงพยาบาล / สถานพยาบาล</option><option>ประสานสถานีตำรวจ</option><option>ให้คำปรึกษา / ส่งต่องานแนะแนว</option><option>ทำบันทึกข้อตกลง</option><option>ทำเอกสารทัณฑ์บน</option><option>ติดตามผลการปรับพฤติกรรม</option><option>ปิดเคส</option></select></div>
+                <div class="field"><label>วันที่ดำเนินการ</label><input id="followupDate" type="datetime-local" required></div>
+                <div class="field"><label>สถานะหลังอัปเดต</label><select id="followupStatus"><option>กำลังติดตาม</option><option>รอผู้ปกครอง</option><option>รอเอกสาร</option><option>ส่งต่อหน่วยงานแล้ว</option><option>เคลียร์เรียบร้อย</option><option>ปิดเคส</option></select></div>
+                <div class="field"><label>คะแนนที่หักตามมติ (ถ้ามี)</label><input id="followupScore" type="number" min="0" max="100" placeholder="เว้นว่างหากยังไม่มีมติ"></div>
+                <div class="field full"><label>ครูรับผิดชอบแก้ไขเคส</label><div class="owner-check-grid" id="caseOwnerChecks"></div></div>
+                <div class="field"><label>แนบเอกสารของเคส</label><input id="followupFile" type="file" multiple accept=".pdf,.jpg,.jpeg,.png"></div>
+                <div class="field full"><label>ผลการดำเนินการ / หมายเหตุ</label><textarea id="followupNote" required placeholder="เช่น ติดต่อผู้ปกครองแล้ว รับทราบและนัดเข้าพบ หรือส่ง รพ. พร้อมชื่อสถานพยาบาล"></textarea></div>
+                <div class="field full"><button class="btn primary" type="submit">เพิ่มลง Timeline ของเคส</button></div>
+              </div>
+              <div class="attachment-list" id="caseAttachmentList"></div>
+              <button class="btn" type="button" id="deleteBehaviorCase" style="margin-top:12px;color:#b91c1c">ลบเคสออกจากทะเบียน</button>
+            </form>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="view" id="view-report">
+        <div class="actions report-actions" style="margin-bottom:14px">
+          <button class="btn" type="button" data-open="cases">กลับทะเบียนเคส</button>
+          <button class="btn primary" type="button" id="printCaseReport">พิมพ์ / บันทึก PDF</button>
+        </div>
+        <article class="report-paper">
+          <header class="report-head">
+            <img src="../student-late-system/web-dashboard/assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+            <div>
+              <h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2>
+              <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานการดำเนินงานกรณีพฤติกรรมนักเรียน</p>
+            </div>
+            <img src="../student-late-system/web-dashboard/assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+          </header>
+          <div class="report-title">
+            <h3>รายงานสรุปผลการดำเนินงานรายกรณี</h3>
+            <p>เลขที่เคส <strong id="reportCaseId">-</strong></p>
+          </div>
+          <div class="report-info">
+            <div><span>ชื่อ-นามสกุลนักเรียน</span><strong id="reportStudent">-</strong></div>
+            <div><span>ระดับชั้น / ห้อง</span><strong id="reportRoom">-</strong></div>
+            <div><span>วันที่รับแจ้งเหตุ</span><strong id="reportOpenedDate">-</strong></div>
+            <div><span>สถานะล่าสุด</span><strong id="reportStatus">-</strong></div>
+            <div><span>ประเภทเหตุการณ์</span><strong id="reportIncident">-</strong></div>
+            <div><span>ระดับความร้ายแรง</span><strong id="reportSeverity">-</strong></div>
+            <div><span>คะแนนที่หัก</span><strong id="reportScore">-</strong></div>
+            <div><span>ครูผู้รับผิดชอบแก้ไขเคส</span><strong id="reportRecorder">-</strong></div>
+          </div>
+          <section class="report-section">
+            <h4>ข้อเท็จจริงและรายละเอียดเหตุการณ์</h4>
+            <p id="reportDetail">ยังไม่ได้เลือกเคสจากทะเบียน</p>
+          </section>
+          <section class="report-section">
+            <h4>ประวัติการดำเนินงานและการติดตาม</h4>
+            <table class="report-history">
+              <thead><tr><th style="width:35px">ลำดับ</th><th style="width:145px">วันที่/เวลา</th><th>การดำเนินงานและผลการติดตาม</th></tr></thead>
+              <tbody id="reportHistory"></tbody>
+            </table>
+          </section>
+          <section class="report-section">
+            <h4>สรุปผล</h4>
+            <p id="reportConclusion">อยู่ระหว่างดำเนินการติดตามตามขั้นตอนของงานปกครองและความปลอดภัยนักเรียน นักศึกษา</p>
+          </section>
+          <div class="signature-area">
+            <div class="signature-box">
+              <div class="signature-line">ลงชื่อ ______________________________</div>
+              <div>(นางสาวปัทมพร แสงศรี)</div>
+              <div>หัวหน้างานปกครองและความปลอดภัย ฯ</div>
+              <div class="report-date">วันที่ <span id="reportSignedDate">7 มิถุนายน 2569</span></div>
+            </div>
+          </div>
+          <section class="report-appendix" id="reportAppendix">
+            <div class="report-title"><h3>ภาคผนวกเอกสารแนบ</h3><p>เอกสารและหลักฐานที่อัปโหลดใน Timeline ของเคส</p></div>
+            <div id="reportAttachments"></div>
+          </section>
+        </article>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast">บันทึกข้อมูลแล้ว</div>
+  <script src="../systems/data-api-config.js"></script>
+  <script src="../systems/data-api.js"></script>
+  <script>
+    const MASTER_SHEET_ID = "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw";
+    const views = document.querySelectorAll(".view");
+    const navButtons = document.querySelectorAll(".nav button");
+    const caseRows = document.getElementById("caseRows");
+    const toast = document.getElementById("toast");
+    const caseModal = document.getElementById("caseModal");
+    const behaviorStudentSearch = document.getElementById("behaviorStudentSearch");
+    const behaviorStudentOptions = document.getElementById("behaviorStudentOptions");
+    const behaviorTeacherSearch = document.getElementById("behaviorTeacherSearch");
+    const behaviorTeacherOptions = document.getElementById("behaviorTeacherOptions");
+    const behaviorTeacherChips = document.getElementById("behaviorTeacherChips");
+    const behaviorMasterStatus = document.getElementById("behaviorMasterStatus");
+    const behaviorApiStatus = document.getElementById("behaviorApiStatus");
+    const behaviorApi = window.StudentAffairsDataApi;
+    let masterStudents = [];
+    let masterTeachers = [];
+    let selectedMasterStudent = null;
+    let selectedCaseOwners = [];
+    const behaviorRecords = new Map();
+    const caseAttachments = {};
+    let selectedCaseRow = null;
+
+    function openView(name) {
+      const isCaseSubview = name === "record";
+      views.forEach(view => {
+        const isTarget = view.id === `view-${name}`;
+        const keepRegister = isCaseSubview && view.id === "view-cases";
+        view.classList.toggle("active", isTarget || keepRegister);
+      });
+      navButtons.forEach(button => button.classList.toggle("active", button.dataset.view === (isCaseSubview ? "cases" : name)));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function sheetSyncTime(date = new Date()) {
+      return new Intl.DateTimeFormat("th-TH", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(date);
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      })[char]);
+    }
+
+    function renderMasterStudents(query = "") {
+      const keyword = query.trim().toLocaleLowerCase("th");
+      const matches = masterStudents.filter(student =>
+        `${student.id} ${student.fullName} ${student.firstName} ${student.lastName} ${student.room}`.toLocaleLowerCase("th").includes(keyword)
+      ).slice(0, 40);
+      behaviorStudentOptions.innerHTML = matches.length ? matches.map(student => `
+        <button class="search-option" type="button" data-master-student="${escapeHtml(student.id)}">
+          <span><strong>${escapeHtml(student.fullName)}</strong><small>${escapeHtml(student.room)} · ครูที่ปรึกษา ${escapeHtml(student.homeroomTeacher || "-")}</small></span>
+          <code>${escapeHtml(student.id)}</code>
+        </button>`).join("") : `<div class="search-empty">ไม่พบนักเรียนที่ตรงกับคำค้น</div>`;
+      behaviorStudentOptions.classList.add("open");
+    }
+
+    function renderMasterTeachers(query = "") {
+      const keyword = query.trim().toLocaleLowerCase("th");
+      const matches = masterTeachers.filter(teacher => teacher.toLocaleLowerCase("th").includes(keyword));
+      behaviorTeacherOptions.innerHTML = matches.length ? matches.map(teacher => `
+        <button class="search-option" type="button" data-master-teacher="${escapeHtml(teacher)}">
+          <span><strong>${escapeHtml(teacher)}</strong><small>${selectedCaseOwners.includes(teacher) ? "เลือกในทีมแล้ว" : "เพิ่มเป็นผู้รับผิดชอบเคส"}</small></span>
+        </button>`).join("") : `<div class="search-empty">ไม่พบรายชื่อครู</div>`;
+      behaviorTeacherOptions.classList.add("open");
+    }
+
+    function shortTeacherName(name) {
+      return String(name || "").replace(/^(นาย|นางสาว|นาง)/, "").trim().split(/\s+/)[0] || name;
+    }
+
+    function renderOwnerChips() {
+      behaviorTeacherChips.innerHTML = selectedCaseOwners.length
+        ? selectedCaseOwners.map(teacher => `<span class="selection-chip">${escapeHtml(teacher)}<button type="button" data-remove-owner="${escapeHtml(teacher)}" aria-label="นำออก">×</button></span>`).join("")
+        : `<span class="master-status">ยังไม่ได้เลือกครูผู้รับผิดชอบ</span>`;
+    }
+
+    behaviorStudentSearch.addEventListener("focus", () => renderMasterStudents(behaviorStudentSearch.value));
+    behaviorStudentSearch.addEventListener("input", () => {
+      selectedMasterStudent = null;
+      renderMasterStudents(behaviorStudentSearch.value);
+    });
+    behaviorStudentOptions.addEventListener("click", event => {
+      const button = event.target.closest("[data-master-student]");
+      if (!button) return;
+      selectedMasterStudent = masterStudents.find(student => student.id === button.dataset.masterStudent);
+      if (!selectedMasterStudent) return;
+      behaviorStudentSearch.value = `${selectedMasterStudent.id} · ${selectedMasterStudent.fullName} · ${selectedMasterStudent.room}`;
+      document.getElementById("studentId").value = selectedMasterStudent.id;
+      document.getElementById("studentName").value = selectedMasterStudent.fullName;
+      document.getElementById("studentRoom").value = selectedMasterStudent.room || selectedMasterStudent.grade;
+      behaviorStudentOptions.classList.remove("open");
+    });
+    behaviorTeacherSearch.addEventListener("focus", () => renderMasterTeachers(behaviorTeacherSearch.value));
+    behaviorTeacherSearch.addEventListener("input", () => renderMasterTeachers(behaviorTeacherSearch.value));
+    behaviorTeacherOptions.addEventListener("click", event => {
+      const button = event.target.closest("[data-master-teacher]");
+      if (!button) return;
+      const teacher = button.dataset.masterTeacher;
+      if (!selectedCaseOwners.includes(teacher)) selectedCaseOwners.push(teacher);
+      behaviorTeacherSearch.value = "";
+      renderOwnerChips();
+      behaviorTeacherOptions.classList.remove("open");
+    });
+    behaviorTeacherChips.addEventListener("click", event => {
+      const button = event.target.closest("[data-remove-owner]");
+      if (!button) return;
+      selectedCaseOwners = selectedCaseOwners.filter(teacher => teacher !== button.dataset.removeOwner);
+      renderOwnerChips();
+    });
+    document.addEventListener("click", event => {
+      if (!document.getElementById("behaviorStudentPicker").contains(event.target)) behaviorStudentOptions.classList.remove("open");
+      if (!document.getElementById("behaviorTeacherPicker").contains(event.target)) behaviorTeacherOptions.classList.remove("open");
+    });
+
+    function loadMasterGviz({ sheet, gid, query, headers = 1 }) {
+      return new Promise((resolve, reject) => {
+        const callback = `behaviorMaster_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const timeout = setTimeout(() => {
+          cleanup();
+          reject(new Error("Master timeout"));
+        }, 10000);
+        function cleanup() {
+          clearTimeout(timeout);
+          script.remove();
+          delete window[callback];
+        }
+        window[callback] = payload => {
+          cleanup();
+          payload.status === "error" ? reject(new Error("Master error")) : resolve(payload.table);
+        };
+        const params = new URLSearchParams({ tqx: `responseHandler:${callback}`, headers: String(headers) });
+        if (sheet) params.set("sheet", sheet);
+        if (gid) params.set("gid", gid);
+        if (query) params.set("tq", query);
+        script.src = `https://docs.google.com/spreadsheets/d/${MASTER_SHEET_ID}/gviz/tq?${params.toString()}`;
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Master network error"));
+        };
+        document.head.append(script);
+      });
+    }
+
+    async function loadBehaviorMaster() {
+      try {
+        const cached = sessionStorage.getItem("spvc-master-data");
+        const local = cached
+          ? JSON.parse(cached)
+          : await fetch("../gender-identity-system/data/master-data.json", { cache: "force-cache" }).then(response => response.json());
+        masterStudents = local.students || [];
+        masterTeachers = local.teachers || [];
+        sessionStorage.setItem("spvc-master-data", JSON.stringify(local));
+        behaviorMasterStatus.textContent = `พร้อมค้นหาทันที · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
+      } catch (error) {
+        behaviorMasterStatus.textContent = "กำลังเชื่อมข้อมูล Master ล่าสุด...";
+      }
+
+      try {
+        const [studentTable, teacherTable] = await Promise.all([
+          loadMasterGviz({ sheet: "Students", query: "select A,C,D,E,F,G,H,I,J where J = 'Active'", headers: 1 }),
+          loadMasterGviz({ gid: "667370291", query: "select C offset 3", headers: 0 })
+        ]);
+        const cell = (row, index) => row.c[index]?.v == null ? "" : String(row.c[index].v);
+        const liveStudents = studentTable.rows.map(row => ({
+          id: cell(row, 0), prefix: cell(row, 1), firstName: cell(row, 2), lastName: cell(row, 3),
+          fullName: cell(row, 4), grade: cell(row, 5), room: cell(row, 6),
+          homeroomTeacher: cell(row, 7), status: cell(row, 8)
+        })).filter(student => student.id);
+        const liveTeachers = teacherTable.rows.map(row => cell(row, 0).trim()).filter(Boolean);
+        if (liveStudents.length) masterStudents = liveStudents;
+        if (liveTeachers.length) masterTeachers = liveTeachers;
+        sessionStorage.setItem("spvc-master-data", JSON.stringify({ students: masterStudents, teachers: masterTeachers }));
+        behaviorMasterStatus.textContent = `เชื่อม Google Sheet แล้ว · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
+      } catch (error) {
+        behaviorMasterStatus.textContent = `ใช้ Master สำรองล่าสุด · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
+      }
+      populateOwnerFilter();
+      renderOwnerKpi();
+    }
+
+    function populateOwnerFilter() {
+      const select = document.getElementById("caseFilterOwner");
+      const current = select.value;
+      const owners = new Set(masterTeachers);
+      [...caseRows.querySelectorAll("tr")].forEach(row => (row.dataset.owners || "").split("|").filter(Boolean).forEach(owner => owners.add(owner)));
+      select.innerHTML = `<option value="">ทุกคน</option>${[...owners].sort((a, b) => a.localeCompare(b, "th")).map(owner => `<option>${escapeHtml(owner)}</option>`).join("")}`;
+      select.value = current;
+    }
+
+    function filterCaseRows() {
+      const keyword = document.getElementById("caseFilterSearch").value.trim().toLocaleLowerCase("th");
+      const status = document.getElementById("caseFilterStatus").value;
+      const severity = document.getElementById("caseFilterSeverity").value;
+      const owner = document.getElementById("caseFilterOwner").value;
+      let visible = 0;
+      [...caseRows.querySelectorAll("tr")].forEach(row => {
+        const cells = row.children;
+        const matches = (!keyword || row.textContent.toLocaleLowerCase("th").includes(keyword))
+          && (!status || cells[6].textContent.includes(status))
+          && (!severity || cells[4].textContent.includes(severity))
+          && (!owner || (row.dataset.owners || "").split("|").includes(owner));
+        row.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      document.getElementById("caseCount").textContent = `${visible} รายการ`;
+    }
+
+    function renderOwnerKpi() {
+      const stats = new Map();
+      const rows = [...caseRows.querySelectorAll("tr")];
+      rows.forEach(row => {
+        const closed = /ปิดเคส|เคลียร์เรียบร้อย/.test(row.children[6].textContent);
+        const severe = /ร้ายแรง|วิกฤต/.test(row.children[4].textContent);
+        (row.dataset.owners || "").split("|").filter(Boolean).forEach(owner => {
+          const item = stats.get(owner) || { total: 0, open: 0, closed: 0, severe: 0 };
+          item.total += 1;
+          item.open += closed ? 0 : 1;
+          item.closed += closed ? 1 : 0;
+          item.severe += severe ? 1 : 0;
+          stats.set(owner, item);
+        });
+      });
+      const entries = [...stats.entries()].sort((a, b) => b[1].open - a[1].open || b[1].total - a[1].total);
+      const openCases = rows.filter(row => !/ปิดเคส|เคลียร์เรียบร้อย/.test(row.children[6].textContent)).length;
+      const maxEntry = entries[0];
+      document.getElementById("ownerKpiTeachers").textContent = entries.length;
+      document.getElementById("ownerKpiOpen").textContent = openCases;
+      document.getElementById("ownerKpiAverage").textContent = entries.length ? (entries.reduce((sum, [, item]) => sum + item.total, 0) / entries.length).toFixed(1) : "0";
+      document.getElementById("ownerKpiMax").textContent = maxEntry ? maxEntry[1].total : 0;
+      document.getElementById("ownerKpiMaxName").textContent = maxEntry ? maxEntry[0] : "ยังไม่มีข้อมูล";
+      document.getElementById("ownerKpiRows").innerHTML = entries.length ? entries.map(([owner, item]) => `
+        <tr><td><strong>${escapeHtml(owner)}</strong></td><td>${item.total}</td><td>${item.open}</td><td>${item.closed}</td><td>${item.severe}</td><td>${item.total ? Math.round(item.closed / item.total * 100) : 0}%</td></tr>`).join("")
+        : `<tr><td colspan="6">ยังไม่มีข้อมูลการมอบหมายเคส</td></tr>`;
+    }
+
+    function severityClass(value) {
+      if (value.includes("วิกฤต") || value === "ร้ายแรง") return "high";
+      if (value === "ปานกลาง") return "mid";
+      return "low";
+    }
+
+    function behaviorStatusTone(status) {
+      if (/ปิดเคส|เคลียร์เรียบร้อย/.test(status)) return "";
+      if (/รอ/.test(status)) return "amber";
+      return "red";
+    }
+
+    function behaviorRow(record) {
+      const row = document.createElement("tr");
+      row.dataset.recordId = record.caseId;
+      row.dataset.version = String(record.version || 1);
+      row.dataset.score = record.score === "" || record.score == null ? "รอพิจารณา" : `${record.score} คะแนน`;
+      row.dataset.detail = record.detail || "";
+      row.dataset.owners = (record.owners || []).join("|");
+      row.innerHTML = `
+        <td>${escapeHtml(record.caseId)}</td>
+        <td>${escapeHtml(new Intl.DateTimeFormat("th-TH", { dateStyle: "medium" }).format(new Date(record.incidentAt || record.createdAt)))}</td>
+        <td class="student"><strong>${escapeHtml(record.studentName)}</strong><small>${escapeHtml(record.room || "-")}</small></td>
+        <td>${escapeHtml(record.incidentType)}</td>
+        <td><span class="severity ${severityClass(record.severity || "")}">${escapeHtml(record.severity || "ไม่ระบุ")}</span></td>
+        <td>${(record.owners || []).length ? record.owners.map(shortTeacherName).map(escapeHtml).join(" · ") : "ยังไม่มอบหมาย"}</td>
+        <td><span class="pill ${behaviorStatusTone(record.status || "")}">${escapeHtml(record.status || "เปิดเคสใหม่")}</span></td>
+        <td><button class="case-action" data-case="${escapeHtml(record.caseId)}">${record.status === "ปิดเคส" ? "ดูประวัติ" : "ติดตาม"}</button> · <button class="case-action" data-report="${escapeHtml(record.caseId)}">รายงาน</button></td>`;
+      return row;
+    }
+
+    function applyBehaviorRecord(record, prepend = false) {
+      behaviorRecords.set(record.caseId, record);
+      caseAttachments[record.caseId] = (record.documents || []).map(file => ({
+        name: file.name,
+        type: file.mimeType || "application/octet-stream",
+        addedAt: formatDate(file.uploadedAt),
+        url: file.url || ""
+      }));
+      const existing = caseRows.querySelector(`[data-record-id="${CSS.escape(record.caseId)}"]`);
+      const row = behaviorRow(record);
+      if (existing) existing.replaceWith(row);
+      else if (prepend) caseRows.prepend(row);
+      else caseRows.append(row);
+      if (selectedCaseRow === existing || selectedCaseRow?.dataset.recordId === record.caseId) selectedCaseRow = row;
+      return row;
+    }
+
+    function refreshBehaviorDerivedUi() {
+      const records = [...behaviorRecords.values()];
+      const now = new Date();
+      const isClosed = record => /ปิดเคส|เคลียร์เรียบร้อย/.test(record.status || "");
+      const isCurrentMonth = record => {
+        const date = new Date(record.incidentAt || record.createdAt);
+        return !Number.isNaN(date.getTime()) && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      };
+      document.getElementById("behaviorMonthlyCount").textContent = records.filter(isCurrentMonth).length.toLocaleString("th-TH");
+      document.getElementById("behaviorSevereOpen").textContent = records.filter(record => !isClosed(record) && /ร้ายแรง|วิกฤต/.test(record.severity || "")).length.toLocaleString("th-TH");
+      document.getElementById("behaviorScoreTotal").textContent = records.reduce((sum, record) => sum + (Number(record.score) || 0), 0).toLocaleString("th-TH");
+      document.getElementById("behaviorPendingDocs").textContent = records.filter(record => /รอเอกสาร/.test(record.status || "")).length.toLocaleString("th-TH");
+      document.getElementById("behaviorParentTasks").textContent = records.filter(record => !isClosed(record) && /รอผู้ปกครอง/.test(record.status || "")).length.toLocaleString("th-TH");
+      document.getElementById("behaviorDocumentTasks").textContent = records.filter(record => !isClosed(record) && /รอเอกสาร/.test(record.status || "")).length.toLocaleString("th-TH");
+      document.getElementById("behaviorPoliceTasks").textContent = records.filter(record => !isClosed(record) && (record.timeline || []).some(item => /สถานีตำรวจ|ตำรวจ/.test(item.action || ""))).length.toLocaleString("th-TH");
+      const typeCounts = {
+        vape: records.filter(record => /บุหรี่/.test(record.incidentType || "")).length,
+        fight: records.filter(record => /ทะเลาะ|ทำร้าย/.test(record.incidentType || "")).length,
+        rules: records.filter(record => /ระเบียบ|แต่งกาย|ทรงผม|หนีเรียน/.test(record.incidentType || "")).length
+      };
+      const maxType = Math.max(1, ...Object.values(typeCounts));
+      [["Vape", "vape"], ["Fight", "fight"], ["Rules", "rules"]].forEach(([id, key]) => {
+        document.getElementById(`behaviorType${id}`).textContent = typeCounts[key].toLocaleString("th-TH");
+        document.getElementById(`behaviorType${id}Bar`).style.width = `${Math.round(typeCounts[key] / maxType * 100)}%`;
+      });
+      document.getElementById("behaviorSeverityHigh").textContent = `${records.filter(record => /ร้ายแรง|วิกฤต/.test(record.severity || "")).length.toLocaleString("th-TH")} เหตุการณ์`;
+      document.getElementById("behaviorSeverityMid").textContent = `${records.filter(record => /ปานกลาง/.test(record.severity || "")).length.toLocaleString("th-TH")} เหตุการณ์`;
+      document.getElementById("behaviorSeverityLow").textContent = `${records.filter(record => /เล็กน้อย/.test(record.severity || "")).length.toLocaleString("th-TH")} เหตุการณ์`;
+      document.getElementById("behaviorClosedCount").textContent = `ปิดเคสแล้ว ${records.filter(isClosed).length.toLocaleString("th-TH")}`;
+      document.getElementById("behaviorOpenCount").textContent = `กำลังติดตาม ${records.filter(record => !isClosed(record)).length.toLocaleString("th-TH")}`;
+      document.getElementById("behaviorEmptyState").hidden = caseRows.children.length > 0;
+      const urgent = records.filter(record => !isClosed(record)).sort((a, b) => {
+        const severity = value => /วิกฤต/.test(value) ? 3 : /ร้ายแรง/.test(value) ? 2 : /ปานกลาง/.test(value) ? 1 : 0;
+        return severity(b.severity || "") - severity(a.severity || "") || new Date(b.incidentAt) - new Date(a.incidentAt);
+      }).slice(0, 4);
+      document.getElementById("behaviorUrgentBadge").textContent = `${urgent.length.toLocaleString("th-TH")} เคส`;
+      document.getElementById("behaviorUrgentRows").innerHTML = urgent.length ? urgent.map(record => `
+        <tr><td class="student"><strong>${escapeHtml(record.studentName)}</strong><small>${escapeHtml(record.room || "-")} · ${escapeHtml(record.studentId || "-")}</small></td><td>${escapeHtml(record.incidentType)}</td><td><span class="severity ${severityClass(record.severity || "")}">${escapeHtml(record.severity || "-")}</span></td><td>${escapeHtml(record.status || "เปิดเคสใหม่")}</td></tr>`).join("")
+        : `<tr><td colspan="4">ยังไม่มีเคสที่ต้องดำเนินการ</td></tr>`;
+      populateOwnerFilter();
+      renderOwnerKpi();
+      filterCaseRows();
+    }
+
+    async function loadBehaviorRecords() {
+      if (!behaviorApi?.configured()) {
+        behaviorApiStatus.textContent = "โหมดตัวอย่าง · ตั้งค่า Apps Script endpoint เพื่อใช้ CRUD จริง";
+        return;
+      }
+      behaviorApiStatus.textContent = "กำลังซิงก์ทะเบียนเคสจาก Google Sheets...";
+      try {
+        const records = await behaviorApi.request("behavior.list");
+        behaviorRecords.clear();
+        caseRows.innerHTML = "";
+        records.forEach(record => applyBehaviorRecord(record));
+        selectedCaseRow = caseRows.querySelector("tr");
+        behaviorApiStatus.textContent = `เชื่อม Google Sheets และ Drive แล้ว · ${records.length.toLocaleString("th-TH")} เคส · ดึงล่าสุด ${sheetSyncTime()}`;
+        refreshBehaviorDerivedUi();
+        if (selectedCaseRow) {
+          selectCase(selectedCaseRow.querySelector("[data-case]"), false);
+          closeCaseModal();
+        }
+      } catch (error) {
+        behaviorApiStatus.textContent = `ซิงก์ข้อมูลไม่สำเร็จ · ${error.message}`;
+        showToast("ไม่สามารถโหลดทะเบียนเคสจริงได้");
+      }
+    }
+
+    function formatDate(value) {
+      if (!value) return "ไม่ระบุเวลา";
+      return new Intl.DateTimeFormat("th-TH", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(value));
+    }
+
+    function setDefaultDate(input) {
+      const local = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+      input.value = local.toISOString().slice(0, 16);
+    }
+
+    function openCaseModal() {
+      caseModal.classList.add("open");
+      caseModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeCaseModal() {
+      caseModal.classList.remove("open");
+      caseModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+    }
+
+    function renderCaseAttachments() {
+      const caseId = document.getElementById("selectedCaseId").textContent.trim();
+      const files = caseAttachments[caseId] || [];
+      document.getElementById("caseAttachmentList").innerHTML = files.length
+        ? files.map((file, index) => `
+          <div class="attachment-item">
+            <span class="list-icon">${file.type.includes("pdf") ? "PDF" : "IMG"}</span>
+            <div><strong>${index + 1}. ${file.url ? `<a href="${escapeHtml(file.url)}" target="_blank" rel="noopener">${escapeHtml(file.name)}</a>` : escapeHtml(file.name)}</strong><small>${escapeHtml(file.addedAt)}</small></div>
+          </div>`).join("")
+        : `<div class="notice">เคสนี้ยังไม่มีเอกสารแนบ</div>`;
+    }
+
+    function updateReport() {
+      if (!selectedCaseRow) return;
+      const cells = selectedCaseRow.children;
+      const studentName = cells[2].querySelector("strong").textContent.trim();
+      const studentRoom = cells[2].querySelector("small").textContent.trim();
+      document.getElementById("reportCaseId").textContent = cells[0].textContent.trim();
+      document.getElementById("reportStudent").textContent = studentName;
+      document.getElementById("reportRoom").textContent = studentRoom;
+      document.getElementById("reportOpenedDate").textContent = cells[1].textContent.trim();
+      document.getElementById("reportIncident").textContent = cells[3].textContent.trim();
+      document.getElementById("reportSeverity").textContent = cells[4].textContent.trim();
+      document.getElementById("reportStatus").textContent = cells[6].textContent.trim();
+      document.getElementById("reportScore").textContent = selectedCaseRow.dataset.score || document.getElementById("selectedScore").textContent;
+      document.getElementById("reportRecorder").textContent = (selectedCaseRow.dataset.owners || "").split("|").filter(Boolean).join(", ") || "ยังไม่ได้มอบหมาย";
+      document.getElementById("reportDetail").textContent = selectedCaseRow.dataset.detail || "บันทึกข้อเท็จจริงตามข้อมูลในทะเบียนเคส";
+      document.getElementById("reportConclusion").textContent = cells[6].textContent.includes("ปิดเคส") || cells[6].textContent.includes("เคลียร์")
+        ? "ดำเนินการตามขั้นตอนครบถ้วนและพิจารณาปิดเคสแล้ว"
+        : "อยู่ระหว่างดำเนินการติดตามตามขั้นตอนของงานปกครองและความปลอดภัยนักเรียน นักศึกษา";
+      document.getElementById("reportSignedDate").textContent = new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date());
+      const history = [...document.querySelectorAll("#caseTimeline .timeline-copy")];
+      document.getElementById("reportHistory").innerHTML = history.map((item, index) => {
+        const detail = item.querySelector("small").textContent.trim();
+        const separator = detail.indexOf(" · ");
+        const date = separator >= 0 ? detail.slice(0, separator) : "-";
+        const note = separator >= 0 ? detail.slice(separator + 3) : detail;
+        return `<tr><td>${index + 1}</td><td>${date}</td><td><strong>${item.querySelector("strong").textContent.trim()}</strong><br>${note}</td></tr>`;
+      }).join("");
+      const attachments = caseAttachments[cells[0].textContent.trim()] || [];
+      document.getElementById("reportAppendix").style.display = attachments.length ? "block" : "none";
+      document.getElementById("reportAttachments").innerHTML = attachments.map((file, index) => `
+        <section class="report-attachment">
+          <h4>เอกสารแนบ ${index + 1}: ${file.name}</h4>
+          <p>ประเภทไฟล์: ${file.type || "ไม่ระบุ"} · เพิ่มเมื่อ ${file.addedAt}</p>
+          ${file.previewUrl && file.type.startsWith("image/")
+            ? `<img src="${file.previewUrl}" alt="${file.name}">`
+            : `<div class="report-file-box"><strong>${file.type.includes("pdf") ? "เอกสาร PDF" : "ไฟล์เอกสาร"}</strong><br>${file.url ? `<a href="${escapeHtml(file.url)}" target="_blank" rel="noopener">${escapeHtml(file.name)}</a>` : escapeHtml(file.name)}<br><small>แนบไฟล์ต้นฉบับไว้กับรายการเคสในระบบ</small></div>`}
+        </section>`).join("");
+    }
+
+    function renderCaseOwnerChecks() {
+      const currentOwners = new Set((selectedCaseRow?.dataset.owners || "").split("|").filter(Boolean));
+      const ownerNames = [...new Set([...masterTeachers, ...currentOwners])];
+      document.getElementById("caseOwnerChecks").innerHTML = ownerNames.length ? ownerNames.map(teacher => `
+        <label class="owner-check"><input type="checkbox" value="${escapeHtml(teacher)}" ${currentOwners.has(teacher) ? "checked" : ""}><span>${escapeHtml(teacher)}</span></label>`).join("")
+        : `<span class="master-status">กำลังโหลดรายชื่อครู...</span>`;
+    }
+
+    function selectCase(button, shouldOpen = true) {
+      selectedCaseRow = button.closest("tr");
+      const cells = selectedCaseRow.children;
+      const caseId = cells[0].textContent.trim();
+      const record = behaviorRecords.get(caseId);
+      const student = `${cells[2].querySelector("strong").textContent.trim()} · ${cells[2].querySelector("small").textContent.trim()}`;
+      document.getElementById("selectedCaseId").textContent = caseId;
+      document.getElementById("selectedStudent").textContent = student;
+      document.getElementById("selectedIncident").textContent = cells[3].textContent.trim();
+      document.getElementById("selectedScore").textContent = selectedCaseRow.dataset.score || "ดูจากประวัติเคส";
+      document.getElementById("selectedCaseStatus").textContent = cells[6].textContent.trim();
+
+      if (record) {
+        document.getElementById("caseTimeline").innerHTML = record.timeline?.length ? record.timeline.map((item, index) => `
+          <div class="timeline-item"><span class="timeline-dot">${index + 1}</span><div class="timeline-copy"><strong>${escapeHtml(item.action || "อัปเดตเคส")}</strong><small>${escapeHtml(formatDate(item.actionAt))} · ${escapeHtml(item.note || item.status || "-")}${item.score !== "" && item.score != null ? ` · หัก ${escapeHtml(item.score)} คะแนน` : ""}</small></div></div>`).join("")
+          : `<div class="notice">ยังไม่มีประวัติการดำเนินงาน</div>`;
+      } else {
+        document.getElementById("caseTimeline").innerHTML = `
+          <div class="timeline-item">
+            <span class="timeline-dot">1</span>
+            <div class="timeline-copy"><strong>เปิดเคสและบันทึกเหตุการณ์</strong><small>${cells[1].textContent.trim()} · ${cells[3].textContent.trim()}</small></div>
+          </div>`;
+      }
+      updateReport();
+      renderCaseAttachments();
+      renderCaseOwnerChecks();
+      if (shouldOpen) openCaseModal();
+    }
+
+    navButtons.forEach(button => button.addEventListener("click", () => openView(button.dataset.view)));
+    document.querySelectorAll("[data-open]").forEach(button => button.addEventListener("click", () => openView(button.dataset.open)));
+    caseRows.addEventListener("click", event => {
+      const button = event.target.closest("[data-case]");
+      if (button) {
+        selectCase(button);
+        return;
+      }
+      const reportButton = event.target.closest("[data-report]");
+      if (reportButton) {
+        selectCase(reportButton);
+        closeCaseModal();
+        updateReport();
+        openView("report");
+      }
+    });
+
+    setDefaultDate(document.getElementById("incidentDate"));
+    setDefaultDate(document.getElementById("followupDate"));
+
+    document.getElementById("behaviorForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!selectedMasterStudent) {
+        showToast("กรุณาค้นหาและเลือกนักเรียนจาก Master Student");
+        behaviorStudentSearch.focus();
+        return;
+      }
+      if (!selectedCaseOwners.length) {
+        showToast("กรุณาเลือกครูรับผิดชอบแก้ไขเคสอย่างน้อย 1 คน");
+        behaviorTeacherSearch.focus();
+        return;
+      }
+      const form = event.target;
+      const submitButton = form.querySelector("[type='submit']");
+      const studentName = document.getElementById("studentName").value.trim();
+      const studentRoom = document.getElementById("studentRoom").value.trim();
+      const incidentType = document.getElementById("incidentType").value;
+      const severity = document.getElementById("severity").value;
+      const incidentDate = document.getElementById("incidentDate").value;
+      const payload = {
+        studentId: document.getElementById("studentId").value.trim(),
+        studentName,
+        room: studentRoom,
+        incidentType,
+        severity,
+        incidentAt: incidentDate,
+        place: document.getElementById("incidentPlace").value.trim(),
+        detail: document.getElementById("incidentDetail").value.trim(),
+        owners: [...selectedCaseOwners],
+        status: "เปิดเคสใหม่",
+        actor: selectedCaseOwners[0] || ""
+      };
+      submitButton.disabled = true;
+      submitButton.textContent = behaviorApi?.configured() ? "กำลังบันทึกลง Google Sheets..." : "กำลังสร้างเคส...";
+      let record;
+      try {
+        record = behaviorApi?.configured()
+          ? await behaviorApi.request("behavior.create", payload)
+          : {
+              ...payload,
+              caseId: `BEH-69${String(Date.now()).slice(-3)}`,
+              version: 1,
+              score: "",
+              createdAt: new Date().toISOString(),
+              timeline: [{
+                action: "เปิดเคสและมอบหมายผู้รับผิดชอบ",
+                actionAt: incidentDate,
+                status: "เปิดเคสใหม่",
+                owners: payload.owners,
+                note: payload.detail
+              }],
+              documents: []
+            };
+      } catch (error) {
+        behaviorApiStatus.textContent = `บันทึกไม่สำเร็จ · ${error.message}`;
+        showToast(`สร้างเคสไม่สำเร็จ: ${error.message}`);
+        return;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "สร้างเคสและไปหน้าติดตาม";
+      }
+      const row = applyBehaviorRecord(record, true);
+      selectedCaseRow = row;
+      form.reset();
+      selectedMasterStudent = null;
+      selectedCaseOwners = [];
+      behaviorStudentSearch.value = "";
+      behaviorTeacherSearch.value = "";
+      renderOwnerChips();
+      setDefaultDate(document.getElementById("incidentDate"));
+      setDefaultDate(document.getElementById("followupDate"));
+      refreshBehaviorDerivedUi();
+      behaviorApiStatus.textContent = behaviorApi?.configured()
+        ? `ซิงก์ Google Sheets และ Drive แล้ว · บันทึกล่าสุด ${record.caseId} · ${sheetSyncTime()}`
+        : "โหมดตัวอย่าง · ข้อมูลยังไม่ถูกส่งไป Google Sheets";
+      showToast(`สร้างเคส ${record.caseId} แล้ว สามารถเพิ่มการติดตามได้`);
+      openView("cases");
+      selectCase(row.querySelector("[data-case]"));
+    });
+
+    document.getElementById("followupForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const action = document.getElementById("followupAction").value;
+      const date = document.getElementById("followupDate").value;
+      const status = document.getElementById("followupStatus").value;
+      const score = document.getElementById("followupScore").value;
+      const note = document.getElementById("followupNote").value.trim();
+      const uploadedFiles = [...document.getElementById("followupFile").files];
+      const caseId = document.getElementById("selectedCaseId").textContent.trim();
+      const owners = [...document.querySelectorAll("#caseOwnerChecks input:checked")].map(input => input.value);
+      const submitButton = event.target.querySelector("[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = uploadedFiles.length ? "กำลังอัปโหลดเอกสารไป Drive..." : "กำลังบันทึกความคืบหน้า...";
+      let record;
+      try {
+        const files = behaviorApi?.configured()
+          ? await behaviorApi.filesToPayload(uploadedFiles, "case-followup")
+          : [];
+        const current = behaviorRecords.get(caseId);
+        const payload = {
+          caseId,
+          version: current?.version || selectedCaseRow?.dataset.version || "",
+          action,
+          actionAt: date,
+          status,
+          score,
+          owners,
+          note,
+          actor: owners[0] || "",
+          files
+        };
+        record = behaviorApi?.configured()
+          ? await behaviorApi.request("behavior.update", payload)
+          : {
+              ...(current || {
+                caseId,
+                studentName: selectedCaseRow.children[2].querySelector("strong").textContent.trim(),
+                room: selectedCaseRow.children[2].querySelector("small").textContent.trim(),
+                incidentType: selectedCaseRow.children[3].textContent.trim(),
+                severity: selectedCaseRow.children[4].textContent.trim(),
+                incidentAt: selectedCaseRow.children[1].textContent.trim(),
+                detail: selectedCaseRow.dataset.detail,
+                timeline: [],
+                documents: []
+              }),
+              version: Number(current?.version || 0) + 1,
+              status,
+              score: score === "" ? current?.score || "" : Number(score),
+              owners,
+              timeline: [...(current?.timeline || []), { action, actionAt: date, status, score, owners, note }],
+              documents: [
+                ...(current?.documents || []),
+                ...uploadedFiles.map(file => ({
+                  name: file.name,
+                  mimeType: file.type || "application/octet-stream",
+                  uploadedAt: date,
+                  previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : ""
+                }))
+              ]
+            };
+      } catch (error) {
+        behaviorApiStatus.textContent = `อัปเดตไม่สำเร็จ · ${error.message}`;
+        showToast(`อัปเดตเคสไม่สำเร็จ: ${error.message}`);
+        return;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "เพิ่มลง Timeline ของเคส";
+      }
+      selectedCaseRow = applyBehaviorRecord(record);
+      refreshBehaviorDerivedUi();
+      event.target.reset();
+      setDefaultDate(document.getElementById("followupDate"));
+      selectCase(selectedCaseRow.querySelector("[data-case]"));
+      behaviorApiStatus.textContent = behaviorApi?.configured()
+        ? `ซิงก์แล้ว · ${caseId}${uploadedFiles.length ? ` · เอกสาร ${uploadedFiles.length} ไฟล์อยู่ใน Google Drive` : ""} · ${sheetSyncTime()}`
+        : "โหมดตัวอย่าง · ข้อมูลยังไม่ถูกส่งไป Google Sheets";
+      showToast(`อัปเดต ${caseId} แล้ว`);
+    });
+
+    document.getElementById("deleteBehaviorCase").addEventListener("click", async () => {
+      if (!selectedCaseRow) return;
+      const caseId = selectedCaseRow.children[0].textContent.trim();
+      if (!window.confirm(`ยืนยันลบ ${caseId} ออกจากทะเบียน? ข้อมูลใน Sheet จะถูกทำเครื่องหมายว่าลบแล้ว`)) return;
+      try {
+        if (behaviorApi?.configured()) {
+          await behaviorApi.request("behavior.delete", {
+            caseId,
+            version: behaviorRecords.get(caseId)?.version || selectedCaseRow.dataset.version,
+            actor: [...document.querySelectorAll("#caseOwnerChecks input:checked")].map(input => input.value)[0] || ""
+          });
+        }
+        behaviorRecords.delete(caseId);
+        delete caseAttachments[caseId];
+        selectedCaseRow.remove();
+        selectedCaseRow = caseRows.querySelector("tr");
+        closeCaseModal();
+        refreshBehaviorDerivedUi();
+        if (behaviorApi?.configured()) behaviorApiStatus.textContent = `ซิงก์ Google Sheets แล้ว · ลบ ${caseId} · ${sheetSyncTime()}`;
+        showToast(`ลบ ${caseId} ออกจากทะเบียนแล้ว`);
+      } catch (error) {
+        showToast(`ลบเคสไม่สำเร็จ: ${error.message}`);
+      }
+    });
+
+    document.getElementById("printCaseReport").addEventListener("click", () => {
+      updateReport();
+      window.print();
+    });
+
+    document.getElementById("closeCaseModal").addEventListener("click", closeCaseModal);
+    caseModal.addEventListener("click", event => {
+      if (event.target === caseModal) closeCaseModal();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeCaseModal();
+    });
+
+    ["caseFilterSearch", "caseFilterStatus", "caseFilterSeverity", "caseFilterOwner"].forEach(id => {
+      document.getElementById(id).addEventListener(id === "caseFilterSearch" ? "input" : "change", filterCaseRows);
+    });
+    renderOwnerChips();
+    populateOwnerFilter();
+    renderOwnerKpi();
+    filterCaseRows();
+    updateReport();
+    loadBehaviorMaster();
+    loadBehaviorRecords();
+  </script>
+</body>
+</html>

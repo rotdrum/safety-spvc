@@ -1,0 +1,2047 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102e2a">
+  <meta name="description" content="ระบบข้อมูลสารสนเทศ งานปกครองและความปลอดภัยนักเรียน นักศึกษา วิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+  <title>ระบบข้อมูลสารสนเทศ | งานปกครองและความปลอดภัยนักเรียน นักศึกษา</title>
+  <style>
+    :root {
+      --ink: #102421;
+      --muted: #61706d;
+      --paper: #ffffff;
+      --canvas: #f3f7f5;
+      --line: #dce7e3;
+      --forest: #123b35;
+      --forest-deep: #0b2925;
+      --teal: #0f766e;
+      --teal-bright: #14b8a6;
+      --mint: #dff5ef;
+      --gold: #d4a64a;
+      --gold-soft: #faefd4;
+      --blue: #3b70d4;
+      --blue-soft: #e8effc;
+      --shadow-sm: 0 8px 24px rgba(16, 36, 33, 0.07);
+      --shadow-lg: 0 24px 64px rgba(11, 41, 37, 0.14);
+      --radius: 22px;
+      color-scheme: light;
+      font-family: "Noto Sans Thai", "Leelawadee UI", Tahoma, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      border-bottom: 1px solid rgba(220, 231, 227, 0.88);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+    }
+
+    .header-inner {
+      display: flex;
+      min-height: 88px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .brand {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logos {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      padding: 3px;
+      border: 1px solid rgba(212, 166, 74, 0.52);
+      border-radius: 50%;
+      background: #fff;
+      object-fit: cover;
+      box-shadow: 0 6px 18px rgba(11, 41, 37, 0.12);
+    }
+
+    .brand-mark.college {
+      width: 43px;
+      height: 43px;
+      margin-left: -8px;
+      border-color: #fff;
+      box-shadow: 0 6px 18px rgba(11, 41, 37, 0.16);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy strong {
+      display: block;
+      max-width: 390px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .brand-copy span,
+    .brand-copy small {
+      display: block;
+    }
+
+    .brand-copy span {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .brand-copy small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .main-nav a {
+      padding: 10px 13px;
+      border-radius: 12px;
+      color: #43534f;
+      font-size: 14px;
+      font-weight: 700;
+      transition: 180ms ease;
+    }
+
+    .main-nav a:hover,
+    .main-nav a.active {
+      background: var(--mint);
+      color: var(--teal);
+    }
+
+    .nav-cta {
+      margin-left: 6px;
+      background: var(--forest) !important;
+      color: #fff !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--teal) !important;
+      transform: translateY(-1px);
+    }
+
+    .menu-button {
+      display: none;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--forest);
+      cursor: pointer;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 76px 0 68px;
+      background:
+        radial-gradient(circle at 82% 12%, rgba(20, 184, 166, 0.26), transparent 26%),
+        radial-gradient(circle at 8% 88%, rgba(212, 166, 74, 0.18), transparent 23%),
+        linear-gradient(135deg, var(--forest-deep), #164b43 64%, #176359);
+      color: #fff;
+    }
+
+    .hero::after {
+      position: absolute;
+      right: -120px;
+      bottom: -170px;
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 70px rgba(255, 255, 255, 0.035),
+        0 0 0 140px rgba(255, 255, 255, 0.025);
+      content: "";
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+      align-items: center;
+      gap: 70px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 18px;
+      color: #a9ede1;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #53e2cc;
+      box-shadow: 0 0 0 6px rgba(83, 226, 204, 0.12);
+    }
+
+    .hero h1 {
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(40px, 5vw, 66px);
+      font-weight: 800;
+      line-height: 1.14;
+      letter-spacing: -0.025em;
+    }
+
+    .hero h1 span {
+      color: #f1cf83;
+    }
+
+    .hero-lead {
+      max-width: 670px;
+      margin: 22px 0 0;
+      color: #cde0dc;
+      font-size: 17px;
+      line-height: 1.85;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 20px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      transition: 180ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      background: #fff;
+      color: var(--forest);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    }
+
+    .button-ghost {
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .button svg,
+    .text-link svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2;
+    }
+
+    .hero-panel {
+      position: relative;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .hero-panel-head span {
+      color: #a9c7c1;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero-panel-head strong {
+      font-size: 16px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(55, 212, 178, 0.14);
+      color: #8cf0dd;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .status-pill::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #5be2c8;
+      content: "";
+    }
+
+    .hero-system-list {
+      display: grid;
+      gap: 11px;
+    }
+
+    .hero-system {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 26px;
+      align-items: center;
+      gap: 13px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      background: rgba(7, 33, 29, 0.32);
+      transition: 180ms ease;
+    }
+
+    .hero-system:hover {
+      border-color: rgba(108, 235, 214, 0.38);
+      background: rgba(7, 33, 29, 0.5);
+      transform: translateX(3px);
+    }
+
+    .hero-system-icon {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(83, 226, 204, 0.14);
+      color: #7cebd7;
+    }
+
+    .hero-system-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .hero-system.behavior .hero-system-icon {
+      background: rgba(247, 198, 103, 0.15);
+      color: #f2cb7e;
+    }
+
+    .hero-system.identity .hero-system-icon {
+      background: rgba(164, 190, 255, 0.15);
+      color: #b9caff;
+    }
+
+    .hero-system strong,
+    .hero-system small {
+      display: block;
+    }
+
+    .hero-system strong {
+      font-size: 14px;
+    }
+
+    .hero-system small {
+      margin-top: 2px;
+      color: #9dbcb6;
+      font-size: 12px;
+    }
+
+    .hero-system-arrow {
+      color: #8fc7bd;
+      font-size: 20px;
+    }
+
+    .quick-strip {
+      position: relative;
+      z-index: 3;
+      margin-top: -30px;
+    }
+
+    .quick-strip-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .quick-stat {
+      padding: 22px 24px;
+      border-right: 1px solid var(--line);
+    }
+
+    .quick-stat:last-child {
+      border-right: 0;
+    }
+
+    .quick-stat span,
+    .quick-stat strong {
+      display: block;
+    }
+
+    .quick-stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .quick-stat strong {
+      margin-top: 4px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+
+    .section {
+      padding: 88px 0;
+    }
+
+    .section-white {
+      background: #fff;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 34px;
+    }
+
+    .section-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .section-heading p {
+      max-width: 560px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .text-link {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+      color: var(--teal);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .systems-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .system-card {
+      position: relative;
+      display: flex;
+      min-height: 360px;
+      overflow: hidden;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: var(--paper);
+      box-shadow: var(--shadow-sm);
+      transition: 220ms ease;
+    }
+
+    .system-card:hover {
+      border-color: #b9d8d0;
+      box-shadow: 0 22px 50px rgba(16, 36, 33, 0.12);
+      transform: translateY(-5px);
+    }
+
+    .system-card::after {
+      position: absolute;
+      z-index: 0;
+      top: -70px;
+      right: -50px;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      background: var(--mint);
+      content: "";
+      opacity: 0.75;
+    }
+
+    .system-card.behavior::after {
+      background: var(--blue-soft);
+    }
+
+    .system-card-top,
+    .system-card-bottom {
+      position: relative;
+      z-index: 1;
+    }
+
+    .system-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .system-number {
+      color: #b2c0bd;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .system-icon {
+      display: grid;
+      width: 68px;
+      height: 68px;
+      place-items: center;
+      border-radius: 20px;
+      background: var(--forest);
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(18, 59, 53, 0.22);
+    }
+
+    .behavior .system-icon {
+      background: var(--blue);
+      box-shadow: 0 12px 28px rgba(59, 112, 212, 0.22);
+    }
+
+    .system-icon svg {
+      width: 31px;
+      height: 31px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.7;
+    }
+
+    .system-card h3 {
+      max-width: 450px;
+      margin: 38px 0 10px;
+      font-size: 26px;
+      line-height: 1.35;
+    }
+
+    .system-card p {
+      max-width: 500px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .system-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .system-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #3e504c;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .system-status::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22a884;
+      box-shadow: 0 0 0 5px rgba(34, 168, 132, 0.1);
+      content: "";
+    }
+
+    .system-status.pending::before {
+      background: #d4a64a;
+      box-shadow: 0 0 0 5px rgba(212, 166, 74, 0.12);
+    }
+
+    .system-enter {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--teal);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .behavior .system-enter {
+      color: var(--blue);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(330px, 0.72fr) minmax(0, 1.48fr);
+      align-items: stretch;
+      gap: 28px;
+    }
+
+    .about-panel {
+      position: relative;
+      overflow: hidden;
+      padding: 40px;
+      border-radius: 28px;
+      background: var(--forest);
+      color: #fff;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .about-panel::before {
+      position: absolute;
+      top: -70px;
+      right: -70px;
+      width: 220px;
+      height: 220px;
+      border: 45px solid rgba(255, 255, 255, 0.04);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .about-logos {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .about-logos img {
+      width: 72px;
+      height: 72px;
+      padding: 3px;
+      border: 2px solid rgba(241, 207, 131, 0.72);
+      border-radius: 50%;
+      background: #fff;
+      object-fit: cover;
+    }
+
+    .about-logos img:last-child {
+      width: 58px;
+      height: 58px;
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .about-panel h2 {
+      margin: 0;
+      font-size: 33px;
+      line-height: 1.35;
+    }
+
+    .about-panel p {
+      margin: 18px 0 0;
+      color: #c7dcd7;
+      font-size: 15px;
+    }
+
+    .mission-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .mission-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e4efec;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .mission-item span {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(83, 226, 204, 0.14);
+      color: #78ead5;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .organization {
+      padding: 38px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .organization h3 {
+      margin: 0 0 6px;
+      font-size: 25px;
+    }
+
+    .organization > p {
+      margin: 0 0 34px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .org-chart {
+      display: grid;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .org-level {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .org-node {
+      width: 190px;
+      padding: 18px 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #f9fbfa;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .org-node.primary {
+      width: 220px;
+      border-color: transparent;
+      background: var(--forest);
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(18, 59, 53, 0.16);
+    }
+
+    .org-node strong,
+    .org-node span {
+      display: block;
+    }
+
+    .org-node strong {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .org-node span {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .org-node.primary span {
+      color: #bcd4cf;
+    }
+
+    .org-connector {
+      width: 1px;
+      height: 28px;
+      margin: -10px auto;
+      background: #b9cbc6;
+    }
+
+    .org-avatar {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      background-image: url("assets/organization/staff-avatar-sheet.png");
+      background-repeat: no-repeat;
+      background-size: 500% 200%;
+      box-shadow: 0 8px 20px rgba(16, 36, 33, 0.15);
+    }
+
+    .avatar-1 { background-position: 0% 0%; }
+    .avatar-2 { background-position: 25% 0%; }
+    .avatar-3 { background-position: 50% 0%; }
+    .avatar-4 { background-position: 75% 0%; }
+    .avatar-5 { background-position: 100% 0%; }
+    .avatar-6 { background-position: 0% 100%; }
+    .avatar-7 { background-position: 25% 100%; }
+    .avatar-8 { background-position: 50% 100%; }
+    .avatar-9 { background-position: 75% 100%; }
+    .avatar-10 { background-position: 100% 100%; }
+
+    .org-role {
+      display: inline-flex !important;
+      margin-top: 8px !important;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--mint);
+      color: var(--teal) !important;
+      font-size: 10px !important;
+      font-weight: 900;
+    }
+
+    .org-node.primary .org-role {
+      background: rgba(83, 226, 204, 0.14);
+      color: #8ae7d7 !important;
+    }
+
+    .sample-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: #8a6118;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .compact-org {
+      display: grid;
+      gap: 0;
+      margin-top: 24px;
+    }
+
+    .compact-level {
+      display: flex;
+      justify-content: center;
+    }
+
+    .compact-person {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+      width: min(100%, 450px);
+      min-height: 102px;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #f9fbfa;
+    }
+
+    .compact-person.leader {
+      border-color: #c8ded8;
+      background: var(--mint);
+    }
+
+    .compact-person.head {
+      border-color: transparent;
+      background: var(--forest);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(18, 59, 53, 0.16);
+    }
+
+    .compact-person.head span {
+      color: #bcd4cf;
+    }
+
+    .compact-avatar {
+      width: 82px;
+      height: 82px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: #eef4f2;
+      object-fit: cover;
+      object-position: center top;
+      box-shadow: 0 4px 10px rgba(16, 36, 33, 0.12);
+    }
+
+    .compact-person strong,
+    .compact-person span {
+      display: block;
+    }
+
+    .compact-person strong {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .compact-person span {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .compact-staff {
+      position: relative;
+      display: grid;
+      gap: 30px;
+      padding-top: 30px;
+    }
+
+    .compact-staff::before {
+      position: absolute;
+      top: 0;
+      bottom: 174px;
+      left: 50%;
+      width: 1px;
+      background: #aec6c0;
+      content: "";
+    }
+
+    .compact-staff-row {
+      position: relative;
+      display: grid;
+      gap: 15px;
+      padding-top: 28px;
+    }
+
+    .compact-staff-row.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .compact-staff-row.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-inline: 11%;
+    }
+
+    .compact-staff-row.four + .compact-staff-row.four {
+      margin-inline: 0;
+    }
+
+    .compact-staff-row::before {
+      position: absolute;
+      top: 0;
+      right: calc(100% / 8);
+      left: calc(100% / 8);
+      height: 1px;
+      background: #aec6c0;
+      content: "";
+    }
+
+    .compact-staff-row.three::before {
+      right: calc(100% / 6);
+      left: calc(100% / 6);
+    }
+
+    .compact-staff-row .compact-person {
+      position: relative;
+      display: flex;
+      width: auto;
+      min-width: 0;
+      min-height: 178px;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 18px 10px;
+      text-align: center;
+    }
+
+    .compact-staff-row .compact-avatar {
+      width: 104px;
+      height: 104px;
+      flex: 0 0 auto;
+    }
+
+    .compact-staff-row .compact-person::before {
+      position: absolute;
+      top: -29px;
+      left: 50%;
+      width: 1px;
+      height: 28px;
+      background: #aec6c0;
+      content: "";
+    }
+
+    .compact-duty {
+      color: var(--muted) !important;
+      font-size: 11px !important;
+      line-height: 1.4 !important;
+    }
+
+    .compact-connector {
+      width: 1px;
+      height: 26px;
+      margin: 0 auto;
+      background: #aec6c0;
+    }
+
+    .unit-banner {
+      margin: 0 0 30px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: #071f4c;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .unit-banner img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1983 / 793;
+      object-fit: cover;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .news-card {
+      display: flex;
+      min-height: 310px;
+      overflow: hidden;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      transition: 180ms ease;
+    }
+
+    .news-card:hover {
+      box-shadow: 0 18px 40px rgba(16, 36, 33, 0.11);
+      transform: translateY(-4px);
+    }
+
+    .news-visual {
+      position: relative;
+      display: flex;
+      min-height: 138px;
+      overflow: hidden;
+      align-items: flex-end;
+      padding: 20px;
+      background: var(--forest);
+      color: #fff;
+    }
+
+    .news-visual::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 35%, rgba(7, 31, 28, 0.74));
+      content: "";
+    }
+
+    .news-visual img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-badge {
+      position: relative;
+      z-index: 1;
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      background: rgba(8, 47, 42, 0.34);
+      font-size: 11px;
+      font-weight: 800;
+      backdrop-filter: blur(8px);
+    }
+
+    .news-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 22px;
+    }
+
+    .news-date {
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .news-card h3 {
+      margin: 9px 0 8px;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .news-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .news-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 18px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .news-source {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .contact-banner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+      overflow: hidden;
+      align-items: stretch;
+      gap: 40px;
+      padding: 48px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 10% 120%, rgba(20, 184, 166, 0.24), transparent 34%),
+        radial-gradient(circle at 84% -10%, rgba(241, 207, 131, 0.2), transparent 30%),
+        linear-gradient(135deg, #0b2925, #154b42);
+      color: #fff;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .contact-banner::after {
+      position: absolute;
+      right: -130px;
+      bottom: -180px;
+      width: 420px;
+      height: 420px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      box-shadow: 0 0 0 58px rgba(255, 255, 255, 0.025);
+      content: "";
+    }
+
+    .contact-main,
+    .contact-panel {
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .contact-panel {
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+    }
+
+    .contact-panel-title {
+      display: block;
+      margin-bottom: 12px;
+      color: #91e8d8;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .contact-banner h2 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.35;
+    }
+
+    .contact-banner p {
+      margin: 10px 0 0;
+      color: #bad1cc;
+      font-size: 14px;
+    }
+
+    .contact-cta {
+      display: inline-flex;
+      align-self: flex-start;
+      min-height: 46px;
+      align-items: center;
+      gap: 9px;
+      margin-top: 22px;
+      padding: 0 18px;
+      border-radius: 13px;
+      background: #fff;
+      color: var(--forest);
+      font-size: 14px;
+      font-weight: 900;
+      transition: 180ms ease;
+    }
+
+    .contact-cta:hover {
+      background: #dff5ef;
+      transform: translateY(-2px);
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .contact-channels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .contact-channel {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      background: rgba(7, 33, 29, 0.3);
+      color: #e3efec;
+      font-size: 11px;
+      font-weight: 800;
+      transition: 180ms ease;
+    }
+
+    .contact-channel:hover {
+      border-color: rgba(118, 226, 206, 0.42);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .contact-channel img {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #fff;
+      object-fit: cover;
+    }
+
+    .contact-channel strong,
+    .contact-channel small {
+      display: block;
+    }
+
+    .contact-channel strong {
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .contact-channel small {
+      margin-top: 3px;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #e3efec;
+      font-size: 13px;
+    }
+
+    a.contact-item {
+      transition: 180ms ease;
+    }
+
+    a.contact-item:hover {
+      border-color: rgba(118, 226, 206, 0.42);
+      background: rgba(255, 255, 255, 0.11);
+      transform: translateX(3px);
+    }
+
+    .contact-item svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: #76e2ce;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .site-footer {
+      padding: 30px 0;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .footer-brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 100;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      max-width: 390px;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 18px;
+      border: 1px solid #c7d8d3;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(16px);
+      transition: 220ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .toast-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--gold-soft);
+      color: #9b6d16;
+      font-weight: 900;
+    }
+
+    .toast strong,
+    .toast span {
+      display: block;
+    }
+
+    .toast strong {
+      font-size: 14px;
+    }
+
+    .toast span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .menu-button {
+        display: inline-flex;
+      }
+
+      .main-nav {
+        position: fixed;
+        z-index: 45;
+        top: 88px;
+        right: 0;
+        left: 0;
+        display: none;
+        align-items: stretch;
+        padding: 16px 20px 24px;
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+        box-shadow: 0 20px 36px rgba(16, 36, 33, 0.1);
+      }
+
+      .main-nav.open {
+        display: grid;
+      }
+
+      .main-nav a {
+        padding: 13px 14px;
+      }
+
+      .nav-cta {
+        margin: 5px 0 0;
+        text-align: center;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 42px;
+      }
+
+      .hero-panel {
+        max-width: 680px;
+      }
+
+      .quick-strip-inner {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .quick-stat:nth-child(2) {
+        border-right: 0;
+      }
+
+      .quick-stat:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .about-grid,
+      .contact-banner {
+        grid-template-columns: 1fr;
+      }
+
+      .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        width: min(100% - 28px, 1180px);
+      }
+
+      .brand-copy small {
+        display: none;
+      }
+
+      .brand-copy strong {
+        max-width: 220px;
+        font-size: 13px;
+      }
+
+      .brand-copy span {
+        max-width: 220px;
+        font-size: 11px;
+      }
+
+      .hero {
+        padding: 58px 0 60px;
+      }
+
+      .hero h1 {
+        font-size: clamp(36px, 11vw, 48px);
+      }
+
+      .hero-lead {
+        font-size: 15px;
+      }
+
+      .hero-panel {
+        padding: 20px;
+      }
+
+      .quick-stat {
+        padding: 18px;
+      }
+
+      .quick-stat strong {
+        font-size: 14px;
+      }
+
+      .section {
+        padding: 68px 0;
+      }
+
+      .section-heading {
+        display: block;
+      }
+
+      .section-heading .text-link {
+        margin-top: 18px;
+      }
+
+      .systems-grid,
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-channels {
+        grid-template-columns: 1fr;
+      }
+
+      .compact-staff {
+        gap: 9px;
+        padding-top: 0;
+      }
+
+      .compact-staff::before,
+      .compact-staff-row::before,
+      .compact-staff-row .compact-person::before {
+        display: none;
+      }
+
+      .compact-staff-row,
+      .compact-staff-row.four,
+      .compact-staff-row.three {
+        grid-template-columns: 1fr;
+        gap: 9px;
+        margin-inline: 0;
+        padding-top: 0;
+      }
+
+      .compact-staff-row .compact-person {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr);
+        min-height: 76px;
+        align-items: center;
+        padding: 10px 12px;
+        text-align: left;
+      }
+
+      .compact-staff-row .compact-avatar {
+        width: 54px;
+        height: 54px;
+      }
+
+      .system-card {
+        min-height: 330px;
+        padding: 26px;
+      }
+
+      .system-card h3 {
+        margin-top: 30px;
+        font-size: 23px;
+      }
+
+      .about-panel,
+      .organization,
+      .contact-banner {
+        padding: 28px;
+      }
+
+      .unit-banner {
+        margin-bottom: 18px;
+        border-radius: 16px;
+      }
+
+      .org-row {
+        grid-template-columns: 1fr;
+      }
+
+      .org-connector {
+        display: none;
+      }
+
+      .contact-banner h2 {
+        font-size: 27px;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toast {
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="หน้าแรก ระบบข้อมูลสารสนเทศ งานปกครองและความปลอดภัยนักเรียน นักศึกษา วิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+        <span class="brand-logos">
+          <img class="brand-mark" src="student-late-system/web-dashboard/assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+          <img class="brand-mark college" src="student-late-system/web-dashboard/assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+        </span>
+        <span class="brand-copy">
+          <strong>ระบบข้อมูลสารสนเทศ</strong>
+          <span>งานปกครองและความปลอดภัยนักเรียน นักศึกษา</span>
+          <small>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</small>
+        </span>
+      </a>
+
+      <button class="menu-button" type="button" aria-label="เปิดเมนู" aria-expanded="false" id="menuButton">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+
+      <nav class="main-nav" id="mainNav" aria-label="เมนูหลัก">
+        <a class="active" href="#home">หน้าแรก</a>
+        <a href="#news">ข่าวประชาสัมพันธ์</a>
+        <a href="#about">เกี่ยวกับหน่วยงาน</a>
+        <!-- <a href="#organization">โครงสร้างองค์กร</a> -->
+        <a class="nav-cta" href="#contact">ติดต่อ</a>
+        <!-- <a class="nav-cta" href="#systems">เข้าสู่ระบบบริการ</a> -->
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-dot"></span>STUDENT AFFAIRS INFORMATION CENTER</div>
+          <h1>ปกครองพร้อมดูแล<br>สร้างคนดี<span> สู่สังคม</span></h1>
+          <p class="hero-lead">
+            ศูนย์กลางข้อมูลและระบบบริการของงานปกครองและความปลอดภัยนักเรียน นักศึกษา
+            วิทยาลัยอาชีวศึกษาสุพรรณบุรี เชื่อมงานตรวจสอบนักเรียนมาสาย
+            งานบริหารจัดการพฤติกรรม ข่าวสาร และข้อมูลสำหรับการดูแลช่วยเหลือนักเรียนอย่างเป็นระบบ
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#about">
+              ข้อมูลงานปกครอง
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+            <a class="button button-ghost" href="#contact">ติดต่อ</a>
+          </div>
+        </div>
+
+        <aside class="hero-panel" id="systems" aria-label="ระบบพร้อมใช้งาน">
+          <div class="hero-panel-head">
+            <div>
+              <span>บริการดิจิทัล</span>
+              <strong>ระบบของงานปกครอง</strong>
+            </div>
+            <span class="status-pill">พร้อมให้บริการ</span>
+          </div>
+          <div class="hero-system-list">
+            <a class="hero-system late" href="student-late-system/web-dashboard/index.html">
+              <span class="hero-system-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </span>
+              <span>
+                <strong>ระบบตรวจสอบนักเรียนมาสาย</strong>
+                <small>แดชบอร์ดและรายงานข้อมูลรายวัน</small>
+              </span>
+              <span class="hero-system-arrow">›</span>
+            </a>
+            <a class="hero-system behavior" id="behavior-system" href="behavior-system/index.html">
+              <span class="hero-system-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l1 3h3v15H4V6h3l1-3Z"/><path d="M9 12h6M9 16h4"/></svg>
+              </span>
+              <span>
+                <strong>ระบบบริหารจัดการพฤติกรรมนักเรียน</strong>
+                <small>บันทึก ติดตาม และดำเนินการด้านพฤติกรรม</small>
+              </span>
+              <span class="hero-system-arrow">›</span>
+            </a>
+            <a class="hero-system identity" id="gender-identity-system" href="gender-identity-system/index.html">
+              <span class="hero-system-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/>
+                  <circle cx="8.5" cy="11" r="2.2"/>
+                  <path d="M5.5 16c.7-1.6 1.7-2.4 3-2.4s2.3.8 3 2.4M14 10h4M14 14h3"/>
+                </svg>
+              </span>
+              <span>
+                <strong>ระบบบันทึกข้อมูลเพศภาพนักเรียน</strong>
+                <small>บันทึก ติดตาม และดำเนินการด้านเพศภาพ</small>
+              </span>
+              <span class="hero-system-arrow">›</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="quick-strip">
+      <div class="container quick-strip-inner">
+        <div class="quick-stat"><span>สถานะศูนย์ข้อมูล</span><strong>พร้อมให้บริการ</strong></div>
+        <div class="quick-stat"><span>ระบบที่เชื่อมต่อ</span><strong>3 ระบบหลัก</strong></div>
+        <div class="quick-stat"><span>หน่วยงาน</span><strong>งานปกครองและความปลอดภัยนักเรียน นักศึกษา</strong></div>
+        <div class="quick-stat"><span>วันที่</span><strong id="currentDate">กำลังโหลด...</strong></div>
+      </div>
+    </div>
+
+    <section class="section section-white" id="about">
+      <div class="container">
+        <figure class="unit-banner">
+          <img src="assets/banner/student-affairs-banner.png" alt="งานปกครองและความปลอดภัยนักเรียน นักศึกษา วิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+        </figure>
+        <div class="about-grid">
+          <article class="about-panel">
+          <div class="about-logos">
+            <img src="student-late-system/web-dashboard/assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+            <img src="student-late-system/web-dashboard/assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+          </div>
+          <span class="section-label" style="color:#82e4d2">Duties & Responsibilities</span>
+          <h2>ภารกิจหน้าที่งานปกครองและความปลอดภัยนักเรียน นักศึกษา</h2>
+          <p>ดำเนินงานตามนโยบายของสำนักงานคณะกรรมการการอาชีวศึกษา เพื่อดูแลความปลอดภัย ระเบียบวินัย ความประพฤติ และประสานการช่วยเหลือนักเรียน นักศึกษาอย่างเป็นระบบ</p>
+          <div class="mission-list">
+            <div class="mission-item"><span>01</span>กำหนดมาตรการและดำเนินการด้านความปลอดภัยในสถานศึกษา ตามนโยบายของสำนักงานคณะกรรมการการอาชีวศึกษา</div>
+            <div class="mission-item"><span>02</span>ประสานครูที่ปรึกษา แผนกวิชา หัวหน้างาน เจ้าหน้าที่ หน่วยงานที่เกี่ยวข้อง และผู้ปกครอง เพื่อแก้ปัญหาความประพฤติ</div>
+            <div class="mission-item"><span>03</span>เสนอหลักเกณฑ์การตัดคะแนนความประพฤติ และเสนอความเห็นในการลงโทษให้สอดคล้องกับกฎ ระเบียบ และข้อบังคับ</div>
+            <div class="mission-item"><span>04</span>จัดทำทะเบียนประวัตินักเรียน นักศึกษาที่ถูกตัดคะแนนความประพฤติหรือลงโทษกรณีทำผิดระเบียบวินัย</div>
+            <div class="mission-item"><span>05</span>ปกครองดูแลนักเรียน นักศึกษา และผู้เข้ารับการฝึกอบรมให้อยู่ในระเบียบวินัยตามกฎหมายและข้อบังคับที่เกี่ยวข้อง</div>
+            <div class="mission-item"><span>06</span>ร่วมมือกับหน่วยงานภายในและภายนอก เพื่อป้องกันและแก้ไขยาเสพติด การพนัน ความรุนแรง ภัยออนไลน์ การทะเลาะวิวาท อุบัติเหตุ การละเมิดสิทธิ และปัญหาสุขภาพ</div>
+            <div class="mission-item"><span>07</span>สรุปผลการดำเนินงานเพื่อเสนอต่อสถานศึกษา</div>
+            <div class="mission-item"><span>08</span>จัดทำปฏิทินการปฏิบัติงาน เสนอโครงการ และรายงานผลการปฏิบัติงานตามลำดับขั้น</div>
+            <div class="mission-item"><span>09</span>ดูแล บำรุงรักษา และรับผิดชอบทรัพย์สินของสถานศึกษาตามที่ได้รับมอบหมาย</div>
+            <div class="mission-item"><span>10</span>ปฏิบัติงานอื่นตามที่ได้รับมอบหมาย</div>
+          </div>
+          </article>
+
+          <article class="organization" id="organization">
+          <h3>โครงสร้างบุคลากร</h3>
+          <p>ลำดับการบริหาร หน้าที่ และผู้รับผิดชอบของหน่วยงาน</p>
+          <div class="compact-org">
+            <div class="compact-level">
+              <div class="compact-person head">
+                <img class="compact-avatar" src="assets/organization/staff/image1.png" alt="ดร.ทรงวุฒิ เรือนไทย">
+                <div><strong>ดร.ทรงวุฒิ เรือนไทย</strong><span>ผู้อำนวยการวิทยาลัยอาชีวศึกษาสุพรรณบุรี</span></div>
+              </div>
+            </div>
+            <div class="compact-connector" aria-hidden="true"></div>
+            <div class="compact-level">
+              <div class="compact-person leader">
+                <img class="compact-avatar" src="assets/organization/staff/image2.jpeg" alt="นายสุรเชษฐ์ แก้วปาน">
+                <div><strong>นายสุรเชษฐ์ แก้วปาน</strong><span>รองผู้อำนวยการฝ่ายกิจการนักเรียน นักศึกษา</span></div>
+              </div>
+            </div>
+            <div class="compact-connector" aria-hidden="true"></div>
+            <div class="compact-level">
+              <div class="compact-person head">
+                <img class="compact-avatar" src="assets/organization/staff/image3.jpeg" alt="นางสาวปัทมพร แสงศรี">
+                <div><strong>นางสาวปัทมพร แสงศรี</strong><span>หัวหน้างานปกครองและความปลอดภัยนักเรียน นักศึกษา</span></div>
+              </div>
+            </div>
+            <div class="compact-connector" aria-hidden="true"></div>
+            <div class="compact-staff">
+              <div class="compact-staff-row four">
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image4.jpeg" alt="นางสาวทิพยรัตน์ อาชนะชัย"><div><strong>นางสาวทิพยรัตน์ อาชนะชัย</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image5.jpeg" alt="นางสาวดวงพร เวียงนนท์"><div><strong>นางสาวดวงพร เวียงนนท์</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image6.jpeg" alt="นายคมสัน เศษโถ"><div><strong>นายคมสัน เศษโถ</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image7.jpeg" alt="นายอานันทชัย มณีโชติ"><div><strong>นายอานันทชัย มณีโชติ</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+              </div>
+              <div class="compact-staff-row four">
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image8.jpeg" alt="นางสาวประภัสรา ชนวัฒน์"><div><strong>นางสาวประภัสรา ชนวัฒน์</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image9.jpeg" alt="นายเอกลักษณ์ พุ่มโต"><div><strong>นายเอกลักษณ์ พุ่มโต</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image10.jpeg" alt="นางสาวกนิตา นาคอ่วม"><div><strong>นางสาวกนิตา นาคอ่วม</strong><span>ผู้ช่วยหัวหน้างานปกครองและความปลอดภัยฯ</span></div></div>
+                <div class="compact-person"><img class="compact-avatar" src="assets/organization/staff/image11.jpeg" alt="นางสาวกนกวรรณ เข็มเพ็ชร์"><div><strong>นางสาวกนกวรรณ เข็มเพ็ชร์</strong><span>เจ้าหน้าที่งาน</span></div></div>
+              </div>
+            </div>
+          </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="news">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <span class="section-label">News & Announcements</span>
+            <h2>ข่าวประชาสัมพันธ์</h2>
+            <p>ข่าวล่าสุดจากเพจงานปกครองฯ วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
+          </div>
+          <a class="text-link" href="https://www.facebook.com/profile.php?id=61589690822596" target="_blank" rel="noopener noreferrer">ดูเพิ่มเติมบน Facebook <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="news-grid">
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0UyYt9jWEbfccwmJUS5s6XxDwCfyCkczZt4bgD5rpjxaGEAiHBGeso9oUT3JCiW3Ql&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าว Pride Month บน Facebook">
+            <div class="news-visual">
+              <img src="assets/protection-news/pride-month.jpg" alt="ประชาสัมพันธ์ Pride Month">
+              <span class="news-badge">ประชาสัมพันธ์</span>
+            </div>
+            <div class="news-body">
+              <span class="news-date">ข่าวล่าสุดจากงานปกครอง</span>
+              <h3>Happy Pride Month</h3>
+              <p>ร่วมเป็นส่วนหนึ่งของสังคมที่เคารพในความแตกต่าง ความเท่าเทียม และศักดิ์ศรีของทุกคน</p>
+              <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
+            </div>
+          </a>
+
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0dgRprfeLT2u4gqQjFL5dazEcpNCHBFpDYjb8F4wVEKW3Hx6MwWyyVngKJExn6DKGl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าวพิธีไหว้ครูบน Facebook">
+            <div class="news-visual">
+              <img src="assets/protection-news/wai-kru.jpg" alt="ประชาสัมพันธ์พิธีไหว้ครู ปีการศึกษา 2569">
+              <span class="news-badge">กิจกรรม</span>
+            </div>
+            <div class="news-body">
+              <span class="news-date">ปีการศึกษา 2569</span>
+              <h3>พิธีไหว้ครู ประจำปีการศึกษา 2569</h3>
+              <p>กำหนดจัดวันพฤหัสบดีที่ 18 มิถุนายน 2569 ณ โดมรวมน้ำใจ วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
+              <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
+            </div>
+          </a>
+
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0zriRG59ZpjHLfEvxQAWAsFWrFcAm7VqvDKuh7jo2ZHYHpdxBm59BAN8a6PRN92UAl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าว Safety First บน Facebook">
+            <div class="news-visual">
+              <img src="assets/protection-news/safety-first.jpg" alt="โครงการ Safety First การฟื้นคืนชีพและการปฐมพยาบาล">
+              <span class="news-badge">ความปลอดภัย</span>
+            </div>
+            <div class="news-body">
+              <span class="news-date">4 มิถุนายน 2569</span>
+              <h3>โครงการ Safety First</h3>
+              <p>เสริมทักษะการฟื้นคืนชีพ การใช้เครื่อง AED การห้ามเลือด และการปฐมพยาบาลเบื้องต้น</p>
+              <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
+            </div>
+          </a>
+
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid02oidLZ6sozrAkYeTAgGkHeQJuM2nGitxyb8XEfuPWS94PCPt82SsXtvXGLMdbQySEl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าววันงดสูบบุหรี่โลกบน Facebook">
+            <div class="news-visual">
+              <img src="assets/protection-news/no-tobacco.jpg" alt="ประชาสัมพันธ์วันงดสูบบุหรี่โลก">
+              <span class="news-badge">รณรงค์</span>
+            </div>
+            <div class="news-body">
+              <span class="news-date">31 พฤษภาคม</span>
+              <h3>วันงดสูบบุหรี่โลก</h3>
+              <p>ลด ละ เลิกบุหรี่และบุหรี่ไฟฟ้า เพื่อสุขภาพที่แข็งแรงและสภาพแวดล้อมที่ปลอดภัย</p>
+              <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
+            </div>
+          </a>
+        </div>
+        <div class="news-source">ข้อมูล ณ วันที่ 7 มิถุนายน 2569 · ที่มา: เพจงานปกครองฯ วิทยาลัยอาชีวศึกษาสุพรรณบุรี</div>
+      </div>
+    </section>
+
+    <section class="section section-white" id="contact">
+      <div class="container">
+        <div class="contact-banner">
+          <div class="contact-main">
+            <span class="section-label" style="color:#82e4d2">Contact</span>
+            <h2>ติดต่อ<br>งานปกครองและความปลอดภัยนักเรียน นักศึกษา</h2>
+            <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา วิทยาลัยอาชีวศึกษาสุพรรณบุรี เปิดให้บริการในวันและเวลาราชการ</p>
+            <a class="contact-cta" href="http://facebook.com/profile.php?id=61589690822596&amp;sk=directory_contact_info" target="_blank" rel="noopener noreferrer">
+              ติดต่อที่นี่ <span aria-hidden="true">→</span>
+            </a>
+            <div class="contact-channels" aria-label="ช่องทาง Facebook">
+              <a class="contact-channel" href="https://www.facebook.com/profile.php?id=100057418549186" target="_blank" rel="noopener noreferrer">
+                <img src="student-late-system/web-dashboard/assets/college-logo.jpg" alt="">
+                <span><strong>เพจวิทยาลัย</strong><small>ข่าวสาร กิจกรรม และประกาศโดยรวมของวิทยาลัย</small></span>
+              </a>
+              <a class="contact-channel" href="https://www.facebook.com/profile.php?id=61589690822596" target="_blank" rel="noopener noreferrer">
+                <img src="student-late-system/web-dashboard/assets/protection-logo.jpg" alt="">
+                <span><strong>เพจงานปกครอง</strong><small>ระเบียบวินัย ความปลอดภัย และข่าวประชาสัมพันธ์ของหน่วยงาน</small></span>
+              </a>
+            </div>
+          </div>
+          <div class="contact-panel">
+            <span class="contact-panel-title">ข้อมูลติดต่อ</span>
+            <div class="contact-list">
+              <a class="contact-item" href="https://maps.google.com/?q=279+ถนนพระพันวษา+ตำบลท่าพี่เลี้ยง+อำเภอเมือง+สุพรรณบุรี+72000" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                <span>279 ถ.พระพันวษา ต.ท่าพี่เลี้ยง อ.เมือง จ.สุพรรณบุรี 72000</span>
+              </a>
+              <a class="contact-item" href="tel:035511355">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.7 3.8.7.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.7 21 3 13.3 3 3.7c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.7 3.8.1.4 0 .8-.2 1.1l-2.4 2.2Z"/></svg>
+                <span>035 511 355</span>
+              </a>
+              <a class="contact-item" href="mailto:saraban@spvc.ac.th">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM4 7l8 6 8-6"/></svg>
+                <span>saraban@spvc.ac.th</span>
+              </a>
+              <a class="contact-item" href="https://spvc.ac.th" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+                <span>spvc.ac.th</span>
+              </a>
+              <a class="contact-item" href="http://facebook.com/profile.php?id=61589690822596&amp;sk=directory_contact_info" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h3V4h-3c-3 0-5 2-5 5v3H6v4h3v5h4v-5h3l1-4h-4V9c0-.6.4-1 1-1Z"/></svg>
+                <span>Facebook: งานปกครองฯ · ติดต่อที่นี่</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="student-late-system/web-dashboard/assets/protection-logo.jpg" alt="">
+        <span>ระบบข้อมูลสารสนเทศ งานปกครองและความปลอดภัยนักเรียน นักศึกษา</span>
+      </div>
+      <span>© <span id="currentYear"></span> วิทยาลัยอาชีวศึกษาสุพรรณบุรี</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="pendingToast" role="status" aria-live="polite">
+    <div class="toast-icon">i</div>
+    <div>
+      <strong>ระบบอยู่ระหว่างพัฒนา</strong>
+      <span id="pendingToastMessage">ระบบที่เลือกจะเปิดให้ใช้งานในลำดับถัดไป</span>
+    </div>
+  </div>
+
+  <script>
+    const menuButton = document.getElementById("menuButton");
+    const mainNav = document.getElementById("mainNav");
+    const pendingToast = document.getElementById("pendingToast");
+    const pendingToastMessage = document.getElementById("pendingToastMessage");
+    const currentDate = document.getElementById("currentDate");
+    const currentYear = document.getElementById("currentYear");
+    let toastTimer;
+
+    const now = new Date();
+    currentDate.textContent = new Intl.DateTimeFormat("th-TH", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }).format(now);
+    currentYear.textContent = now.getFullYear() + 543;
+
+    menuButton.addEventListener("click", () => {
+      const isOpen = mainNav.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.setAttribute("aria-label", isOpen ? "ปิดเมนู" : "เปิดเมนู");
+      document.body.classList.toggle("menu-open", isOpen);
+    });
+
+    mainNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        mainNav.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "เปิดเมนู");
+        document.body.classList.remove("menu-open");
+      });
+    });
+
+    document.querySelectorAll("[data-pending-system]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        clearTimeout(toastTimer);
+        pendingToastMessage.textContent = `${link.dataset.systemName} จะเปิดให้ใช้งานในลำดับถัดไป`;
+        pendingToast.classList.add("show");
+        toastTimer = setTimeout(() => pendingToast.classList.remove("show"), 4200);
+      });
+    });
+
+    const newsSection = document.getElementById("news");
+    const aboutSection = document.getElementById("about");
+    aboutSection.before(newsSection);
+
+    const sections = [...document.querySelectorAll("main section[id]")];
+    const navLinks = [...mainNav.querySelectorAll("a[href^='#']")];
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (!visible) return;
+      navLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
+    }, { rootMargin: "-28% 0px -62% 0px", threshold: [0, 0.2, 0.6] });
+
+    sections.forEach((section) => observer.observe(section));
+  </script>
+</body>
+</html>

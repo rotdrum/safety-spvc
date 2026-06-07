@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบบันทึกข้อมูลเพศภาพนักเรียน</title>
+  <link rel="stylesheet" href="../systems/shared.css">
+  <style>
+    :root { --brand:#7c3aed; --brand-dark:#24133e; --brand-soft:#f3e8ff; --accent:#ec4899; }
+    body { background: linear-gradient(135deg, #faf7ff 0, #f4fbff 48%, #fff9f1 100%); }
+    .sidebar { background: linear-gradient(180deg, #2d1550, #492066 58%, #164e63); }
+    .rainbow-line { height: 5px; margin-bottom: 18px; border-radius: 999px; background: linear-gradient(90deg,#ef4444,#f59e0b,#facc15,#22c55e,#3b82f6,#8b5cf6,#ec4899); }
+    .kpi::before { position:absolute; right:18px; bottom:16px; z-index:1; color:var(--brand); font-size:20px; content:"✦"; }
+    .permission-card { border-color:#ead8ff; background:linear-gradient(145deg,#fff,#fcf8ff); }
+    .privacy-note { background:linear-gradient(90deg,#f5eaff,#eaf8ff); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../student-late-system/web-dashboard/assets/protection-logo.jpg" alt="">
+        <div><strong>ระบบข้อมูลเพศภาพ<br>และการดูแลที่เท่าเทียม</strong><small>Respect · Consent · Privacy</small></div>
+      </div>
+      <nav class="nav">
+        <button class="active" data-view="overview">ภาพรวมนักเรียน</button>
+        <button data-view="requests">ทะเบียนและสถานะการอนุญาต</button>
+        <button data-view="teacher-kpi">KPI การดำเนินงานครู</button>
+        <button data-view="record">เพิ่มข้อมูลรายบุคคล</button>
+        <button data-view="insights">สถิติเพื่อออกแบบกิจกรรม</button>
+        <button data-view="report">รายงาน</button>
+      </nav>
+      <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a>
+    </aside>
+    <main class="main">
+      <div class="rainbow-line"></div>
+      <header class="topbar">
+        <div><span class="eyebrow">Inclusive Student Support</span><h1>ข้อมูลเพศภาพและสิทธิการแต่งกายรายบุคคล</h1><p class="lead">เชื่อม Master Student เพื่อเลือกรายชื่อนักเรียน บันทึกข้อมูลเพศภาพ สิทธิทรงผมและเครื่องแต่งกาย ติดตามสถานะการอนุญาต และใช้จำนวนรวมออกแบบกิจกรรมที่เหมาะสม</p></div>
+        <div class="actions"><button class="btn" data-open="requests">ดูทะเบียน</button><button class="btn primary" data-open="record">+ เพิ่มข้อมูลนักเรียน</button></div>
+      </header>
+      <div class="privacy-note"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>ระบบสำหรับเจ้าหน้าที่ผู้มีสิทธิ์ ข้อมูลเชื่อมจากทะเบียนนักเรียนกลางและใช้เพื่ออนุมัติสิทธิ ดูแลนักเรียน และวางแผนกิจกรรมของวิทยาลัย</div>
+      <div class="master-status" id="genderApiStatus">กำลังโหลดข้อมูลจริงจาก Google Sheets...</div>
+
+      <section class="view active" id="view-overview">
+        <div class="population-grid">
+          <article class="population-card"><span>นักเรียนทั้งหมด</span><strong id="totalStudents">0</strong><small>รอข้อมูลจาก Master Student</small></article>
+          <article class="population-card"><span>นักเรียนชายตามทะเบียน</span><strong id="maleStudents">0</strong><small id="malePercent">0.0% ของนักเรียนทั้งหมด</small></article>
+          <article class="population-card"><span>นักเรียนหญิงตามทะเบียน</span><strong id="femaleStudents">0</strong><small id="femalePercent">0.0% ของนักเรียนทั้งหมด</small></article>
+          <article class="population-card"><span>นักเรียน LGBTQ ที่บันทึก</span><strong id="lgbtqStudents">0</strong><small id="lgbtqPercent">0.0% ของนักเรียนทั้งหมด</small></article>
+        </div>
+        <div class="grid kpis" style="margin-top:16px">
+          <article class="card kpi"><div class="kpi-label">LGBTQ เทียบนักเรียนชายตามทะเบียน</div><div class="kpi-value" id="lgbtqMaleRatio">0.0%</div><div class="kpi-note" id="lgbtqMaleNote">0 ต่อ 0 คน</div></article>
+          <article class="card kpi"><div class="kpi-label">LGBTQ เทียบนักเรียนหญิงตามทะเบียน</div><div class="kpi-value" id="lgbtqFemaleRatio">0.0%</div><div class="kpi-note" id="lgbtqFemaleNote">0 ต่อ 0 คน</div></article>
+          <article class="card kpi"><div class="kpi-label">อนุมัติสิทธิแล้ว</div><div class="kpi-value" id="genderApprovedCount">0</div><div class="kpi-note">อนุมัติทั้งหมดหรือบางส่วน</div></article>
+          <article class="card kpi"><div class="kpi-label">อยู่ระหว่างพิจารณา</div><div class="kpi-value" id="genderPendingCount">0</div><div class="kpi-note">รอเอกสาร ตรวจข้อมูล หรือลงนาม</div></article>
+        </div>
+        <div class="grid two-col" style="margin-top:16px">
+          <article class="panel permission-card"><div class="panel-head"><h2>รายการที่กำลังดำเนินการ</h2><span class="pill" id="genderActiveCount">0 รายการ</span></div>
+            <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>รายการอนุญาต</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th></tr></thead><tbody id="genderActiveRows"><tr><td colspan="4">ยังไม่มีรายการในทะเบียนจริง</td></tr></tbody></table></div>
+          </article>
+          <article class="panel"><div class="panel-head"><h3>บริการที่ควรเตรียม</h3><span class="pill">Service planning</span></div><div class="list">
+            <div class="list-item"><span class="list-icon">衣</span><div><strong>แนวปฏิบัติการแต่งกายและทรงผม</strong><small>สื่อสารเกณฑ์ที่ยืดหยุ่น ชัดเจน และไม่เลือกปฏิบัติ</small></div></div>
+            <div class="list-item"><span class="list-icon">WC</span><div><strong>พื้นที่และห้องน้ำที่ปลอดภัย</strong><small>ประเมินจุดบริการโดยไม่บังคับให้เปิดเผยอัตลักษณ์</small></div></div>
+            <div class="list-item"><span class="list-icon">♡</span><div><strong>การให้คำปรึกษาและส่งต่อ</strong><small>รายชื่อผู้ให้คำปรึกษาที่นักเรียนไว้วางใจและช่องทางขอความช่วยเหลือ</small></div></div>
+          </div></article>
+        </div>
+        <div class="grid three-col" style="margin-top:16px">
+          <article class="panel"><div class="panel-head"><h3>สิทธิที่ใช้งานอยู่</h3></div>
+            <div class="bar-row"><span>ทรงผม</span><div class="bar-track"><div class="bar-fill" id="genderHairBar" style="width:0%"></div></div><b id="genderHairCount">0</b></div>
+            <div class="bar-row"><span>เครื่องแต่งกาย</span><div class="bar-track"><div class="bar-fill" id="genderUniformBar" style="width:0%"></div></div><b id="genderUniformCount">0</b></div>
+            <div class="bar-row"><span>ชื่อที่ใช้ภายใน</span><div class="bar-track"><div class="bar-fill" id="genderNameBar" style="width:0%"></div></div><b id="genderNameCount">0</b></div>
+          </article>
+          <article class="panel"><div class="panel-head"><h3>ประโยชน์ของข้อมูลรวม</h3></div><div class="list">
+            <div class="list-item"><span class="list-icon">1</span><div><strong>วางแผนบริการ</strong><small>รู้ว่าควรเพิ่มบริการหรือทรัพยากรด้านใด</small></div></div>
+            <div class="list-item"><span class="list-icon">2</span><div><strong>ประเมินความเท่าเทียม</strong><small>ติดตามระยะเวลาการอนุมัติและอุปสรรคเชิงระบบ</small></div></div>
+          </div></article>
+          <article class="panel"><div class="panel-head"><h3>ตัวชี้วัดที่เหมาะสม</h3></div><div class="list">
+            <div class="list-item"><span class="list-icon">80%</span><div><strong>คำขอที่ดำเนินการสำเร็จ</strong><small>ไม่ใช้จำนวน LGBTQ เป็นคะแนนผลงาน</small></div></div>
+            <div class="list-item"><span class="list-icon">4.2</span><div><strong>ความรู้สึกปลอดภัยเฉลี่ย</strong><small>แบบประเมินสมัครใจ 5 ระดับ</small></div></div>
+          </div></article>
+        </div>
+      </section>
+
+      <section class="view" id="view-requests"><article class="panel permission-card"><div class="panel-head"><h2>ทะเบียนและสถานะการอนุญาต</h2><span class="pill">เชื่อม Master Student</span></div>
+        <div class="filter-panel-compact"><div class="filter-grid">
+          <div class="field"><label>ค้นหานักเรียน / เลขที่ / สิทธิ</label><input id="identityFilterSearch" type="search" placeholder="พิมพ์คำค้น"></div>
+          <div class="field"><label>สถานะ</label><select id="identityFilterStatus"><option value="">ทุกสถานะ</option><option>รอเอกสารยินยอม</option><option>รอตรวจข้อมูล</option><option>รอลงนาม</option><option>อนุมัติบางส่วน</option><option>อนุมัติแล้ว</option><option>ไม่อนุมัติ</option><option>ใช้งานแล้ว</option></select></div>
+          <div class="field"><label>รายการสิทธิ</label><select id="identityFilterPermission"><option value="">ทุกสิทธิ</option><option>ผม</option><option>ชุดนักเรียนหญิง</option><option>ชุดนักเรียนชาย</option><option>ชื่อที่ใช้ภายใน</option><option>สรรพนาม</option></select></div>
+          <div class="field"><label>ผู้อนุมัติ</label><select id="identityFilterApprover"><option value="">ทุกคน</option></select></div>
+        </div></div>
+        <div class="table-wrap"><table><thead><tr><th>เลขที่</th><th>นักเรียน</th><th>ข้อมูล/สิทธิที่บันทึก</th><th>วันที่เริ่มใช้</th><th>ยินยอมผู้ปกครอง</th><th>ครูผู้บันทึก</th><th>ผู้อนุมัติ</th><th>สถานะ</th><th></th></tr></thead><tbody id="identityRows"></tbody></table></div>
+        <div class="notice" id="genderEmptyState">ยังไม่มีรายการใน Google Sheets กด “เพิ่มข้อมูลนักเรียน” เพื่อเริ่มทะเบียนจริง</div>
+      </article></section>
+
+      <section class="view" id="view-teacher-kpi">
+        <div class="grid kpis">
+          <article class="card kpi"><div class="kpi-label">ครูที่ดำเนินงาน</div><div class="kpi-value" id="identityKpiTeachers">0</div><div class="kpi-note">ผู้บันทึกหรือผู้อนุมัติ</div></article>
+          <article class="card kpi"><div class="kpi-label">รายการรอดำเนินการ</div><div class="kpi-value" id="identityKpiPending">0</div><div class="kpi-note">รวมรอเอกสาร ตรวจ และลงนาม</div></article>
+          <article class="card kpi"><div class="kpi-label">พิจารณาเสร็จแล้ว</div><div class="kpi-value" id="identityKpiCompleted">0</div><div class="kpi-note">อนุมัติ บางส่วน หรือไม่อนุมัติ</div></article>
+          <article class="card kpi"><div class="kpi-label">ภาระงานสูงสุด</div><div class="kpi-value" id="identityKpiMax">0</div><div class="kpi-note" id="identityKpiMaxName">ยังไม่มีข้อมูล</div></article>
+        </div>
+        <article class="panel permission-card" style="margin-top:16px"><div class="panel-head"><h2>KPI การบันทึกและพิจารณาคำขอ</h2><span class="pill">คำนวณจากทะเบียนปัจจุบัน</span></div>
+          <div class="table-wrap"><table><thead><tr><th>ครู / เจ้าหน้าที่</th><th>บันทึกคำขอ</th><th>ได้รับมอบหมายอนุมัติ</th><th>พิจารณาเสร็จ</th><th>ยังรอดำเนินการ</th><th>อัตราดำเนินการสำเร็จ</th></tr></thead><tbody id="identityTeacherKpiRows"></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="view" id="view-record"><article class="panel permission-card"><div class="panel-head"><h2>เพิ่มข้อมูลเพศภาพและสิทธิรายบุคคล</h2><span class="pill">Master Student</span></div>
+        <div class="workflow-steps">
+          <div class="workflow-step"><b>1</b><strong>เลือกนักเรียนและสิทธิ</strong><small>ข้อมูลชั้น ห้อง และเพศตามทะเบียนเติมจาก Master</small></div>
+          <div class="workflow-step"><b>2</b><strong>รับหนังสือยินยอม</strong><small>แนบเอกสารผู้ปกครองและวันที่รับเอกสาร</small></div>
+          <div class="workflow-step"><b>3</b><strong>เจ้าหน้าที่ตรวจข้อมูล</strong><small>ระบุครูผู้บันทึกและรายละเอียดเงื่อนไข</small></div>
+          <div class="workflow-step"><b>4</b><strong>ผู้มีอำนาจอนุมัติ</strong><small>ส่งรายการให้ผู้อนุมัติในระบบและติดตามสถานะ</small></div>
+        </div>
+        <form id="identityForm" class="form-grid">
+          <div class="field full"><label>ค้นหาและเลือกนักเรียนจาก Master Student</label>
+            <div class="search-select" id="studentPicker">
+              <input id="studentSearch" type="search" autocomplete="off" placeholder="ค้นหาด้วยรหัส ชื่อ นามสกุล หรือห้องเรียน">
+              <div class="search-options" id="studentOptions"></div>
+            </div>
+            <div class="master-status" id="masterStatus">กำลังโหลดข้อมูล Master จาก Google Sheet...</div>
+          </div>
+          <div class="field"><label>รหัสนักเรียน</label><input id="masterId" readonly></div>
+          <div class="field"><label>ชื่อ-นามสกุล</label><input id="masterName" readonly></div>
+          <div class="field"><label>ระดับชั้น / ห้อง</label><input id="masterRoom" readonly></div>
+          <div class="field"><label>เพศตามทะเบียน</label><input id="masterSex" readonly></div>
+          <div class="field"><label>กลุ่มข้อมูลเพศภาพ</label><select id="identityGroup" required><option value="">เลือกกลุ่ม</option><option>LGBTQ+</option><option>ชาย</option><option>หญิง</option><option>ไม่ประสงค์ระบุ</option></select></div>
+          <div class="field"><label>สถานะเริ่มต้น</label><select id="identityStatus"><option>รอตรวจข้อมูล</option><option>รอลงนามอนุมัติ</option></select></div>
+          <div class="field full"><label>รายการที่ต้องการบันทึกหรืออนุญาต</label><div class="permission-grid">
+            <label class="permission-option"><span class="permission-icon">ผม</span><span><strong>ไว้ผมยาวตามเพศภาพ</strong><small>บันทึกสิทธิและวันที่เริ่มใช้</small></span><input type="checkbox" name="permission" value="อนุญาตไว้ผมยาว"></label>
+            <label class="permission-option"><span class="permission-icon">✂</span><span><strong>ใช้ทรงผมชาย</strong><small>สำหรับนักเรียนที่ต้องการใช้ระเบียบทรงผมชาย</small></span><input type="checkbox" name="permission" value="อนุญาตทรงผมชาย"></label>
+            <label class="permission-option"><span class="permission-icon">ญ</span><span><strong>แต่งกายชุดนักเรียนหญิง</strong><small>เสื้อ กระโปรง รองเท้า และเครื่องแบบที่เกี่ยวข้อง</small></span><input type="checkbox" name="permission" value="อนุญาตชุดนักเรียนหญิง"></label>
+            <label class="permission-option"><span class="permission-icon">ช</span><span><strong>แต่งกายชุดนักเรียนชาย</strong><small>เสื้อ กางเกง รองเท้า และเครื่องแบบที่เกี่ยวข้อง</small></span><input type="checkbox" name="permission" value="อนุญาตชุดนักเรียนชาย"></label>
+            <label class="permission-option"><span class="permission-icon">ชื่อ</span><span><strong>บันทึกชื่อที่ใช้ภายใน</strong><small>ใช้ในรายชื่อกิจกรรมและการสื่อสารภายใน</small></span><input type="checkbox" name="permission" value="บันทึกชื่อที่ใช้ภายใน"></label>
+            <label class="permission-option"><span class="permission-icon">Aa</span><span><strong>บันทึกสรรพนามที่ใช้</strong><small>สำหรับครูที่ปรึกษาและผู้เกี่ยวข้อง</small></span><input type="checkbox" name="permission" value="บันทึกสรรพนาม"></label>
+            <label class="permission-option"><span class="permission-icon">↻</span><span><strong>เปลี่ยนแปลงหรือยกเลิกสิทธิเดิม</strong><small>แก้ไขรายการอนุญาตที่มีอยู่</small></span><input type="checkbox" name="permission" value="ขอเปลี่ยนแปลงสิทธิเดิม"></label>
+            <label class="permission-option"><span class="permission-icon">♡</span><span><strong>ส่งต่อการดูแล</strong><small>ประสานครูที่ปรึกษา งานแนะแนว หรือผู้เกี่ยวข้อง</small></span><input type="checkbox" name="permission" value="ส่งต่อการดูแล"></label>
+          </div></div>
+          <div class="field"><label>ชื่อที่ใช้ภายใน (ถ้ามี)</label><input id="preferredName"></div>
+          <div class="field"><label>สรรพนาม (ถ้ามี)</label><input id="pronouns"></div>
+          <div class="field"><label>วันที่เริ่มใช้สิทธิ</label><input id="effectiveDate" type="date" required></div>
+          <div class="field"><label>วันที่รับหนังสือยินยอมผู้ปกครอง (ถ้ามี)</label><input id="parentConsentDate" type="date"></div>
+          <div class="field full"><label>หนังสือยินยอมจากผู้ปกครอง (แนบภายหลังได้)</label><input id="parentConsentFile" type="file" accept=".pdf,.jpg,.jpeg,.png"><div class="master-status">หากยังไม่มีเอกสาร ระบบจะเปิดรายการเป็น “รอเอกสารยินยอม” และแนบเพิ่มในหน้าติดตามได้</div></div>
+          <div class="field"><label>ครูผู้บันทึก</label>
+            <div class="search-select" id="teacherPicker">
+              <input id="teacherSearch" type="search" autocomplete="off" placeholder="ค้นหาชื่อครู">
+              <div class="search-options" id="teacherOptions"></div>
+            </div>
+          </div>
+          <div class="field"><label>ผู้อนุมัติในระบบ</label>
+            <div class="search-select" id="approverPicker">
+              <input id="approverSearch" type="search" autocomplete="off" placeholder="ค้นหาชื่อผู้อนุมัติ">
+              <div class="search-options" id="approverOptions"></div>
+            </div>
+          </div>
+          <div class="field full"><label>เอกสารประกอบอื่น (ถ้ามี)</label><input id="identityOtherFiles" type="file" multiple accept=".pdf,.jpg,.jpeg,.png"></div>
+          <div class="field full"><label>หมายเหตุ</label><textarea id="identityNote" placeholder="รายละเอียดการอนุญาต ผู้รับทราบ หรือเงื่อนไขเพิ่มเติม"></textarea></div>
+          <div class="field full"><button class="btn primary" type="submit">บันทึกข้อมูลรายบุคคล</button></div>
+        </form><div class="notice">จำนวน LGBTQ ใน Dashboard อ้างอิงจากรายการนักเรียนที่บันทึกในระบบนี้ และใช้เป็นข้อมูลประกอบการจัดกิจกรรม ไม่ใช่การประเมินคุณค่าหรือความประพฤติของนักเรียน</div>
+      </article></section>
+
+      <div class="modal" id="identityModal" aria-hidden="true">
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="identityModalTitle">
+          <div class="modal-head"><h2 id="identityModalTitle">รายละเอียดและติดตามคำขอ</h2><button class="modal-close" type="button" id="closeIdentityModal" aria-label="ปิด">×</button></div>
+          <div class="modal-body">
+            <div class="panel-head"><h3>ข้อมูลรายการที่เลือก</h3><span class="pill amber" id="selectedIdentityStatus">ยังไม่ได้เลือกรายการ</span></div>
+            <div class="case-summary">
+              <div><span>เลขที่รายการ</span><strong id="selectedIdentityId">-</strong></div>
+              <div><span>นักเรียน</span><strong id="selectedIdentityStudent">-</strong></div>
+              <div><span>ครูผู้บันทึก</span><strong id="selectedIdentityRecorder">-</strong></div>
+              <div><span>ผู้อนุมัติ</span><strong id="selectedIdentityApprover">-</strong></div>
+            </div>
+            <div class="grid two-col">
+              <div>
+                <div class="panel-head"><h3>ผลพิจารณารายสิทธิ</h3><span class="pill">แยกอนุมัติได้</span></div>
+                <div class="decision-list" id="identityDecisionList"></div>
+                <div class="panel-head" style="margin-top:18px"><h3>ประวัติการดำเนินงาน</h3><span class="pill">Timeline</span></div>
+                <div class="timeline" id="identityTimeline"></div>
+                <div class="attachment-list" id="identityAttachmentList"></div>
+              </div>
+              <form id="identityUpdateForm">
+                <div class="panel-head"><h3>อัปเดตรายการ</h3><span class="pill">Follow update</span></div>
+                <div class="form-grid">
+                  <div class="field"><label>สถานะรวมหลังอัปเดต</label><select id="identityUpdateStatus"><option>รอเอกสารยินยอม</option><option>รอตรวจข้อมูล</option><option>รอลงนามอนุมัติ</option><option>อนุมัติบางส่วน</option><option>อนุมัติแล้ว</option><option>ไม่อนุมัติ</option><option>ใช้งานแล้ว</option><option>ยกเลิกสิทธิ</option></select></div>
+                  <div class="field"><label>วันที่ดำเนินการ</label><input id="identityUpdateDate" type="datetime-local" required></div>
+                  <div class="field full"><label>ผู้อนุมัติในระบบ</label><select id="identityUpdateApprover"></select></div>
+                  <div class="field full"><label>แนบเอกสารเพิ่มเติม / หนังสือยินยอม</label><input id="identityUpdateFiles" type="file" multiple accept=".pdf,.jpg,.jpeg,.png"></div>
+                  <div class="field full"><label>ผลการพิจารณา / เหตุผลกรณีไม่อนุมัติ</label><textarea id="identityUpdateNote" required placeholder="ระบุเหตุผล เงื่อนไข หรือสิ่งที่ต้องติดตามเพิ่มเติม"></textarea></div>
+                  <div class="field full"><button class="btn primary" type="submit">บันทึกการอัปเดต</button></div>
+                  <div class="field full"><button class="btn" type="button" id="deleteIdentityRequest" style="color:#b91c1c">ลบรายการออกจากทะเบียน</button></div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="view" id="view-insights"><div class="grid two-col"><article class="panel"><div class="panel-head"><h2>โครงสร้างนักเรียนสำหรับวางแผนกิจกรรม</h2><span class="pill">ภาคเรียน 1/2569</span></div>
+        <div class="bar-row"><span>นักเรียนชาย</span><div class="bar-track"><div class="bar-fill" id="insightMaleBar" style="width:0%"></div></div><b id="insightMaleCount">0</b></div>
+        <div class="bar-row"><span>นักเรียนหญิง</span><div class="bar-track"><div class="bar-fill" id="insightFemaleBar" style="width:0%"></div></div><b id="insightFemaleCount">0</b></div>
+        <div class="bar-row"><span>LGBTQ ที่บันทึก</span><div class="bar-track"><div class="bar-fill" id="insightLgbtqBar" style="width:0%"></div></div><b id="insightLgbtqCount">0</b></div>
+        <div class="bar-row"><span>ใช้สิทธิทรงผม</span><div class="bar-track"><div class="bar-fill" id="insightHairBar" style="width:0%"></div></div><b id="insightHairCount">0</b></div>
+        <div class="bar-row"><span>ใช้สิทธิแต่งกาย</span><div class="bar-track"><div class="bar-fill" id="insightUniformBar" style="width:0%"></div></div><b id="insightUniformCount">0</b></div>
+      </article><article class="panel"><div class="panel-head"><h3>นำข้อมูลไปออกแบบกิจกรรม</h3></div><div class="list">
+        <div class="list-item"><span class="list-icon">1</span><div><strong>จัดกลุ่มกิจกรรมอย่างยืดหยุ่น</strong><small>ไม่แบ่งกิจกรรมด้วยเพศเพียงอย่างเดียว เปิดตัวเลือกตามความถนัดและความสมัครใจ</small></div></div>
+        <div class="list-item"><span class="list-icon">2</span><div><strong>วางแผนกีฬาและนันทนาการ</strong><small>เพิ่มกิจกรรมผสมและกิจกรรมที่ไม่จำกัดเพศ พร้อมจัดชุดหรือพื้นที่เปลี่ยนเครื่องแต่งกายให้เหมาะสม</small></div></div>
+        <div class="list-item"><span class="list-icon">3</span><div><strong>เตรียมการสื่อสารกับครูผู้ดูแล</strong><small>แจ้งเฉพาะสิทธิที่เกี่ยวข้อง เช่น ทรงผม เครื่องแต่งกาย และชื่อที่ใช้ภายใน</small></div></div>
+        <div class="list-item"><span class="list-icon">4</span><div><strong>ประเมินทรัพยากร</strong><small>ใช้จำนวนรวมวางแผนงบประมาณ ห้องน้ำ พื้นที่กิจกรรม และสื่อประชาสัมพันธ์</small></div></div>
+      </div></article></div></section>
+
+      <section class="view" id="view-report">
+        <div class="actions report-actions" style="margin-bottom:14px">
+          <button class="btn" type="button" data-open="requests">กลับทะเบียน</button>
+          <button class="btn primary" type="button" id="printIdentityReport">พิมพ์ / บันทึก PDF</button>
+        </div>
+        <article class="report-paper">
+          <header class="report-head">
+            <img src="../student-late-system/web-dashboard/assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+            <div>
+              <h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2>
+              <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานข้อมูลเพศภาพและการดูแลที่เท่าเทียม</p>
+            </div>
+            <img src="../student-late-system/web-dashboard/assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+          </header>
+          <div class="report-title">
+            <h3>รายงานสรุปข้อมูลและสถานะการอนุญาต</h3>
+            <p id="identityReportPeriod">ข้อมูล ณ วันที่ 7 มิถุนายน 2569</p>
+          </div>
+          <div class="report-metrics">
+            <div class="report-metric"><span>นักเรียนทั้งหมด</span><strong id="reportTotalStudents">0</strong></div>
+            <div class="report-metric"><span>ชายตามทะเบียน</span><strong id="reportMaleStudents">0</strong></div>
+            <div class="report-metric"><span>หญิงตามทะเบียน</span><strong id="reportFemaleStudents">0</strong></div>
+            <div class="report-metric"><span>รายการในทะเบียน</span><strong id="reportIdentityCount">0</strong></div>
+          </div>
+          <section class="report-section">
+            <h4>รายการข้อมูลและสิทธิรายบุคคล</h4>
+            <table class="report-history">
+              <thead><tr><th>เลขที่</th><th>นักเรียน</th><th>ข้อมูล/สิทธิ</th><th>หนังสือยินยอม</th><th>ครูผู้บันทึก</th><th>ผู้อนุมัติ</th><th>สถานะ</th></tr></thead>
+              <tbody id="identityReportRows"></tbody>
+            </table>
+          </section>
+          <div class="report-note">รายงานนี้ใช้สำหรับการบริหารจัดการสิทธิ การดูแล และการออกแบบกิจกรรมอย่างเท่าเทียม โดยเปิดเผยเฉพาะผู้มีหน้าที่เกี่ยวข้องตามขอบเขตที่จำเป็น</div>
+          <div class="signature-area">
+            <div class="signature-box">
+              <div class="signature-line">ลงชื่อ ______________________________</div>
+              <div>(นางสาวปัทมพร แสงศรี)</div>
+              <div>หัวหน้างานปกครองและความปลอดภัย ฯ</div>
+              <div class="report-date">วันที่ <span id="identityReportSignedDate">7 มิถุนายน 2569</span></div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast">บันทึกข้อมูลแล้ว</div>
+  <script src="../systems/data-api-config.js"></script>
+  <script src="../systems/data-api.js"></script>
+  <script>
+    const views = document.querySelectorAll(".view");
+    const navButtons = document.querySelectorAll(".nav button");
+    function openView(name) {
+      views.forEach(view => view.classList.toggle("active", view.id === `view-${name}`));
+      navButtons.forEach(button => button.classList.toggle("active", button.dataset.view === name));
+      if (name === "report") updateIdentityReport();
+      if (name === "teacher-kpi") renderIdentityTeacherKpi();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    navButtons.forEach(button => button.addEventListener("click", () => openView(button.dataset.view)));
+    document.querySelectorAll("[data-open]").forEach(button => button.addEventListener("click", () => openView(button.dataset.open)));
+
+    const SHEET_ID = "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw";
+    const toast = document.getElementById("toast");
+    const identityRows = document.getElementById("identityRows");
+    const identityModal = document.getElementById("identityModal");
+    const studentSearch = document.getElementById("studentSearch");
+    const studentOptions = document.getElementById("studentOptions");
+    const teacherSearch = document.getElementById("teacherSearch");
+    const teacherOptions = document.getElementById("teacherOptions");
+    const approverSearch = document.getElementById("approverSearch");
+    const approverOptions = document.getElementById("approverOptions");
+    const masterStatus = document.getElementById("masterStatus");
+    const effectiveDate = document.getElementById("effectiveDate");
+    const parentConsentDate = document.getElementById("parentConsentDate");
+    const genderApiStatus = document.getElementById("genderApiStatus");
+    const genderApi = window.StudentAffairsDataApi;
+    let students = [];
+    let teachers = [];
+    let selectedStudent = null;
+    let selectedTeacher = "";
+    let selectedApprover = "";
+    let selectedIdentityRow = null;
+    const genderRecords = new Map();
+    const identityAttachments = {};
+    effectiveDate.value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    parentConsentDate.value = effectiveDate.value;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function sheetSyncTime(date = new Date()) {
+      return new Intl.DateTimeFormat("th-TH", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(date);
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      })[char]);
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "ไม่ระบุเวลา";
+      return new Intl.DateTimeFormat("th-TH", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+    }
+
+    function setCurrentDateTime(input) {
+      const local = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+      input.value = local.toISOString().slice(0, 16);
+    }
+
+    function statusTone(status) {
+      if (status.includes("ไม่อนุมัติ") || status.includes("ยกเลิก")) return "reject";
+      if (status.includes("รอ") || status.includes("บางส่วน")) return "amber";
+      return "";
+    }
+
+    function genderRow(record) {
+      const row = document.createElement("tr");
+      const hasConsent = (record.documents || []).some(file => file.category === "parent-consent");
+      row.dataset.recordId = record.requestId;
+      row.dataset.version = String(record.version || 1);
+      row.dataset.approver = record.approver || "";
+      row.dataset.recorder = record.recorder || "";
+      row.dataset.permissions = (record.permissions || []).join("|");
+      row.dataset.decisions = (record.decisions || []).join("|");
+      row.dataset.consent = hasConsent ? "แนบแล้ว" : "";
+      row.innerHTML = `
+        <td>${escapeHtml(record.requestId)}</td>
+        <td class="student"><strong>${escapeHtml(record.studentName)}</strong><small>${escapeHtml(record.studentId)} · ${escapeHtml(record.room || "-")}</small></td>
+        <td></td>
+        <td>${escapeHtml(new Intl.DateTimeFormat("th-TH", { dateStyle: "medium" }).format(new Date(record.effectiveDate || record.createdAt)))}</td>
+        <td>${hasConsent ? `<span class="pill">แนบแล้ว</span>` : `<span class="pill pending">ยังไม่แนบ</span>`}</td>
+        <td>${escapeHtml(record.recorder || "-")}</td>
+        <td>${escapeHtml(record.approver || "-")}</td>
+        <td><span class="pill ${statusTone(record.status || "")}">${escapeHtml(record.status || "รอตรวจข้อมูล")}</span></td>
+        <td><button class="case-action" data-identity-case="${escapeHtml(record.requestId)}">ดู / อัปเดต</button></td>`;
+      row.children[2].innerHTML = permissionDisplay(row);
+      return row;
+    }
+
+    function applyGenderRecord(record, prepend = false) {
+      genderRecords.set(record.requestId, record);
+      identityAttachments[record.requestId] = (record.documents || []).map(file => ({
+        name: file.name,
+        addedAt: formatDateTime(file.uploadedAt),
+        url: file.url || "",
+        category: file.category || "document"
+      }));
+      const existing = identityRows.querySelector(`[data-record-id="${CSS.escape(record.requestId)}"]`);
+      const row = genderRow(record);
+      if (existing) existing.replaceWith(row);
+      else if (prepend) identityRows.prepend(row);
+      else identityRows.append(row);
+      if (selectedIdentityRow === existing || selectedIdentityRow?.dataset.recordId === record.requestId) selectedIdentityRow = row;
+      return row;
+    }
+
+    function refreshGenderDerivedUi() {
+      const records = [...genderRecords.values()];
+      const completed = record => /อนุมัติแล้ว|อนุมัติบางส่วน|ไม่อนุมัติ|ใช้งานแล้ว|ยกเลิกสิทธิ/.test(record.status || "");
+      const lgbtq = records.filter(record => String(record.identityGroup || "").includes("LGBTQ")).length;
+      document.getElementById("lgbtqStudents").textContent = lgbtq.toLocaleString("th-TH");
+      document.getElementById("genderApprovedCount").textContent = records.filter(record => /อนุมัติแล้ว|อนุมัติบางส่วน|ใช้งานแล้ว/.test(record.status || "")).length.toLocaleString("th-TH");
+      document.getElementById("genderPendingCount").textContent = records.filter(record => !completed(record)).length.toLocaleString("th-TH");
+      const approvedPermissions = records.flatMap(record => (record.permissions || []).filter((permission, index) => ["อนุมัติ", "ใช้งานแล้ว"].includes((record.decisions || [])[index])));
+      const rightCounts = {
+        Hair: approvedPermissions.filter(permission => /ผม/.test(permission)).length,
+        Uniform: approvedPermissions.filter(permission => /ชุดนักเรียน/.test(permission)).length,
+        Name: approvedPermissions.filter(permission => /ชื่อที่ใช้ภายใน/.test(permission)).length
+      };
+      const maxRight = Math.max(1, ...Object.values(rightCounts));
+      Object.entries(rightCounts).forEach(([key, value]) => {
+        document.getElementById(`gender${key}Count`).textContent = value.toLocaleString("th-TH");
+        document.getElementById(`gender${key}Bar`).style.width = `${Math.round(value / maxRight * 100)}%`;
+      });
+      document.getElementById("genderEmptyState").hidden = identityRows.children.length > 0;
+      const active = records.filter(record => !completed(record)).slice(0, 5);
+      document.getElementById("genderActiveCount").textContent = `${active.length.toLocaleString("th-TH")} รายการ`;
+      document.getElementById("genderActiveRows").innerHTML = active.length ? active.map(record => `
+        <tr><td class="student"><strong>${escapeHtml(record.studentName)}</strong><small>${escapeHtml(record.room || "-")} · ${escapeHtml(record.studentId || "-")}</small></td><td>${escapeHtml((record.permissions || []).join(" + "))}</td><td>${escapeHtml(record.approver || record.recorder || "-")}</td><td><span class="pill ${statusTone(record.status || "")}">${escapeHtml(record.status || "รอตรวจข้อมูล")}</span></td></tr>`).join("")
+        : `<tr><td colspan="4">ยังไม่มีรายการที่กำลังดำเนินการ</td></tr>`;
+      const male = students.filter(student => inferRegisteredSex(student.prefix, student.fullName) === "ชาย").length;
+      const female = students.filter(student => inferRegisteredSex(student.prefix, student.fullName) === "หญิง").length;
+      const maxPopulation = Math.max(1, male, female);
+      [
+        ["Male", male, maxPopulation],
+        ["Female", female, maxPopulation],
+        ["Lgbtq", lgbtq, Math.max(1, students.length)],
+        ["Hair", rightCounts.Hair, Math.max(1, records.length)],
+        ["Uniform", rightCounts.Uniform, Math.max(1, records.length)]
+      ].forEach(([key, value, base]) => {
+        document.getElementById(`insight${key}Count`).textContent = value.toLocaleString("th-TH");
+        document.getElementById(`insight${key}Bar`).style.width = `${Math.round(value / base * 100)}%`;
+      });
+      updatePopulationStats();
+      populateIdentityApprovers();
+      filterIdentityRows();
+      renderIdentityTeacherKpi();
+      updateIdentityReport();
+    }
+
+    async function loadGenderRecords() {
+      if (!genderApi?.configured()) {
+        genderApiStatus.textContent = "โหมดตัวอย่าง · ตั้งค่า Apps Script endpoint เพื่อใช้ CRUD จริง";
+        return;
+      }
+      genderApiStatus.textContent = "กำลังซิงก์ทะเบียนจาก Google Sheets...";
+      try {
+        const records = await genderApi.request("gender.list");
+        genderRecords.clear();
+        identityRows.innerHTML = "";
+        records.forEach(record => applyGenderRecord(record));
+        genderApiStatus.textContent = `เชื่อม Google Sheets และ Drive แล้ว · ${records.length.toLocaleString("th-TH")} รายการ · ดึงล่าสุด ${sheetSyncTime()}`;
+        refreshGenderDerivedUi();
+      } catch (error) {
+        genderApiStatus.textContent = `ซิงก์ข้อมูลไม่สำเร็จ · ${error.message}`;
+        showToast("ไม่สามารถโหลดทะเบียนข้อมูลจริงได้");
+      }
+    }
+
+    function permissionParts(row) {
+      return (row.dataset.permissions || row.children[2].textContent).split("|").map(value => value.trim()).filter(Boolean);
+    }
+
+    function decisionParts(row) {
+      const permissions = permissionParts(row);
+      const decisions = (row.dataset.decisions || "").split("|");
+      return permissions.map((permission, index) => ({ permission, decision: decisions[index] || "รอพิจารณา" }));
+    }
+
+    function permissionDisplay(row) {
+      const items = decisionParts(row);
+      const approved = items.filter(item => item.decision === "อนุมัติ").length;
+      const rejected = items.filter(item => item.decision === "ไม่อนุมัติ").length;
+      const pending = items.length - approved - rejected;
+      return `${items.map(item => item.permission).join(" + ")}<div class="decision-summary">${approved ? `<span class="pill">อนุมัติ ${approved}</span>` : ""}${rejected ? `<span class="pill reject">ไม่อนุมัติ ${rejected}</span>` : ""}${pending ? `<span class="pill pending">รอ ${pending}</span>` : ""}</div>`;
+    }
+
+    function deriveDecisionStatus(decisions) {
+      const approved = decisions.filter(value => value === "อนุมัติ").length;
+      const rejected = decisions.filter(value => value === "ไม่อนุมัติ").length;
+      const pending = decisions.filter(value => value === "รอพิจารณา").length;
+      if (pending) return "";
+      if (approved && rejected) return "อนุมัติบางส่วน";
+      if (approved === decisions.length) return "อนุมัติแล้ว";
+      if (rejected === decisions.length) return "ไม่อนุมัติ";
+      return "";
+    }
+
+    function inferRegisteredSex(prefix, fullName = "") {
+      const value = `${prefix || ""}${fullName}`.trim();
+      if (/^(เด็กชาย|นาย)/.test(value)) return "ชาย";
+      if (/^(เด็กหญิง|นางสาว|นาง)/.test(value)) return "หญิง";
+      return "ไม่ระบุ";
+    }
+
+    function updatePopulationStats() {
+      const male = students.filter(student => inferRegisteredSex(student.prefix, student.fullName) === "ชาย").length;
+      const female = students.filter(student => inferRegisteredSex(student.prefix, student.fullName) === "หญิง").length;
+      const total = students.length;
+      const lgbtq = Number(document.getElementById("lgbtqStudents").textContent.replace(/,/g, "")) || 0;
+      const fmt = value => new Intl.NumberFormat("th-TH").format(value);
+      const pct = (value, base) => base ? `${(value / base * 100).toFixed(1)}%` : "0.0%";
+      document.getElementById("totalStudents").textContent = fmt(total);
+      document.getElementById("maleStudents").textContent = fmt(male);
+      document.getElementById("femaleStudents").textContent = fmt(female);
+      document.getElementById("malePercent").textContent = `${pct(male, total)} ของนักเรียนทั้งหมด`;
+      document.getElementById("femalePercent").textContent = `${pct(female, total)} ของนักเรียนทั้งหมด`;
+      document.getElementById("lgbtqPercent").textContent = `${pct(lgbtq, total)} ของนักเรียนทั้งหมด`;
+      document.getElementById("lgbtqMaleRatio").textContent = pct(lgbtq, male);
+      document.getElementById("lgbtqFemaleRatio").textContent = pct(lgbtq, female);
+      document.getElementById("lgbtqMaleNote").textContent = `${fmt(lgbtq)} ต่อ ${fmt(male)} คน`;
+      document.getElementById("lgbtqFemaleNote").textContent = `${fmt(lgbtq)} ต่อ ${fmt(female)} คน`;
+    }
+
+    function renderStudentOptions(query = "") {
+      const keyword = query.trim().toLocaleLowerCase("th");
+      const matches = students.filter(student => {
+        const haystack = `${student.id} ${student.fullName} ${student.firstName} ${student.lastName} ${student.room}`.toLocaleLowerCase("th");
+        return !keyword || haystack.includes(keyword);
+      }).slice(0, 40);
+      studentOptions.innerHTML = matches.length ? matches.map(student => `
+        <button class="search-option" type="button" data-student-id="${escapeHtml(student.id)}">
+          <span><strong>${escapeHtml(student.fullName)}</strong><small>${escapeHtml(student.room)} · ครูที่ปรึกษา ${escapeHtml(student.homeroomTeacher || "-")}</small></span>
+          <code>${escapeHtml(student.id)}</code>
+        </button>`).join("") : `<div class="search-empty">ไม่พบนักเรียนที่ตรงกับคำค้น</div>`;
+      studentOptions.classList.add("open");
+    }
+
+    function selectStudent(student) {
+      selectedStudent = student;
+      studentSearch.value = `${student.id} · ${student.fullName} · ${student.room}`;
+      document.getElementById("masterId").value = student.id;
+      document.getElementById("masterName").value = student.fullName;
+      document.getElementById("masterRoom").value = student.room || student.grade;
+      document.getElementById("masterSex").value = inferRegisteredSex(student.prefix, student.fullName);
+      studentOptions.classList.remove("open");
+    }
+
+    function renderTeacherOptions(query = "") {
+      const keyword = query.trim().toLocaleLowerCase("th");
+      const matches = teachers.filter(teacher => !keyword || teacher.toLocaleLowerCase("th").includes(keyword));
+      teacherOptions.innerHTML = matches.length ? matches.map(teacher => `
+        <button class="search-option" type="button" data-teacher="${escapeHtml(teacher)}">
+          <span><strong>${escapeHtml(teacher)}</strong><small>ครู/เจ้าหน้าที่ผู้บันทึกข้อมูล</small></span>
+        </button>`).join("") : `<div class="search-empty">ไม่พบรายชื่อครู</div>`;
+      teacherOptions.classList.add("open");
+    }
+
+    function renderApproverOptions(query = "") {
+      const keyword = query.trim().toLocaleLowerCase("th");
+      const matches = teachers.filter(teacher => !keyword || teacher.toLocaleLowerCase("th").includes(keyword));
+      approverOptions.innerHTML = matches.length ? matches.map(teacher => `
+        <button class="search-option" type="button" data-approver="${escapeHtml(teacher)}">
+          <span><strong>${escapeHtml(teacher)}</strong><small>ผู้ตรวจและอนุมัติรายการในระบบ</small></span>
+        </button>`).join("") : `<div class="search-empty">ไม่พบรายชื่อผู้อนุมัติ</div>`;
+      approverOptions.classList.add("open");
+    }
+
+    studentSearch.addEventListener("focus", () => renderStudentOptions(studentSearch.value));
+    studentSearch.addEventListener("input", () => {
+      selectedStudent = null;
+      renderStudentOptions(studentSearch.value);
+    });
+    studentOptions.addEventListener("click", event => {
+      const button = event.target.closest("[data-student-id]");
+      if (!button) return;
+      const student = students.find(item => item.id === button.dataset.studentId);
+      if (student) selectStudent(student);
+    });
+    teacherSearch.addEventListener("focus", () => renderTeacherOptions(teacherSearch.value));
+    teacherSearch.addEventListener("input", () => {
+      selectedTeacher = "";
+      renderTeacherOptions(teacherSearch.value);
+    });
+    teacherOptions.addEventListener("click", event => {
+      const button = event.target.closest("[data-teacher]");
+      if (!button) return;
+      selectedTeacher = button.dataset.teacher;
+      teacherSearch.value = selectedTeacher;
+      teacherOptions.classList.remove("open");
+    });
+    approverSearch.addEventListener("focus", () => renderApproverOptions(approverSearch.value));
+    approverSearch.addEventListener("input", () => {
+      selectedApprover = "";
+      renderApproverOptions(approverSearch.value);
+    });
+    approverOptions.addEventListener("click", event => {
+      const button = event.target.closest("[data-approver]");
+      if (!button) return;
+      selectedApprover = button.dataset.approver;
+      approverSearch.value = selectedApprover;
+      approverOptions.classList.remove("open");
+    });
+    document.addEventListener("click", event => {
+      if (!document.getElementById("studentPicker").contains(event.target)) studentOptions.classList.remove("open");
+      if (!document.getElementById("teacherPicker").contains(event.target)) teacherOptions.classList.remove("open");
+      if (!document.getElementById("approverPicker").contains(event.target)) approverOptions.classList.remove("open");
+    });
+
+    function loadGviz({ sheet, gid, query, headers = 1 }) {
+      return new Promise((resolve, reject) => {
+        const callback = `masterCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const timeout = setTimeout(() => {
+          cleanup();
+          reject(new Error("Google Sheet timeout"));
+        }, 12000);
+        function cleanup() {
+          clearTimeout(timeout);
+          script.remove();
+          delete window[callback];
+        }
+        window[callback] = payload => {
+          cleanup();
+          if (payload.status === "error") reject(new Error("Google Sheet error"));
+          else resolve(payload.table);
+        };
+        const params = new URLSearchParams({
+          tqx: `responseHandler:${callback}`,
+          headers: String(headers)
+        });
+        if (sheet) params.set("sheet", sheet);
+        if (gid) params.set("gid", gid);
+        if (query) params.set("tq", query);
+        script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?${params.toString()}`;
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Google Sheet network error"));
+        };
+        document.head.append(script);
+      });
+    }
+
+    function applyMasterData(data, message) {
+      if (data.students?.length) students = data.students;
+      if (data.teachers?.length) teachers = data.teachers;
+      updatePopulationStats();
+      masterStatus.textContent = message;
+      populateIdentityApprovers();
+    }
+
+    async function loadMasterData() {
+      let fallbackMaster = null;
+      const cached = sessionStorage.getItem("spvc-master-data");
+      if (cached) {
+        fallbackMaster = JSON.parse(cached);
+        students = fallbackMaster.students || [];
+        teachers = fallbackMaster.teachers || [];
+        masterStatus.textContent = "เตรียมข้อมูลค้นหาสำรองแล้ว · กำลังดึง Master Student จาก Google Sheet...";
+        populateIdentityApprovers();
+      } else {
+        try {
+          fallbackMaster = await fetch("data/master-data.json", { cache: "force-cache" }).then(response => response.json());
+          students = fallbackMaster.students || [];
+          teachers = fallbackMaster.teachers || [];
+          masterStatus.textContent = "เตรียมข้อมูลค้นหาสำรองแล้ว · กำลังดึง Master Student จาก Google Sheet...";
+          populateIdentityApprovers();
+          sessionStorage.setItem("spvc-master-data", JSON.stringify(fallbackMaster));
+        } catch (error) {
+          masterStatus.textContent = "กำลังเชื่อมข้อมูล Master ล่าสุด...";
+        }
+      }
+
+      try {
+        const [studentTable, teacherTable] = await Promise.all([
+          loadGviz({
+            sheet: "Students",
+            query: "select A,C,D,E,F,G,H,I,J where J = 'Active'",
+            headers: 1
+          }),
+          loadGviz({
+            gid: "667370291",
+            query: "select C offset 3",
+            headers: 0
+          })
+        ]);
+        const cellValue = (row, index) => row.c[index]?.v == null ? "" : String(row.c[index].v);
+        const liveStudents = studentTable.rows.map(row => ({
+          id: cellValue(row, 0),
+          prefix: cellValue(row, 1),
+          firstName: cellValue(row, 2),
+          lastName: cellValue(row, 3),
+          fullName: cellValue(row, 4),
+          grade: cellValue(row, 5),
+          room: cellValue(row, 6),
+          homeroomTeacher: cellValue(row, 7),
+          status: cellValue(row, 8)
+        })).filter(student => student.id);
+        const liveTeachers = teacherTable.rows.map(row => cellValue(row, 0).trim()).filter(Boolean);
+        if (liveStudents.length) students = liveStudents;
+        if (liveTeachers.length) teachers = liveTeachers;
+        sessionStorage.setItem("spvc-master-data", JSON.stringify({ students, teachers }));
+        refreshGenderDerivedUi();
+        masterStatus.textContent = `เชื่อม Google Sheet แล้ว · นักเรียน ${students.length.toLocaleString("th-TH")} คน · ครู ${teachers.length} คน · ดึงล่าสุด ${sheetSyncTime()}`;
+      } catch (error) {
+        if (fallbackMaster) {
+          applyMasterData(fallbackMaster, `Google Sheet ไม่ตอบกลับ · ใช้ Master สำรอง ${students.length.toLocaleString("th-TH")} คน · ${sheetSyncTime()}`);
+          refreshGenderDerivedUi();
+        } else {
+          masterStatus.textContent = "โหลด Master Student ไม่สำเร็จ";
+        }
+      }
+    }
+
+    function populateIdentityApprovers() {
+      const select = document.getElementById("identityFilterApprover");
+      const current = select.value;
+      const names = new Set(teachers);
+      [...document.querySelectorAll("#identityRows tr")].forEach(row => {
+        if (row.dataset.approver) names.add(row.dataset.approver);
+      });
+      select.innerHTML = `<option value="">ทุกคน</option>${[...names].sort((a, b) => a.localeCompare(b, "th")).map(name => `<option>${escapeHtml(name)}</option>`).join("")}`;
+      select.value = current;
+      const updateSelect = document.getElementById("identityUpdateApprover");
+      const updateCurrent = updateSelect.value;
+      updateSelect.innerHTML = [...names].sort((a, b) => a.localeCompare(b, "th")).map(name => `<option>${escapeHtml(name)}</option>`).join("");
+      updateSelect.value = updateCurrent;
+    }
+
+    function renderIdentityTeacherKpi() {
+      const stats = new Map();
+      const rows = [...identityRows.querySelectorAll("tr")];
+      const completedPattern = /อนุมัติแล้ว|อนุมัติบางส่วน|ไม่อนุมัติ|ใช้งานแล้ว|ยกเลิกสิทธิ/;
+      const ensure = name => {
+        if (!name) return null;
+        if (!stats.has(name)) stats.set(name, { recorded: 0, assigned: 0, completed: 0, pending: 0 });
+        return stats.get(name);
+      };
+      rows.forEach(row => {
+        const status = row.children[7].textContent.trim();
+        const recorder = ensure(row.dataset.recorder || row.children[5].textContent.trim());
+        const approver = ensure(row.dataset.approver || row.children[6].textContent.trim());
+        if (recorder) recorder.recorded += 1;
+        if (approver) {
+          approver.assigned += 1;
+          if (completedPattern.test(status)) approver.completed += 1;
+          else approver.pending += 1;
+        }
+      });
+      const entries = [...stats.entries()].sort((a, b) => (b[1].recorded + b[1].assigned) - (a[1].recorded + a[1].assigned));
+      const pending = rows.filter(row => !completedPattern.test(row.children[7].textContent)).length;
+      const completed = rows.length - pending;
+      const maxEntry = entries[0];
+      document.getElementById("identityKpiTeachers").textContent = entries.length;
+      document.getElementById("identityKpiPending").textContent = pending;
+      document.getElementById("identityKpiCompleted").textContent = completed;
+      document.getElementById("identityKpiMax").textContent = maxEntry ? maxEntry[1].recorded + maxEntry[1].assigned : 0;
+      document.getElementById("identityKpiMaxName").textContent = maxEntry ? maxEntry[0] : "ยังไม่มีข้อมูล";
+      document.getElementById("identityTeacherKpiRows").innerHTML = entries.length ? entries.map(([name, item]) => `
+        <tr><td><strong>${escapeHtml(name)}</strong></td><td>${item.recorded}</td><td>${item.assigned}</td><td>${item.completed}</td><td>${item.pending}</td><td>${item.assigned ? Math.round(item.completed / item.assigned * 100) : 0}%</td></tr>`).join("")
+        : `<tr><td colspan="6">ยังไม่มีข้อมูลการดำเนินงาน</td></tr>`;
+    }
+
+    function renderIdentityDecisions() {
+      if (!selectedIdentityRow) return;
+      document.getElementById("identityDecisionList").innerHTML = decisionParts(selectedIdentityRow).map((item, index) => `
+        <label class="decision-item">
+          <strong>${escapeHtml(item.permission)}</strong>
+          <select data-decision-index="${index}">
+            <option ${item.decision === "รอพิจารณา" ? "selected" : ""}>รอพิจารณา</option>
+            <option ${item.decision === "อนุมัติ" ? "selected" : ""}>อนุมัติ</option>
+            <option ${item.decision === "ไม่อนุมัติ" ? "selected" : ""}>ไม่อนุมัติ</option>
+          </select>
+        </label>`).join("");
+    }
+
+    function renderIdentityAttachments() {
+      const id = document.getElementById("selectedIdentityId").textContent.trim();
+      const files = identityAttachments[id] || [];
+      document.getElementById("identityAttachmentList").innerHTML = files.length ? files.map((file, index) => `
+        <div class="attachment-item"><span class="list-icon">${index + 1}</span><div><strong>${file.url ? `<a href="${escapeHtml(file.url)}" target="_blank" rel="noopener">${escapeHtml(file.name)}</a>` : escapeHtml(file.name)}</strong><small>${escapeHtml(file.addedAt)}${file.category === "parent-consent" ? " · หนังสือยินยอม" : ""}</small></div></div>`).join("")
+        : `<div class="notice">ยังไม่มีหนังสือยินยอมหรือเอกสารแนบ สามารถเพิ่มได้จากแบบฟอร์มอัปเดต</div>`;
+    }
+
+    function openIdentityModal(row) {
+      selectedIdentityRow = row;
+      const cells = row.children;
+      const id = cells[0].textContent.trim();
+      document.getElementById("selectedIdentityId").textContent = id;
+      document.getElementById("selectedIdentityStudent").textContent = `${cells[1].querySelector("strong").textContent.trim()} · ${cells[1].querySelector("small").textContent.trim()}`;
+      document.getElementById("selectedIdentityRecorder").textContent = row.dataset.recorder || cells[5].textContent.trim();
+      document.getElementById("selectedIdentityApprover").textContent = row.dataset.approver || cells[6].textContent.trim();
+      document.getElementById("selectedIdentityStatus").textContent = cells[7].textContent.trim();
+      document.getElementById("identityUpdateStatus").value = cells[7].textContent.trim().replace("รอลงนาม", "รอลงนามอนุมัติ");
+      document.getElementById("identityUpdateApprover").value = row.dataset.approver || cells[6].textContent.trim();
+      const record = genderRecords.get(id);
+      document.getElementById("identityTimeline").innerHTML = record?.timeline?.length ? record.timeline.map((item, index) => `
+        <div class="timeline-item"><span class="timeline-dot">${index + 1}</span><div class="timeline-copy"><strong>${index ? "อัปเดตผลการพิจารณา" : "บันทึกคำขอเข้าระบบ"}</strong><small>${escapeHtml(formatDateTime(item.actionAt))} · ${escapeHtml(item.note || item.status || "-")}${item.actor ? ` · โดย ${escapeHtml(item.actor)}` : ""}</small></div></div>`).join("") : `
+        <div class="timeline-item"><span class="timeline-dot">1</span><div class="timeline-copy"><strong>บันทึกคำขอเข้าระบบ</strong><small>${cells[3].textContent.trim()} · ผู้บันทึก ${escapeHtml(row.dataset.recorder || cells[5].textContent.trim())}</small></div></div>
+        ${row.dataset.lastUpdate ? `<div class="timeline-item"><span class="timeline-dot">2</span><div class="timeline-copy"><strong>อัปเดตผลการพิจารณาล่าสุด</strong><small>${escapeHtml(row.dataset.lastUpdate)}</small></div></div>` : ""}`;
+      renderIdentityDecisions();
+      renderIdentityAttachments();
+      identityModal.classList.add("open");
+      identityModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeIdentityModal() {
+      identityModal.classList.remove("open");
+      identityModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+    }
+
+    function filterIdentityRows() {
+      const keyword = document.getElementById("identityFilterSearch").value.trim().toLocaleLowerCase("th");
+      const status = document.getElementById("identityFilterStatus").value;
+      const permission = document.getElementById("identityFilterPermission").value;
+      const approver = document.getElementById("identityFilterApprover").value;
+      [...document.querySelectorAll("#identityRows tr")].forEach(row => {
+        const cells = row.children;
+        const matches = (!keyword || row.textContent.toLocaleLowerCase("th").includes(keyword))
+          && (!status || cells[7].textContent.includes(status))
+          && (!permission || cells[2].textContent.includes(permission))
+          && (!approver || row.dataset.approver === approver);
+        row.hidden = !matches;
+      });
+    }
+
+    function updateIdentityReport() {
+      const fmt = value => new Intl.NumberFormat("th-TH").format(value);
+      const male = students.filter(student => inferRegisteredSex(student.prefix, student.fullName) === "ชาย").length;
+      const female = students.filter(student => inferRegisteredSex(student.prefix, student.fullName) === "หญิง").length;
+      const rows = [...document.querySelectorAll("#identityRows tr")].filter(row => !row.hidden);
+      document.getElementById("reportTotalStudents").textContent = fmt(students.length);
+      document.getElementById("reportMaleStudents").textContent = fmt(male);
+      document.getElementById("reportFemaleStudents").textContent = fmt(female);
+      document.getElementById("reportIdentityCount").textContent = fmt(rows.length);
+      const reportDate = new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date());
+      document.getElementById("identityReportPeriod").textContent = `ข้อมูล ณ วันที่ ${reportDate}`;
+      document.getElementById("identityReportSignedDate").textContent = reportDate;
+      document.getElementById("identityReportRows").innerHTML = rows.length ? rows.map(row => {
+        const cells = row.children;
+        const studentName = cells[1]?.querySelector("strong")?.textContent.trim() || "-";
+        const studentMeta = cells[1]?.querySelector("small")?.textContent.trim() || "";
+        return `<tr>
+          <td>${escapeHtml(cells[0]?.textContent.trim())}</td>
+          <td><strong>${escapeHtml(studentName)}</strong><br>${escapeHtml(studentMeta)}</td>
+          <td>${decisionParts(row).map(item => `${escapeHtml(item.permission)}: ${escapeHtml(item.decision)}`).join("<br>")}</td>
+          <td>${escapeHtml(cells[4]?.textContent.trim())}</td>
+          <td>${escapeHtml(cells[5]?.textContent.trim())}</td>
+          <td>${escapeHtml(cells[6]?.textContent.trim())}</td>
+          <td>${escapeHtml(cells[7]?.textContent.trim())}</td>
+        </tr>`;
+      }).join("") : `<tr><td colspan="7">ไม่พบข้อมูลในทะเบียน</td></tr>`;
+    }
+
+    document.getElementById("identityForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const permissions = [...document.querySelectorAll("input[name='permission']:checked")].map(input => input.value);
+      if (!selectedStudent) {
+        showToast("กรุณาค้นหาและเลือกนักเรียนจาก Master Student");
+        studentSearch.focus();
+        return;
+      }
+      if (!selectedTeacher) {
+        showToast("กรุณาค้นหาและเลือกครูผู้บันทึก");
+        teacherSearch.focus();
+        return;
+      }
+      if (!selectedApprover) {
+        showToast("กรุณาค้นหาและเลือกผู้อนุมัติในระบบ");
+        approverSearch.focus();
+        return;
+      }
+      if (!permissions.length) {
+        showToast("กรุณาเลือกรายการที่ต้องการบันทึกหรืออนุญาต");
+        return;
+      }
+      const form = event.target;
+      const submitButton = form.querySelector("[type='submit']");
+      const id = document.getElementById("masterId").value;
+      const name = document.getElementById("masterName").value;
+      const room = document.getElementById("masterRoom").value;
+      let status = document.getElementById("identityStatus").value;
+      const consentFile = document.getElementById("parentConsentFile").files[0];
+      const otherFiles = [...document.getElementById("identityOtherFiles").files];
+      if (!consentFile) status = "รอเอกสารยินยอม";
+      submitButton.disabled = true;
+      submitButton.textContent = consentFile || otherFiles.length ? "กำลังอัปโหลดเอกสารไป Drive..." : "กำลังบันทึกลง Google Sheets...";
+      let record;
+      try {
+        const files = genderApi?.configured()
+          ? [
+              ...(consentFile ? await genderApi.filesToPayload([consentFile], "parent-consent") : []),
+              ...await genderApi.filesToPayload(otherFiles, "supporting-document")
+            ]
+          : [];
+        const payload = {
+          studentId: id,
+          studentName: name,
+          room,
+          registeredSex: document.getElementById("masterSex").value,
+          identityGroup: document.getElementById("identityGroup").value,
+          permissions,
+          decisions: permissions.map(() => "รอพิจารณา"),
+          preferredName: document.getElementById("preferredName").value.trim(),
+          pronouns: document.getElementById("pronouns").value.trim(),
+          effectiveDate: effectiveDate.value,
+          consentDate: parentConsentDate.value,
+          recorder: selectedTeacher,
+          approver: selectedApprover,
+          status,
+          note: document.getElementById("identityNote").value.trim(),
+          actor: selectedTeacher,
+          files
+        };
+        record = genderApi?.configured()
+          ? await genderApi.request("gender.create", payload)
+          : {
+              ...payload,
+              requestId: `GI-69${String(Date.now()).slice(-3)}`,
+              version: 1,
+              createdAt: new Date().toISOString(),
+              timeline: [{ actionAt: new Date().toISOString(), status, approver: selectedApprover, decisions: payload.decisions, note: payload.note || "บันทึกคำขอเข้าระบบ", actor: selectedTeacher }],
+              documents: [
+                ...(consentFile ? [{ name: consentFile.name, mimeType: consentFile.type, category: "parent-consent", uploadedAt: new Date().toISOString() }] : []),
+                ...otherFiles.map(file => ({ name: file.name, mimeType: file.type, category: "supporting-document", uploadedAt: new Date().toISOString() }))
+              ]
+            };
+      } catch (error) {
+        genderApiStatus.textContent = `บันทึกไม่สำเร็จ · ${error.message}`;
+        showToast(`บันทึกรายการไม่สำเร็จ: ${error.message}`);
+        return;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "บันทึกข้อมูลรายบุคคล";
+      }
+      applyGenderRecord(record, true);
+      showToast(`บันทึกข้อมูล ${name} แล้ว`);
+      form.reset();
+      selectedStudent = null;
+      selectedTeacher = "";
+      selectedApprover = "";
+      studentSearch.value = "";
+      teacherSearch.value = "";
+      approverSearch.value = "";
+      document.getElementById("masterId").value = "";
+      document.getElementById("masterName").value = "";
+      document.getElementById("masterRoom").value = "";
+      document.getElementById("masterSex").value = "";
+      effectiveDate.value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      parentConsentDate.value = effectiveDate.value;
+      genderApiStatus.textContent = genderApi?.configured()
+        ? `ซิงก์ Google Sheets และ Drive แล้ว · บันทึกล่าสุด ${record.requestId} · ${sheetSyncTime()}`
+        : "โหมดตัวอย่าง · ข้อมูลยังไม่ถูกส่งไป Google Sheets";
+      refreshGenderDerivedUi();
+      openView("requests");
+    });
+
+    identityRows.addEventListener("click", event => {
+      const button = event.target.closest("[data-identity-case]");
+      if (!button) return;
+      openIdentityModal(button.closest("tr"));
+    });
+
+    document.getElementById("identityDecisionList").addEventListener("change", () => {
+      const decisions = [...document.querySelectorAll("#identityDecisionList select")].map(select => select.value);
+      const derived = deriveDecisionStatus(decisions);
+      if (derived) document.getElementById("identityUpdateStatus").value = derived;
+    });
+
+    document.getElementById("identityUpdateForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!selectedIdentityRow) return;
+      const decisions = [...document.querySelectorAll("#identityDecisionList select")].map(select => select.value);
+      const derivedStatus = deriveDecisionStatus(decisions);
+      const status = derivedStatus || document.getElementById("identityUpdateStatus").value;
+      const approver = document.getElementById("identityUpdateApprover").value;
+      const date = document.getElementById("identityUpdateDate").value;
+      const note = document.getElementById("identityUpdateNote").value.trim();
+      const files = [...document.getElementById("identityUpdateFiles").files];
+      const id = selectedIdentityRow.children[0].textContent.trim();
+      const submitButton = event.target.querySelector("[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = files.length ? "กำลังอัปโหลดเอกสารไป Drive..." : "กำลังบันทึกการอัปเดต...";
+      let record;
+      try {
+        const filePayload = genderApi?.configured()
+          ? await genderApi.filesToPayload(files, selectedIdentityRow.dataset.consent ? "supporting-document" : "parent-consent")
+          : [];
+        const current = genderRecords.get(id);
+        const payload = {
+          requestId: id,
+          version: current?.version || selectedIdentityRow.dataset.version || "",
+          decisions,
+          status,
+          approver,
+          recorder: current?.recorder || selectedIdentityRow.dataset.recorder,
+          actionAt: date,
+          note,
+          actor: approver,
+          files: filePayload
+        };
+        record = genderApi?.configured()
+          ? await genderApi.request("gender.update", payload)
+          : {
+              ...(current || {
+                requestId: id,
+                studentId: selectedIdentityRow.children[1].querySelector("small").textContent.split(" · ")[0],
+                studentName: selectedIdentityRow.children[1].querySelector("strong").textContent,
+                room: selectedIdentityRow.children[1].querySelector("small").textContent.split(" · ")[1],
+                permissions: permissionParts(selectedIdentityRow),
+                recorder: selectedIdentityRow.dataset.recorder,
+                effectiveDate: new Date().toISOString(),
+                timeline: [],
+                documents: []
+              }),
+              version: Number(current?.version || 0) + 1,
+              decisions,
+              status,
+              approver,
+              timeline: [...(current?.timeline || []), { actionAt: date, status, approver, decisions, note, actor: approver }],
+              documents: [
+                ...(current?.documents || []),
+                ...files.map(file => ({ name: file.name, mimeType: file.type, category: selectedIdentityRow.dataset.consent ? "supporting-document" : "parent-consent", uploadedAt: date }))
+              ]
+            };
+      } catch (error) {
+        genderApiStatus.textContent = `อัปเดตไม่สำเร็จ · ${error.message}`;
+        showToast(`อัปเดตรายการไม่สำเร็จ: ${error.message}`);
+        return;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "บันทึกการอัปเดต";
+      }
+      selectedIdentityRow = applyGenderRecord(record);
+      refreshGenderDerivedUi();
+      event.target.reset();
+      setCurrentDateTime(document.getElementById("identityUpdateDate"));
+      document.getElementById("identityUpdateApprover").value = approver;
+      openIdentityModal(selectedIdentityRow);
+      genderApiStatus.textContent = genderApi?.configured()
+        ? `ซิงก์แล้ว · ${id}${files.length ? ` · เอกสาร ${files.length} ไฟล์อยู่ใน Google Drive` : ""} · ${sheetSyncTime()}`
+        : "โหมดตัวอย่าง · ข้อมูลยังไม่ถูกส่งไป Google Sheets";
+      showToast(`อัปเดต ${id} แล้ว`);
+    });
+
+    document.getElementById("deleteIdentityRequest").addEventListener("click", async () => {
+      if (!selectedIdentityRow) return;
+      const id = selectedIdentityRow.children[0].textContent.trim();
+      if (!window.confirm(`ยืนยันลบ ${id} ออกจากทะเบียน? ข้อมูลใน Sheet จะถูกทำเครื่องหมายว่าลบแล้ว`)) return;
+      try {
+        if (genderApi?.configured()) {
+          await genderApi.request("gender.delete", {
+            requestId: id,
+            version: genderRecords.get(id)?.version || selectedIdentityRow.dataset.version,
+            actor: document.getElementById("identityUpdateApprover").value
+          });
+        }
+        genderRecords.delete(id);
+        delete identityAttachments[id];
+        selectedIdentityRow.remove();
+        selectedIdentityRow = null;
+        closeIdentityModal();
+        refreshGenderDerivedUi();
+        if (genderApi?.configured()) genderApiStatus.textContent = `ซิงก์ Google Sheets แล้ว · ลบ ${id} · ${sheetSyncTime()}`;
+        showToast(`ลบ ${id} ออกจากทะเบียนแล้ว`);
+      } catch (error) {
+        showToast(`ลบรายการไม่สำเร็จ: ${error.message}`);
+      }
+    });
+
+    document.getElementById("printIdentityReport").addEventListener("click", () => {
+      updateIdentityReport();
+      window.print();
+    });
+
+    document.getElementById("closeIdentityModal").addEventListener("click", closeIdentityModal);
+    identityModal.addEventListener("click", event => {
+      if (event.target === identityModal) closeIdentityModal();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeIdentityModal();
+    });
+
+    ["identityFilterSearch", "identityFilterStatus", "identityFilterPermission", "identityFilterApprover"].forEach(id => {
+      document.getElementById(id).addEventListener(id === "identityFilterSearch" ? "input" : "change", filterIdentityRows);
+    });
+    [...identityRows.querySelectorAll("tr")].forEach(row => {
+      row.children[2].innerHTML = permissionDisplay(row);
+    });
+    setCurrentDateTime(document.getElementById("identityUpdateDate"));
+    populateIdentityApprovers();
+    filterIdentityRows();
+    renderIdentityTeacherKpi();
+    loadMasterData();
+    loadGenderRecords();
+  </script>
+</body>
+</html>
