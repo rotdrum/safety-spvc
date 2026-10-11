@@ -412,6 +412,11 @@
       color: #b9caff;
     }
 
+    .hero-system.permission .hero-system-icon {
+      background: rgba(96, 165, 250, 0.16);
+      color: #93c5fd;
+    }
+
     .hero-system strong,
     .hero-system small {
       display: block;
@@ -472,6 +477,347 @@
       margin-top: 4px;
       font-size: 17px;
       line-height: 1.4;
+    }
+
+    .overview-section {
+      padding: 58px 0 88px;
+    }
+
+    .overview-shell {
+      position: relative;
+      overflow: hidden;
+      padding: 32px;
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: 30px;
+      background:
+        radial-gradient(circle at 9% 12%, rgba(245, 158, 11, 0.16), transparent 27%),
+        radial-gradient(circle at 78% 4%, rgba(168, 85, 247, 0.12), transparent 24%),
+        radial-gradient(circle at 95% 82%, rgba(239, 68, 68, 0.12), transparent 24%),
+        linear-gradient(135deg, #ffffff, #f8fbfb 60%, #f3f7f5);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .overview-shell::before {
+      position: absolute;
+      right: -80px;
+      bottom: -100px;
+      width: 280px;
+      height: 280px;
+      border: 48px solid rgba(18, 59, 53, 0.05);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .overview-head {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .overview-head h2 {
+      margin: 0;
+      font-size: clamp(27px, 3.6vw, 42px);
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+    }
+
+    .overview-head p {
+      max-width: 700px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .overview-sync {
+      min-width: 230px;
+      padding: 16px 18px;
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .overview-sync span,
+    .overview-sync strong {
+      display: block;
+    }
+
+    .overview-sync span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .overview-sync strong {
+      margin-top: 3px;
+      color: var(--forest);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .overview-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+    }
+
+    .overview-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      padding: 20px;
+      border: 1px solid rgba(220, 231, 227, 0.95);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 28px rgba(16, 36, 33, 0.06);
+    }
+
+    .overview-card::after {
+      position: absolute;
+      top: -42px;
+      right: -44px;
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+      background: rgba(15, 118, 110, 0.08);
+      content: "";
+    }
+
+    .overview-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .overview-card.late {
+      border-color: rgba(245, 158, 11, 0.32);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(251, 191, 36, 0.22), transparent 42%),
+        linear-gradient(145deg, #fffaf0, #ffffff 58%, #fff7ed);
+    }
+
+    .overview-card.late::after {
+      background: rgba(245, 158, 11, 0.15);
+    }
+
+    .overview-card.late.featured {
+      border-color: rgba(251, 191, 36, 0.48);
+      background:
+        radial-gradient(circle at 88% 8%, rgba(254, 243, 199, 0.26), transparent 28%),
+        linear-gradient(145deg, #7c2d12, #ea580c 56%, #f59e0b);
+      color: #fff;
+      box-shadow: 0 18px 42px rgba(234, 88, 12, 0.22);
+    }
+
+    .overview-card.featured .overview-card-label,
+    .overview-card.featured small {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .overview-card.identity {
+      border-color: rgba(168, 85, 247, 0.3);
+      background:
+        linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1), rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1)),
+        linear-gradient(145deg, #ffffff, #fdf7ff);
+    }
+
+    .overview-card.identity::before {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e, #3b82f6, #a855f7);
+      content: "";
+    }
+
+    .overview-card.identity::after {
+      background: rgba(168, 85, 247, 0.14);
+    }
+
+    .overview-card.report {
+      border-color: rgba(239, 68, 68, 0.28);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(248, 113, 113, 0.17), transparent 36%),
+        linear-gradient(145deg, #fff7f4, #ffffff 58%, #fff1f2);
+    }
+
+    .overview-card.report::after {
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .overview-card.permission {
+      border-color: rgba(37, 99, 235, 0.28);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(96, 165, 250, 0.18), transparent 38%),
+        linear-gradient(145deg, #eff6ff, #ffffff 58%, #ecfeff);
+    }
+
+    .overview-card.permission::after {
+      background: rgba(37, 99, 235, 0.12);
+    }
+
+    .overview-card-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .overview-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--teal-bright);
+      box-shadow: 0 0 0 5px rgba(20, 184, 166, 0.12);
+    }
+
+    .overview-dot.gold {
+      background: var(--gold);
+      box-shadow: 0 0 0 5px rgba(212, 166, 74, 0.15);
+    }
+
+    .overview-dot.blue {
+      background: var(--blue);
+      box-shadow: 0 0 0 5px rgba(59, 112, 212, 0.12);
+    }
+
+    .overview-dot.rainbow {
+      background: linear-gradient(135deg, #ef4444, #f59e0b, #22c55e, #3b82f6, #a855f7);
+      box-shadow: 0 0 0 5px rgba(168, 85, 247, 0.13);
+    }
+
+    .overview-dot.red {
+      background: #ef4444;
+      box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.12);
+    }
+
+    .overview-card strong {
+      display: block;
+      margin-top: 16px;
+      font-size: clamp(34px, 5vw, 50px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .overview-card small {
+      display: block;
+      margin-top: 11px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .overview-breakdown {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.05fr 1.95fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .overview-note,
+    .case-status-board {
+      border: 1px solid rgba(220, 231, 227, 0.95);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 12px 28px rgba(16, 36, 33, 0.05);
+    }
+
+    .overview-note {
+      padding: 20px;
+    }
+
+    .overview-note strong,
+    .case-status-board h3 {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .overview-note p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .case-status-board {
+      padding: 18px;
+      border-color: rgba(248, 113, 113, 0.24);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(251, 146, 60, 0.13), transparent 34%),
+        linear-gradient(145deg, #ffffff, #fff7f4);
+    }
+
+    .case-status-board h3 {
+      color: #9a3412;
+    }
+
+    .case-status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .case-status {
+      padding: 14px;
+      border: 1px solid transparent;
+      border-radius: 17px;
+      background: #f6faf8;
+    }
+
+    .case-status.total {
+      border-color: rgba(251, 146, 60, 0.24);
+      background: #fff7ed;
+      color: #9a3412;
+    }
+
+    .case-status.active {
+      border-color: rgba(244, 63, 94, 0.22);
+      background: #fff1f2;
+      color: #be123c;
+    }
+
+    .case-status.pending {
+      border-color: rgba(245, 158, 11, 0.25);
+      background: #fffbeb;
+      color: #b45309;
+    }
+
+    .case-status.done {
+      border-color: rgba(16, 185, 129, 0.22);
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+    .case-status span,
+    .case-status strong {
+      display: block;
+    }
+
+    .case-status span {
+      color: currentColor;
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 0.72;
+    }
+
+    .case-status strong {
+      margin-top: 5px;
+      font-size: 26px;
+      line-height: 1;
     }
 
     .section {
@@ -906,14 +1252,14 @@
 
     .compact-person {
       display: grid;
-      grid-template-columns: 82px minmax(0, 1fr);
+      grid-template-columns: 110px minmax(0, 1fr);
       align-items: center;
-      gap: 14px;
-      width: min(100%, 450px);
-      min-height: 102px;
-      padding: 10px 16px;
+      gap: 18px;
+      width: min(100%, 520px);
+      min-height: 136px;
+      padding: 13px 20px;
       border: 1px solid var(--line);
-      border-radius: 18px;
+      border-radius: 24px;
       background: #f9fbfa;
     }
 
@@ -934,14 +1280,14 @@
     }
 
     .compact-avatar {
-      width: 82px;
-      height: 82px;
-      border: 2px solid #fff;
+      width: 110px;
+      height: 110px;
+      border: 3px solid #fff;
       border-radius: 50%;
       background: #eef4f2;
       object-fit: cover;
       object-position: center top;
-      box-shadow: 0 4px 10px rgba(16, 36, 33, 0.12);
+      box-shadow: 0 8px 18px rgba(16, 36, 33, 0.14);
     }
 
     .compact-person strong,
@@ -950,14 +1296,14 @@
     }
 
     .compact-person strong {
-      font-size: 15px;
+      font-size: 17px;
       line-height: 1.35;
     }
 
     .compact-person span {
-      margin-top: 3px;
+      margin-top: 5px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.4;
     }
 
@@ -1024,6 +1370,14 @@
       gap: 10px;
       padding: 18px 10px;
       text-align: center;
+    }
+
+    .compact-staff-row .compact-person strong {
+      font-size: 13px;
+    }
+
+    .compact-staff-row .compact-person span {
+      font-size: 11px;
     }
 
     .compact-staff-row .compact-avatar {
@@ -1495,6 +1849,20 @@
         border-bottom: 1px solid var(--line);
       }
 
+      .overview-head,
+      .overview-breakdown {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-sync {
+        min-width: 0;
+      }
+
+      .overview-grid,
+      .case-status-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
       .about-grid,
       .contact-banner {
         grid-template-columns: 1fr;
@@ -1549,6 +1917,24 @@
         font-size: 14px;
       }
 
+      .overview-section {
+        padding: 42px 0 68px;
+      }
+
+      .overview-shell {
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .overview-grid,
+      .case-status-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-card {
+        min-height: 126px;
+      }
+
       .section {
         padding: 68px 0;
       }
@@ -1588,6 +1974,26 @@
         gap: 9px;
         margin-inline: 0;
         padding-top: 0;
+      }
+
+      .compact-level .compact-person {
+        grid-template-columns: 82px minmax(0, 1fr);
+        min-height: 104px;
+        padding: 10px 14px;
+        border-radius: 18px;
+      }
+
+      .compact-level .compact-avatar {
+        width: 82px;
+        height: 82px;
+      }
+
+      .compact-level .compact-person strong {
+        font-size: 15px;
+      }
+
+      .compact-level .compact-person span {
+        font-size: 12px;
       }
 
       .compact-staff-row .compact-person {
@@ -1685,6 +2091,8 @@
 
       <nav class="main-nav" id="mainNav" aria-label="เมนูหลัก">
         <a class="active" href="#home">หน้าแรก</a>
+        <a href="student-portal/index.html">พื้นที่นักเรียน</a>
+        <a href="#data-overview">ภาพรวมข้อมูล</a>
         <a href="#news">ข่าวประชาสัมพันธ์</a>
         <a href="#about">เกี่ยวกับหน่วยงาน</a>
         <!-- <a href="#organization">โครงสร้างองค์กร</a> -->
@@ -1703,14 +2111,14 @@
           <p class="hero-lead">
             ศูนย์กลางข้อมูลและระบบบริการของงานปกครองและความปลอดภัยนักเรียน นักศึกษา
             วิทยาลัยอาชีวศึกษาสุพรรณบุรี เชื่อมงานตรวจสอบนักเรียนมาสาย
-            งานบริหารจัดการพฤติกรรม ข่าวสาร และข้อมูลสำหรับการดูแลช่วยเหลือนักเรียนอย่างเป็นระบบ
+            งานบริหารจัดการพฤติกรรม การขออนุญาตออกนอกสถานศึกษา ข่าวสาร และข้อมูลสำหรับการดูแลช่วยเหลือนักเรียนอย่างเป็นระบบ
           </p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#about">
-              ข้อมูลงานปกครอง
+            <a class="button button-primary" href="student-portal/index.html">
+              เข้าสู่พื้นที่นักเรียน
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </a>
-            <a class="button button-ghost" href="#contact">ติดต่อ</a>
+            <a class="button button-ghost" href="#about" target="_blank">ข้อมูลงานปกครอง</a>
           </div>
         </div>
 
@@ -1723,7 +2131,7 @@
             <span class="status-pill">พร้อมให้บริการ</span>
           </div>
           <div class="hero-system-list">
-            <a class="hero-system late" href="student-late-system/web-dashboard/index.html">
+            <a class="hero-system late" href="student-late-system/web-dashboard/index.html" target="_blank">
               <span class="hero-system-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
               </span>
@@ -1733,7 +2141,7 @@
               </span>
               <span class="hero-system-arrow">›</span>
             </a>
-            <a class="hero-system behavior" id="behavior-system" href="behavior-system/index.html">
+            <a class="hero-system behavior" id="behavior-system" href="behavior-system/index.html" target="_blank">
               <span class="hero-system-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l1 3h3v15H4V6h3l1-3Z"/><path d="M9 12h6M9 16h4"/></svg>
               </span>
@@ -1743,7 +2151,7 @@
               </span>
               <span class="hero-system-arrow">›</span>
             </a>
-            <a class="hero-system identity" id="gender-identity-system" href="gender-identity-system/index.html">
+            <a class="hero-system identity" id="gender-identity-system" href="gender-identity-system/index.html" target="_blank">
               <span class="hero-system-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <rect x="3" y="5" width="18" height="14" rx="2"/>
@@ -1757,6 +2165,16 @@
               </span>
               <span class="hero-system-arrow">›</span>
             </a>
+            <a class="hero-system permission" id="off-campus-system" href="off-campus-system/index.html" target="_blank">
+              <span class="hero-system-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h11v16H4Z"/><path d="M9 12h11m-4-4 4 4-4 4"/><path d="M8 12h.01"/></svg>
+              </span>
+              <span>
+                <strong>ระบบขออนุญาตออกนอกสถานศึกษา</strong>
+                <small>รับรอง อนุมัติ และติดตามการออก-กลับ</small>
+              </span>
+              <span class="hero-system-arrow">›</span>
+            </a>
           </div>
         </aside>
       </div>
@@ -1765,11 +2183,73 @@
     <div class="quick-strip">
       <div class="container quick-strip-inner">
         <div class="quick-stat"><span>สถานะศูนย์ข้อมูล</span><strong>พร้อมให้บริการ</strong></div>
-        <div class="quick-stat"><span>ระบบที่เชื่อมต่อ</span><strong>3 ระบบหลัก</strong></div>
+        <div class="quick-stat"><span>ระบบที่เชื่อมต่อ</span><strong>4 ระบบหลัก</strong></div>
         <div class="quick-stat"><span>หน่วยงาน</span><strong>งานปกครองและความปลอดภัยนักเรียน นักศึกษา</strong></div>
         <div class="quick-stat"><span>วันที่</span><strong id="currentDate">กำลังโหลด...</strong></div>
       </div>
     </div>
+
+    <section class="section overview-section" id="data-overview">
+      <div class="container">
+        <div class="overview-shell">
+          <div class="overview-head">
+            <div>
+              <span class="section-label">Integrated Dashboard</span>
+              <h2>ภาพรวมข้อมูลจากระบบงานปกครอง</h2>
+              <p>สรุปเฉพาะข้อมูลเชิงจำนวนที่เผยแพร่ได้ ไม่แสดงรายชื่อ รายละเอียดนักเรียน หรือเอกสารส่วนบุคคล</p>
+            </div>
+            <div class="overview-sync" aria-live="polite">
+              <span id="overviewStatus">กำลังเชื่อมต่อข้อมูล</span>
+              <strong id="overviewUpdated">กำลังโหลด...</strong>
+            </div>
+          </div>
+
+          <div class="overview-grid">
+            <article class="overview-card late featured">
+              <span class="overview-card-label"><i class="overview-dot gold"></i>นักเรียนมาสายประจำวัน</span>
+              <strong id="lateDailyCount">-</strong>
+              <small id="lateDailyLabel">กำลังดึงข้อมูลจากระบบนักเรียนมาสาย</small>
+            </article>
+            <article class="overview-card late">
+              <span class="overview-card-label"><i class="overview-dot gold"></i>มาสาย 3 ครั้งขึ้นไป</span>
+              <strong id="lateFrequentCount">-</strong>
+              <small>นับจากข้อมูลมาสายที่บันทึกแล้ว</small>
+            </article>
+            <article class="overview-card identity">
+              <span class="overview-card-label"><i class="overview-dot rainbow"></i>ขึ้นทะเบียน LGBTQ</span>
+              <strong id="genderRegisteredCount">-</strong>
+              <small>ข้อมูลรวมจากระบบข้อมูลเพศภาพและการดูแลที่เท่าเทียม</small>
+            </article>
+            <article class="overview-card report">
+              <span class="overview-card-label"><i class="overview-dot red"></i>แจ้งเคสจากนักเรียน</span>
+              <strong id="studentReportCountPublic">-</strong>
+              <small>จำนวนเรื่องที่นักเรียนส่งเข้ามาให้ครูคัดกรอง</small>
+            </article>
+            <article class="overview-card permission">
+              <span class="overview-card-label"><i class="overview-dot blue"></i>อนุมัติออกนอกสถานศึกษา</span>
+              <strong id="offCampusApprovedCount">-</strong>
+              <small id="offCampusPendingLabel">กำลังดึงข้อมูลคำขอจากระบบกลาง</small>
+            </article>
+          </div>
+
+          <div class="overview-breakdown">
+            <div class="overview-note">
+              <strong>ข้อมูลแสดงแบบภาพรวม</strong>
+              <p>ตัวเลขชุดนี้ช่วยให้เห็นภาระงานและแนวโน้มการดูแลนักเรียน โดยคงความเป็นส่วนตัวของผู้เกี่ยวข้องทุกคน</p>
+            </div>
+            <div class="case-status-board">
+              <h3>สถานะเคสพฤติกรรมนักเรียน</h3>
+              <div class="case-status-grid">
+                <div class="case-status total"><span>เคสทั้งหมด</span><strong id="behaviorCaseTotal">-</strong></div>
+                <div class="case-status active"><span>กำลังดำเนินงาน</span><strong id="behaviorCaseActive">-</strong></div>
+                <div class="case-status pending"><span>ค้าง / รอติดตาม</span><strong id="behaviorCasePending">-</strong></div>
+                <div class="case-status done"><span>เสร็จสิ้น</span><strong id="behaviorCaseDone">-</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="section section-white" id="about">
       <div class="container">
@@ -1856,59 +2336,59 @@
         </div>
 
         <div class="news-grid">
-          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0UyYt9jWEbfccwmJUS5s6XxDwCfyCkczZt4bgD5rpjxaGEAiHBGeso9oUT3JCiW3Ql&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าว Pride Month บน Facebook">
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid05GiA7e6s76HqzPx1GxTm16qkztt9srrMghZ36TnXsAXr75kQp3FRQhFdrPc3X5bdl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าวช่องทางแจ้งเหตุของนักเรียน นักศึกษาบน Facebook">
             <div class="news-visual">
-              <img src="assets/protection-news/pride-month.jpg" alt="ประชาสัมพันธ์ Pride Month">
-              <span class="news-badge">ประชาสัมพันธ์</span>
+              <img src="assets/protection-news/student-report-channel.jpg" alt="ประชาสัมพันธ์ช่องทางแจ้งเหตุของนักเรียน นักศึกษา">
+              <span class="news-badge">แจ้งเหตุ</span>
             </div>
             <div class="news-body">
-              <span class="news-date">ข่าวล่าสุดจากงานปกครอง</span>
-              <h3>Happy Pride Month</h3>
-              <p>ร่วมเป็นส่วนหนึ่งของสังคมที่เคารพในความแตกต่าง ความเท่าเทียม และศักดิ์ศรีของทุกคน</p>
+              <span class="news-date">17 มิถุนายน 2569</span>
+              <h3>ช่องทางแจ้งเหตุของนักเรียน นักศึกษา</h3>
+              <p>ร่วมสร้างสังคมที่ปลอดภัย พบเหตุไม่ปลอดภัย ทะเลาะวิวาท กลั่นแกล้ง หรือพฤติกรรมไม่เหมาะสม แจ้งผ่านระบบได้ทันที</p>
               <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
             </div>
           </a>
 
-          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0dgRprfeLT2u4gqQjFL5dazEcpNCHBFpDYjb8F4wVEKW3Hx6MwWyyVngKJExn6DKGl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าวพิธีไหว้ครูบน Facebook">
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid033R2XjN8ksYgSDaHW4wYk7B3uTb3LLeDEuAcvsMWNk3Vm6Xj1YuFStDh1JWWQ7gQml&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าวแนวปฏิบัติการขออนุญาตออกนอกสถานศึกษาบน Facebook">
             <div class="news-visual">
-              <img src="assets/protection-news/wai-kru.jpg" alt="ประชาสัมพันธ์พิธีไหว้ครู ปีการศึกษา 2569">
-              <span class="news-badge">กิจกรรม</span>
+              <img src="assets/protection-news/wai-kru-permission.jpg" alt="แนวปฏิบัติการขออนุญาตออกนอกสถานศึกษาเพื่อซื้อวัสดุพานไหว้ครู">
+              <span class="news-badge">แนวปฏิบัติ</span>
             </div>
             <div class="news-body">
-              <span class="news-date">ปีการศึกษา 2569</span>
-              <h3>พิธีไหว้ครู ประจำปีการศึกษา 2569</h3>
-              <p>กำหนดจัดวันพฤหัสบดีที่ 18 มิถุนายน 2569 ณ โดมรวมน้ำใจ วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
+              <span class="news-date">15 มิถุนายน 2569</span>
+              <h3>การขออนุญาตออกนอกสถานศึกษา</h3>
+              <p>แจ้งแนวปฏิบัติสำหรับตัวแทนห้องเรียนที่ออกไปซื้อวัสดุจัดทำพานไหว้ครู ต้องรับใบอนุญาตและปฏิบัติตามระเบียบ</p>
               <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
             </div>
           </a>
 
-          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0zriRG59ZpjHLfEvxQAWAsFWrFcAm7VqvDKuh7jo2ZHYHpdxBm59BAN8a6PRN92UAl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าว Safety First บน Facebook">
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid02VPN2Dz6MJe5SdbmvSMZiNTJRhCnqjxYz9hMiShbxPSDigP346Co8UUwcrsfqb8i7l&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าวใช้สื่อโซเชียลอย่างสร้างสรรค์บน Facebook">
             <div class="news-visual">
-              <img src="assets/protection-news/safety-first.jpg" alt="โครงการ Safety First การฟื้นคืนชีพและการปฐมพยาบาล">
-              <span class="news-badge">ความปลอดภัย</span>
+              <img src="assets/protection-news/social-media-creative.jpg" alt="ประชาสัมพันธ์การใช้สื่อโซเชียลอย่างสร้างสรรค์">
+              <span class="news-badge">ดิจิทัล</span>
             </div>
             <div class="news-body">
-              <span class="news-date">4 มิถุนายน 2569</span>
-              <h3>โครงการ Safety First</h3>
-              <p>เสริมทักษะการฟื้นคืนชีพ การใช้เครื่อง AED การห้ามเลือด และการปฐมพยาบาลเบื้องต้น</p>
+              <span class="news-date">9 มิถุนายน 2569</span>
+              <h3>ใช้สื่อโซเชียลอย่างสร้างสรรค์</h3>
+              <p>ชวนเป็นพลเมืองดิจิทัลที่ดี ใช้สื่ออย่างมีสติ คิดก่อนโพสต์ เคารพสิทธิผู้อื่น และตรวจสอบข้อมูลก่อนแชร์</p>
               <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
             </div>
           </a>
 
-          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid02oidLZ6sozrAkYeTAgGkHeQJuM2nGitxyb8XEfuPWS94PCPt82SsXtvXGLMdbQySEl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าววันงดสูบบุหรี่โลกบน Facebook">
+          <a class="news-card" href="https://www.facebook.com/permalink.php?story_fbid=pfbid0Y5CxxQzuXA7zNeLeTkyXcqaZ39hkbz613AVxMeEgcRTBsFgSmqjBNEsUzJbsxavnl&id=61589690822596" target="_blank" rel="noopener noreferrer" aria-label="อ่านข่าวตรวจระเบียบการแต่งกายบน Facebook">
             <div class="news-visual">
-              <img src="assets/protection-news/no-tobacco.jpg" alt="ประชาสัมพันธ์วันงดสูบบุหรี่โลก">
-              <span class="news-badge">รณรงค์</span>
+              <img src="assets/protection-news/uniform-inspection-current.jpg" alt="ประชาสัมพันธ์ตรวจระเบียบการแต่งกาย ครั้งที่ 1">
+              <span class="news-badge">ระเบียบวินัย</span>
             </div>
             <div class="news-body">
-              <span class="news-date">31 พฤษภาคม</span>
-              <h3>วันงดสูบบุหรี่โลก</h3>
-              <p>ลด ละ เลิกบุหรี่และบุหรี่ไฟฟ้า เพื่อสุขภาพที่แข็งแรงและสภาพแวดล้อมที่ปลอดภัย</p>
+              <span class="news-date">7 มิถุนายน 2569</span>
+              <h3>ตรวจระเบียบการแต่งกาย ครั้งที่ 1</h3>
+              <p>กำหนดตรวจระเบียบการแต่งกายระหว่างวันที่ 8-12 มิถุนายน 2569 เพื่อส่งเสริมภาพลักษณ์ที่ดีของวิทยาลัย</p>
               <span class="news-more">อ่านโพสต์ต้นฉบับ <span aria-hidden="true">→</span></span>
             </div>
           </a>
         </div>
-        <div class="news-source">ข้อมูล ณ วันที่ 7 มิถุนายน 2569 · ที่มา: เพจงานปกครองฯ วิทยาลัยอาชีวศึกษาสุพรรณบุรี</div>
+        <div class="news-source">ข้อมูล ณ วันที่ 17 มิถุนายน 2569 · ที่มา: เพจงานปกครองฯ วิทยาลัยอาชีวศึกษาสุพรรณบุรี</div>
       </div>
     </section>
 
@@ -1981,6 +2461,8 @@
     </div>
   </div>
 
+  <script src="systems/data-api-config.js"></script>
+  <script src="systems/data-api.js"></script>
   <script>
     const menuButton = document.getElementById("menuButton");
     const mainNav = document.getElementById("mainNav");
@@ -2022,6 +2504,336 @@
         pendingToast.classList.add("show");
         toastTimer = setTimeout(() => pendingToast.classList.remove("show"), 4200);
       });
+    });
+
+    const overviewIds = {
+      status: "overviewStatus",
+      updated: "overviewUpdated",
+      lateDaily: "lateDailyCount",
+      lateDailyLabel: "lateDailyLabel",
+      lateFrequent: "lateFrequentCount",
+      genderRegistered: "genderRegisteredCount",
+      studentReports: "studentReportCountPublic",
+      offCampusApproved: "offCampusApprovedCount",
+      offCampusPendingLabel: "offCampusPendingLabel",
+      behaviorTotal: "behaviorCaseTotal",
+      behaviorActive: "behaviorCaseActive",
+      behaviorPending: "behaviorCasePending",
+      behaviorDone: "behaviorCaseDone"
+    };
+
+    const LATE_DATA_SOURCE = {
+      sheetId: "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw",
+      gid: "1977681832",
+      sheetName: "Late_Transactions"
+    };
+
+    function setOverviewText(key, value) {
+      const node = document.getElementById(overviewIds[key]);
+      if (node) node.textContent = value;
+    }
+
+    function formatThaiNumber(value) {
+      return Number(value || 0).toLocaleString("th-TH");
+    }
+
+    function formatOverviewTime(date = new Date()) {
+      return new Intl.DateTimeFormat("th-TH", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function toDateKey(value) {
+      if (!value) return "";
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return [
+          value.getFullYear(),
+          String(value.getMonth() + 1).padStart(2, "0"),
+          String(value.getDate()).padStart(2, "0")
+        ].join("-");
+      }
+
+      const text = String(value).trim();
+      const iso = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (iso) return `${iso[1]}-${iso[2].padStart(2, "0")}-${iso[3].padStart(2, "0")}`;
+
+      const gvizDate = text.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})(?:,\d+,\d+,\d+)?\)$/);
+      if (gvizDate) {
+        return [
+          gvizDate[1],
+          String(Number(gvizDate[2]) + 1).padStart(2, "0"),
+          gvizDate[3].padStart(2, "0")
+        ].join("-");
+      }
+
+      const slash = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
+      if (slash) {
+        let year = Number(slash[3]);
+        if (year < 100) year += 2000;
+        if (year > 2400) year -= 543;
+        return `${year}-${slash[2].padStart(2, "0")}-${slash[1].padStart(2, "0")}`;
+      }
+
+      const parsed = new Date(text);
+      return Number.isNaN(parsed.getTime()) ? "" : toDateKey(parsed);
+    }
+
+    function formatThaiDateKey(dateKey) {
+      if (!dateKey) return "ยังไม่มีข้อมูลวันที่";
+      const [year, month, day] = dateKey.split("-").map(Number);
+      return new Intl.DateTimeFormat("th-TH", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      }).format(new Date(year, month - 1, day));
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+        const next = text[index + 1];
+        if (char === '"' && quoted && next === '"') {
+          cell += '"';
+          index += 1;
+        } else if (char === '"') {
+          quoted = !quoted;
+        } else if (char === "," && !quoted) {
+          row.push(cell);
+          cell = "";
+        } else if ((char === "\n" || char === "\r") && !quoted) {
+          if (char === "\r" && next === "\n") index += 1;
+          row.push(cell);
+          if (row.some(value => String(value).trim())) rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += char;
+        }
+      }
+
+      row.push(cell);
+      if (row.some(value => String(value).trim())) rows.push(row);
+      return rows;
+    }
+
+    function csvToObjects(text) {
+      const rows = parseCsv(text);
+      const headers = (rows.shift() || []).map(header => String(header).trim());
+      return rows.map(row => headers.reduce((record, header, index) => {
+        record[header] = row[index] || "";
+        return record;
+      }, {}));
+    }
+
+    async function fetchTextNoStore(url) {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.text();
+    }
+
+    function loadLateSheetGviz() {
+      return new Promise((resolve, reject) => {
+        const callbackName = `homeLateSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const params = new URLSearchParams({
+          gid: LATE_DATA_SOURCE.gid,
+          tq: "select *",
+          tqx: `responseHandler:${callbackName}`,
+          headers: "1",
+          _: String(Date.now())
+        });
+        const timeout = window.setTimeout(() => {
+          cleanup();
+          reject(new Error("หมดเวลารอข้อมูลจาก Google Sheet"));
+        }, 20000);
+
+        function cleanup() {
+          window.clearTimeout(timeout);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = (payload) => {
+          cleanup();
+          resolve(payload);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("เชื่อมต่อ Google Sheet ไม่ได้ หรือเครื่องนี้ยังไม่มีสิทธิ์อ่านชีต"));
+        };
+
+        script.src = `https://docs.google.com/spreadsheets/d/${LATE_DATA_SOURCE.sheetId}/gviz/tq?${params.toString()}`;
+        document.head.appendChild(script);
+      });
+    }
+
+    function gvizCellValue(cell) {
+      if (!cell) return "";
+      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") return String(cell.f);
+      const value = cell.v;
+      if (value instanceof Date && !Number.isNaN(value.getTime())) return toDateKey(value);
+      if (value !== undefined && value !== null && String(value).trim() !== "") return String(value);
+      return "";
+    }
+
+    function gvizTableToObjects(table) {
+      const headers = (table.cols || []).map((col, index) => String(col.label || col.id || `Column ${index + 1}`).trim());
+      return (table.rows || [])
+        .map(row => Object.fromEntries(headers.map((header, index) => [header, gvizCellValue(row.c && row.c[index])])))
+        .filter(row => Object.values(row).some(value => String(value || "").trim()));
+    }
+
+    async function loadLateRows() {
+      const response = await loadLateSheetGviz();
+      if (response.errors && response.errors.length) {
+        const message = response.errors[0].detailed_message || response.errors[0].message || "Google Sheet ไม่ตอบกลับข้อมูล";
+        throw new Error(message);
+      }
+      if (!response.table) throw new Error(`ไม่พบตาราง ${LATE_DATA_SOURCE.sheetName} ใน Google Sheet`);
+      return gvizTableToObjects(response.table);
+    }
+
+    function normalizeLateRows(rows) {
+      const field = (record, keys) => {
+        const found = keys.find(key => record[key] != null && String(record[key]).trim() !== "");
+        return found ? String(record[found]).trim() : "";
+      };
+
+      return rows.map(record => ({
+        date: toDateKey(field(record, ["late_date", "lateDate", "วันที่มาสาย", "วันที่", "Date", "date", "timestamp", "createdAt"])),
+        status: field(record, ["status", "Status", "สถานะ"]) || "Recorded",
+        studentKey: field(record, ["student_id", "studentId", "Student ID", "รหัสนักเรียน", "รหัสประจำตัว", "เลขนักเรียน", "เลขประจำตัว", "full_name", "studentName", "Name", "ชื่อ", "ชื่อ-สกุล", "ชื่อนักเรียน"])
+      })).filter(record => record.date);
+    }
+
+    function summarizeLate(rows) {
+      const recorded = normalizeLateRows(rows).filter(record => String(record.status || "Recorded").trim() === "Recorded");
+      const todayKey = toDateKey(new Date());
+      const latestKey = recorded.map(record => record.date).sort().pop() || "";
+      const focusKey = recorded.some(record => record.date === todayKey) ? todayKey : latestKey;
+      const dailyCount = focusKey ? recorded.filter(record => record.date === focusKey).length : 0;
+      const byStudent = new Map();
+
+      recorded.forEach((record) => {
+        if (!record.studentKey) return;
+        byStudent.set(record.studentKey, (byStudent.get(record.studentKey) || 0) + 1);
+      });
+
+      return {
+        dailyCount,
+        frequentCount: [...byStudent.values()].filter(count => count >= 3).length,
+        focusKey,
+        isToday: focusKey === todayKey
+      };
+    }
+
+    function activeRecords(records) {
+      return (Array.isArray(records) ? records : []).filter(record => !String(record.deletedAt || record.deleted_at || "").trim());
+    }
+
+    function classifyBehaviorStatus(status) {
+      const value = String(status || "").trim().toLowerCase();
+      if (/^(ปิดเคส|เสร็จสิ้น|closed|resolved|done)$/.test(value)) return "done";
+      if (/รอ|ค้าง|pending|hold/.test(value)) return "pending";
+      return "active";
+    }
+
+    async function loadAffairsSummary() {
+      const api = window.StudentAffairsDataApi;
+      if (!api || !api.configured()) throw new Error("Student affairs API is not configured");
+      try {
+        return await api.request("public.summary");
+      } catch (error) {
+        console.info("public.summary unavailable, falling back to legacy summary", error);
+      }
+
+      const [bootstrapResult, reportResult] = await Promise.allSettled([
+        api.request("bootstrap"),
+        api.request("behavior-report.list")
+      ]);
+
+      if (bootstrapResult.status === "rejected" && reportResult.status === "rejected") {
+        throw bootstrapResult.reason;
+      }
+
+      const bootstrap = bootstrapResult.status === "fulfilled" ? bootstrapResult.value || {} : {};
+      const cases = activeRecords(bootstrap.behaviorCases);
+      const genderRequests = activeRecords(bootstrap.genderRequests);
+      const reports = reportResult.status === "fulfilled" ? activeRecords(reportResult.value) : [];
+      const caseGroups = cases.reduce((summary, record) => {
+        summary[classifyBehaviorStatus(record.status)] += 1;
+        return summary;
+      }, { active: 0, pending: 0, done: 0 });
+
+      return {
+        behaviorCases: {
+          total: cases.length,
+          active: caseGroups.active,
+          pending: caseGroups.pending,
+          done: caseGroups.done
+        },
+        behaviorReports: {
+          total: reports.length
+        },
+        genderRequests: {
+          total: genderRequests.length
+        }
+      };
+    }
+
+    async function refreshOverviewDashboard() {
+      const results = await Promise.allSettled([
+        loadLateRows().then(summarizeLate),
+        loadAffairsSummary()
+      ]);
+
+      const late = results[0].status === "fulfilled" ? results[0].value : null;
+      if (late) {
+        setOverviewText("lateDaily", formatThaiNumber(late.dailyCount));
+        setOverviewText("lateFrequent", formatThaiNumber(late.frequentCount));
+        setOverviewText("lateDailyLabel", `${late.isToday ? "วันนี้" : "ข้อมูลล่าสุด"} ${formatThaiDateKey(late.focusKey)}`);
+      } else {
+        setOverviewText("lateDaily", "-");
+        setOverviewText("lateFrequent", "-");
+        setOverviewText("lateDailyLabel", "ยังดึงข้อมูลระบบมาสายไม่ได้");
+      }
+
+      const affairs = results[1].status === "fulfilled" ? results[1].value : null;
+      if (affairs) {
+        setOverviewText("genderRegistered", formatThaiNumber(affairs.genderRequests?.total));
+        setOverviewText("studentReports", formatThaiNumber(affairs.behaviorReports?.total));
+        setOverviewText("offCampusApproved", formatThaiNumber(affairs.offCampusRequests?.approved));
+        setOverviewText("offCampusPendingLabel", `รอดำเนินการ ${formatThaiNumber(affairs.offCampusRequests?.pending)} คำขอ`);
+        setOverviewText("behaviorTotal", formatThaiNumber(affairs.behaviorCases?.total));
+        setOverviewText("behaviorActive", formatThaiNumber(affairs.behaviorCases?.active));
+        setOverviewText("behaviorPending", formatThaiNumber(affairs.behaviorCases?.pending));
+        setOverviewText("behaviorDone", formatThaiNumber(affairs.behaviorCases?.done));
+      } else {
+        ["genderRegistered", "studentReports", "offCampusApproved", "behaviorTotal", "behaviorActive", "behaviorPending", "behaviorDone"].forEach(key => {
+          setOverviewText(key, "-");
+        });
+        setOverviewText("offCampusPendingLabel", "ยังดึงข้อมูลระบบออกนอกสถานศึกษาไม่ได้");
+      }
+
+      const okCount = results.filter(result => result.status === "fulfilled").length;
+      setOverviewText("status", okCount === results.length ? "อัปเดตจากระบบจริงแล้ว" : "ดึงข้อมูลได้บางส่วน");
+      setOverviewText("updated", `ล่าสุด ${formatOverviewTime(new Date())}`);
+    }
+
+    refreshOverviewDashboard().catch((error) => {
+      console.error("Overview dashboard failed", error);
+      setOverviewText("status", "ยังดึงข้อมูลไม่ได้");
+      setOverviewText("updated", "โปรดลองรีเฟรชหน้าอีกครั้ง");
     });
 
     const newsSection = document.getElementById("news");

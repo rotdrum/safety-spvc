@@ -17,20 +17,28 @@
         <div><strong>ระบบบริหารจัดการ<br>พฤติกรรมนักเรียน</strong><small>งานปกครองและความปลอดภัยฯ</small></div>
       </div>
       <nav class="nav">
-        <button class="active" data-view="overview">ภาพรวมและเคสเร่งด่วน</button>
-        <button data-view="cases">ทะเบียนและติดตามเคส</button>
-        <button data-view="owners">KPI ครูผู้รับผิดชอบ</button>
-        <button data-view="report">รายงานรายเคส</button>
+        <button class="active" data-view="overview">ภาพรวมและเคสเร่งด่วน <span class="nav-count" id="navBehaviorOverview">0</span></button>
+        <button data-view="reports">เรื่องแจ้งจากนักเรียน <span class="nav-count" id="navBehaviorReports">0</span></button>
+        <button data-view="cases">ทะเบียนและติดตามเคส <span class="nav-count" id="navBehaviorCases">0</span></button>
+        <button data-view="owners">KPI ครูผู้รับผิดชอบ <span class="nav-count" id="navBehaviorOwners">0</span></button>
+        <button data-view="report">รายงานรายเคส <span class="nav-count" id="navBehaviorReport">0</span></button>
       </nav>
-      <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a>
+      <!-- <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a> -->
     </aside>
     <main class="main">
       <header class="topbar">
         <div><span class="eyebrow">Student Conduct Management</span><h1>เปิดเคสก่อน แล้วติดตามจนจบ</h1><p class="lead">เริ่มจากบันทึกข้อเท็จจริงและระดับความร้ายแรง จากนั้นค่อยเพิ่มประวัติการติดต่อผู้ปกครอง ส่งโรงพยาบาล ประสานตำรวจ แนบเอกสาร และปิดเคส</p></div>
-        <div class="actions"><button class="btn" data-open="cases">ทะเบียนเคส</button><button class="btn primary" data-open="record">+ เปิดเคสใหม่</button></div>
+        <div class="actions"><a class="btn" href="../behavior-report/index.html" target="_blank" rel="noopener">หน้าสำหรับนักเรียน</a><button class="btn" data-open="reports">คิวคัดกรอง</button><button class="btn primary" data-open="record">+ เปิดเคสใหม่</button></div>
       </header>
       <div class="privacy-note"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>ข้อมูลวินัยเป็นข้อมูลจำกัดสิทธิ์ ใช้เพื่อการดูแล แก้ไข และคุ้มครองนักเรียน ไม่ใช้เพื่อประจานหรือตีตรา</div>
       <div class="master-status" id="behaviorApiStatus">กำลังโหลดข้อมูลจริงจาก Google Sheets...</div>
+      <div class="filter-panel-compact" aria-label="ตัวกรองภาคเรียน">
+        <div class="filter-grid">
+          <div class="field"><label for="behaviorPeriodTerm">ภาคเรียน</label><select id="behaviorPeriodTerm"><option value="1">ภาคเรียนที่ 1</option><option value="2" selected>ภาคเรียนที่ 2</option><option value="summer">ภาคฤดูร้อน</option></select></div>
+          <div class="field"><label for="behaviorPeriodYear">ปีการศึกษา</label><select id="behaviorPeriodYear"></select></div>
+          <div class="field"><label>ช่วงข้อมูลที่กำลังแสดง</label><div class="master-status" id="behaviorPeriodLabel">ภาคเรียนที่ 2 ปีการศึกษา 2569</div></div>
+        </div>
+      </div>
 
       <section class="view active" id="view-overview">
         <div class="grid kpis">
@@ -65,6 +73,26 @@
             <div class="list-item"><span class="list-icon">↻</span><div><strong id="behaviorOpenCount">กำลังติดตาม 0</strong><small>รวมทุกสถานะที่ยังไม่ปิด</small></div></div>
           </div></article>
         </div>
+      </section>
+
+      <section class="view" id="view-reports">
+        <div class="grid kpis">
+          <article class="card kpi"><div class="kpi-label">เรื่องแจ้งทั้งหมด</div><div class="kpi-value" id="studentReportTotal">0</div><div class="kpi-note">รับจากช่องทางนักเรียน</div></article>
+          <article class="card kpi"><div class="kpi-label">รอครูคัดกรอง</div><div class="kpi-value" id="studentReportPending">0</div><div class="kpi-note">ยังไม่เปิดเป็นเคส</div></article>
+          <article class="card kpi"><div class="kpi-label">แจ้งว่าไม่ปลอดภัย</div><div class="kpi-value" id="studentReportUnsafe">0</div><div class="kpi-note">ควรตรวจสอบก่อนลำดับอื่น</div></article>
+          <article class="card kpi"><div class="kpi-label">อนุมัติเปิดเป็นเคส</div><div class="kpi-value" id="studentReportOpened">0</div><div class="kpi-note">เชื่อมทะเบียนเคสแล้ว</div></article>
+        </div>
+        <article class="panel" style="margin-top:16px">
+          <div class="panel-head"><div><h2>คิวคัดกรองเรื่องแจ้งจากนักเรียน</h2><div class="master-status" id="behaviorReportApiStatus">กำลังโหลดเรื่องแจ้งจาก Google Sheets...</div></div><div class="case-tools"><span class="pill amber" id="studentReportCount">0 รายการ</span><button class="btn" type="button" id="reloadStudentReports">โหลดใหม่</button></div></div>
+          <div class="filter-panel-compact"><div class="filter-grid">
+            <div class="field"><label>ค้นหาเลขอ้างอิง / ประเภท / สถานที่</label><input id="studentReportSearch" type="search" placeholder="พิมพ์คำค้น"></div>
+            <div class="field"><label>สถานะคัดกรอง</label><select id="studentReportStatus"><option value="">ทุกสถานะ</option><option>รอตรวจสอบ</option><option>ขอข้อมูลเพิ่ม</option><option>เก็บเป็นข้อมูลเฝ้าระวัง</option><option>ไม่เข้าเกณฑ์</option><option>ข้อมูลซ้ำ</option><option>เปิดเป็นเคสแล้ว</option></select></div>
+            <div class="field"><label>ความปลอดภัยขณะส่ง</label><select id="studentReportSafety"><option value="">ทุกระดับ</option><option>กำลังมีอันตราย</option><option>ยังรู้สึกไม่ปลอดภัย</option><option>ปลอดภัยแล้ว</option></select></div>
+            <div class="field"><label>รูปแบบผู้แจ้ง</label><select id="studentReporterMode"><option value="">ทั้งหมด</option><option value="anonymous">ไม่ระบุตัวตน</option><option value="identified">แสดงตัว</option></select></div>
+          </div></div>
+          <div class="table-wrap"><table><thead><tr><th>เลขอ้างอิง / วันที่เกิดเหตุ</th><th>ผู้แจ้ง</th><th>ประเภทเรื่อง</th><th>สถานที่</th><th>ความปลอดภัย</th><th>สถานะ</th><th></th></tr></thead><tbody id="studentReportRows"></tbody></table></div>
+          <div class="notice" id="studentReportEmpty">ยังไม่มีเรื่องแจ้งจากนักเรียน</div>
+        </article>
       </section>
 
       <section class="view" id="view-cases"><article class="panel"><div class="panel-head"><h2>ทะเบียนและติดตามเคส</h2><div class="case-tools"><span class="pill" id="caseCount">0 รายการ</span><button class="btn primary" type="button" data-open="record">+ เปิดเคสใหม่</button></div></div>
@@ -154,6 +182,54 @@
         </div>
       </div>
 
+      <div class="modal" id="studentReportModal" aria-hidden="true">
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="studentReportModalTitle">
+          <div class="modal-head"><h2 id="studentReportModalTitle">คัดกรองเรื่องแจ้งจากนักเรียน</h2><button class="modal-close" type="button" id="closeStudentReportModal" aria-label="ปิด">×</button></div>
+          <div class="modal-body">
+            <div class="panel-head"><h3 id="selectedReportId">-</h3><span class="pill amber" id="selectedReportStatus">รอตรวจสอบ</span></div>
+            <div class="case-summary">
+              <div><span>ผู้แจ้ง</span><strong id="selectedReporter">-</strong></div>
+              <div><span>ประเภทเรื่อง</span><strong id="selectedReportType">-</strong></div>
+              <div><span>วันที่ / เวลา</span><strong id="selectedReportDate">-</strong></div>
+              <div><span>ความปลอดภัย</span><strong id="selectedReportSafety">-</strong></div>
+            </div>
+            <div class="grid two-col">
+              <div>
+                <article class="panel" style="box-shadow:none">
+                  <div class="panel-head"><h3>ข้อมูลที่นักเรียนแจ้ง</h3><span class="pill" id="selectedReportUrgency">-</span></div>
+                  <div class="list">
+                    <div class="list-item"><span class="list-icon">ที่</span><div><strong>สถานที่</strong><small id="selectedReportPlace">-</small></div></div>
+                    <div class="list-item"><span class="list-icon">คน</span><div><strong>ผู้กระทำความผิด</strong><small id="selectedReportPeople">-</small></div></div>
+                    <div class="list-item"><span class="list-icon">แจ้ง</span><div><strong>รายละเอียด</strong><small id="selectedReportDetail">-</small></div></div>
+                  </div>
+                  <div class="panel-head" style="margin-top:16px"><h3>หลักฐานแนบ</h3></div>
+                  <div class="attachment-list" id="selectedReportDocuments"></div>
+                </article>
+              </div>
+              <form id="studentReportReviewForm">
+                <div class="panel-head"><h3>ผลการคัดกรอง</h3><span class="pill">Teacher review</span></div>
+                <div class="form-grid">
+                  <div class="field"><label>ผลการคัดกรอง</label><select id="studentReviewStatus" required><option>รอตรวจสอบ</option><option>ขอข้อมูลเพิ่ม</option><option>เก็บเป็นข้อมูลเฝ้าระวัง</option><option>ไม่เข้าเกณฑ์</option><option>ข้อมูลซ้ำ</option><option>เปิดเป็นเคสแล้ว</option></select></div>
+                  <div class="field"><label>ครูผู้คัดกรอง</label><select id="studentReportReviewer" required></select></div>
+                  <div class="field full"><label>บันทึกผลการคัดกรอง / เหตุผล</label><textarea id="studentReviewNote" required placeholder="สรุปข้อเท็จจริงที่ตรวจสอบเบื้องต้น เหตุผลที่เปิดหรือไม่เปิดเป็นเคส"></textarea></div>
+                </div>
+                <div id="studentReportCaseFields" style="display:none;margin-top:16px">
+                  <div class="panel-head"><h3>ข้อมูลสำหรับเปิดเคส</h3><span class="pill amber">สร้างเมื่อกดบันทึก</span></div>
+                  <div class="form-grid">
+                    <div class="field full"><label>ค้นหาและเลือกนักเรียนที่เป็นเจ้าของเคสจาก Master Student</label><div class="search-select" id="reportStudentPicker"><input id="reportStudentSearch" type="search" autocomplete="off" placeholder="ค้นหาด้วยรหัส ชื่อ หรือนามสกุล"><div class="search-options" id="reportStudentOptions"></div></div><div class="master-status" id="selectedReportStudentLabel">ยังไม่ได้เลือกนักเรียน</div></div>
+                    <div class="field"><label>ประเภทเหตุการณ์</label><select id="reportCaseIncidentType"><option>บุหรี่หรือบุหรี่ไฟฟ้า</option><option>ทะเลาะวิวาท / ทำร้ายร่างกาย</option><option>การคุกคามหรือประพฤติไม่เหมาะสมทางเพศ</option><option>กลั่นแกล้ง / กลั่นแกล้งออนไลน์</option><option>สารเสพติดหรือของมึนเมา</option><option>ลักทรัพย์ / ทำลายทรัพย์สิน</option><option>พกพาอาวุธหรือวัตถุอันตราย</option><option>หนีเรียน / ออกจากสถานศึกษาโดยไม่ได้รับอนุญาต</option><option>แต่งกายหรือทรงผมผิดระเบียบ</option><option>อื่น ๆ</option></select></div>
+                    <div class="field"><label>ระดับความร้ายแรงที่ครูประเมิน</label><select id="reportCaseSeverity"><option>เล็กน้อย</option><option selected>ปานกลาง</option><option>ร้ายแรง</option><option>วิกฤต / ต้องส่งต่อทันที</option></select></div>
+                    <div class="field full"><label>ครูรับผิดชอบแก้ไขเคส</label><div class="owner-check-grid" id="studentReportOwnerChecks"></div></div>
+                  </div>
+                </div>
+                <button class="btn primary" type="submit" style="width:100%;margin-top:16px">บันทึกผลการคัดกรอง</button>
+              </form>
+            </div>
+            <button class="btn" type="button" id="deleteStudentReport" style="margin-top:14px;color:#b91c1c">ซ่อนเรื่องแจ้งออกจากคิว</button>
+          </div>
+        </div>
+      </div>
+
       <section class="view" id="view-report">
         <div class="actions report-actions" style="margin-bottom:14px">
           <button class="btn" type="button" data-open="cases">กลับทะเบียนเคส</button>
@@ -206,7 +282,6 @@
             </div>
           </div>
           <section class="report-appendix" id="reportAppendix">
-            <div class="report-title"><h3>ภาคผนวกเอกสารแนบ</h3><p>เอกสารและหลักฐานที่อัปโหลดใน Timeline ของเคส</p></div>
             <div id="reportAttachments"></div>
           </section>
         </article>
@@ -214,10 +289,11 @@
     </main>
   </div>
   <div class="toast" id="toast">บันทึกข้อมูลแล้ว</div>
-  <script src="../systems/data-api-config.js"></script>
-  <script src="../systems/data-api.js"></script>
+  <script src="../systems/data-api-config.js?v=20261011-secure"></script>
+  <script src="../systems/data-api.js?v=20261011-secure"></script>
+  <script src="../systems/auth-guard.js?v=20261011-secure"></script>
+  <script src="../systems/vendor/pdfjs/pdf.min.js"></script>
   <script>
-    const MASTER_SHEET_ID = "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw";
     const views = document.querySelectorAll(".view");
     const navButtons = document.querySelectorAll(".nav button");
     const caseRows = document.getElementById("caseRows");
@@ -230,13 +306,24 @@
     const behaviorTeacherChips = document.getElementById("behaviorTeacherChips");
     const behaviorMasterStatus = document.getElementById("behaviorMasterStatus");
     const behaviorApiStatus = document.getElementById("behaviorApiStatus");
+    const behaviorReportApiStatus = document.getElementById("behaviorReportApiStatus");
+    const studentReportRows = document.getElementById("studentReportRows");
+    const studentReportModal = document.getElementById("studentReportModal");
+    const reportStudentSearch = document.getElementById("reportStudentSearch");
+    const reportStudentOptions = document.getElementById("reportStudentOptions");
     const behaviorApi = window.StudentAffairsDataApi;
     let masterStudents = [];
     let masterTeachers = [];
     let selectedMasterStudent = null;
+    let selectedReportStudent = null;
+    let selectedStudentReport = null;
     let selectedCaseOwners = [];
     const behaviorRecords = new Map();
+    const behaviorReports = new Map();
     const caseAttachments = {};
+    const documentPayloadCache = new Map();
+    let reportAttachmentsReady = Promise.resolve();
+    let reportRenderToken = 0;
     let selectedCaseRow = null;
 
     function openView(name) {
@@ -263,10 +350,77 @@
       }).format(date);
     }
 
+    function academicYearForValue(value) {
+      const date = new Date(value || 0);
+      if (Number.isNaN(date.getTime())) return 0;
+      return date.getFullYear() + (date.getMonth() >= 4 ? 543 : 542);
+    }
+
+    function behaviorPeriodBounds() {
+      const year = Number(document.getElementById("behaviorPeriodYear").value || 2569) - 543;
+      const term = document.getElementById("behaviorPeriodTerm").value || "2";
+      if (term === "1") return [new Date(year, 4, 1), new Date(year, 9, 31, 23, 59, 59, 999)];
+      if (term === "2") return [new Date(year, 10, 1), new Date(year + 1, 3, 30, 23, 59, 59, 999)];
+      return [new Date(year + 1, 2, 1), new Date(year + 1, 4, 15, 23, 59, 59, 999)];
+    }
+
+    function behaviorInSelectedPeriod(value) {
+      const date = new Date(value || 0);
+      if (Number.isNaN(date.getTime())) return false;
+      const [start, end] = behaviorPeriodBounds();
+      return date >= start && date <= end;
+    }
+
+    function scopedBehaviorRecords() {
+      return [...behaviorRecords.values()].filter(record => behaviorInSelectedPeriod(record.incidentAt || record.createdAt));
+    }
+
+    function scopedBehaviorReports() {
+      return [...behaviorReports.values()].filter(record => behaviorInSelectedPeriod(record.incidentAt || record.createdAt));
+    }
+
+    function refreshBehaviorPeriodOptions() {
+      const select = document.getElementById("behaviorPeriodYear");
+      const current = select.value || "2569";
+      const years = [...new Set([
+        2568, 2569, 2570,
+        ...[...behaviorRecords.values(), ...behaviorReports.values()]
+          .map(record => academicYearForValue(record.incidentAt || record.createdAt)).filter(Boolean)
+      ])].sort((a, b) => a - b);
+      select.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join("");
+      select.value = years.includes(Number(current)) ? current : "2569";
+      const term = document.getElementById("behaviorPeriodTerm").value;
+      document.getElementById("behaviorPeriodLabel").textContent = `${term === "summer" ? "ภาคฤดูร้อน" : `ภาคเรียนที่ ${term}`} ปีการศึกษา ${select.value}`;
+    }
+
     function escapeHtml(value) {
       return String(value || "").replace(/[&<>"']/g, char => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
       })[char]);
+    }
+
+    const thaiMojibakeMap = {
+      "‡∏£‡∏≠‡∏ï‡∏£‡∏ß‡∏à‡∏™‡∏≠‡∏ö": "รอตรวจสอบ",
+      "‡∏Ç‡∏≠‡∏Ç‡πâ‡∏≠‡∏°‡∏π‡∏•‡πÄ‡∏û‡∏¥‡πà‡∏°": "ขอข้อมูลเพิ่ม",
+      "‡πÄ‡∏Å‡πá‡∏ö‡πÄ‡∏õ‡πá‡∏ô‡∏Ç‡πâ‡∏≠‡∏°‡∏π‡∏•‡πÄ‡∏ù‡πâ‡∏≤‡∏£‡∏∞‡∏ß‡∏±‡∏á": "เก็บเป็นข้อมูลเฝ้าระวัง",
+      "‡πÑ‡∏°‡πà‡πÄ‡∏Ç‡πâ‡∏≤‡πÄ‡∏Å‡∏ì‡∏ë‡πå": "ไม่เข้าเกณฑ์",
+      "‡∏Ç‡πâ‡∏≠‡∏°‡∏π‡∏•‡∏ã‡πâ‡∏≥": "ข้อมูลซ้ำ",
+      "‡πÄ‡∏õ‡∏¥‡∏î‡πÄ‡∏õ‡πá‡∏ô‡πÄ‡∏Ñ‡∏™‡πÅ‡∏•‡πâ‡∏ß": "เปิดเป็นเคสแล้ว"
+    };
+
+    function normalizeThaiText(value) {
+      const text = String(value || "").trim();
+      return thaiMojibakeMap[text] || text;
+    }
+
+    function normalizeStudentReport(record) {
+      if (!record) return record;
+      return {
+        ...record,
+        status: normalizeThaiText(record.status),
+        safeNow: normalizeThaiText(record.safeNow),
+        urgencySelf: normalizeThaiText(record.urgencySelf)
+      };
     }
 
     function renderMasterStudents(query = "") {
@@ -290,6 +444,19 @@
           <span><strong>${escapeHtml(teacher)}</strong><small>${selectedCaseOwners.includes(teacher) ? "เลือกในทีมแล้ว" : "เพิ่มเป็นผู้รับผิดชอบเคส"}</small></span>
         </button>`).join("") : `<div class="search-empty">ไม่พบรายชื่อครู</div>`;
       behaviorTeacherOptions.classList.add("open");
+    }
+
+    function renderReportStudents(query = "") {
+      const keyword = query.trim().toLocaleLowerCase("th");
+      const matches = masterStudents.filter(student =>
+        `${student.id} ${student.fullName} ${student.firstName} ${student.lastName} ${student.room}`.toLocaleLowerCase("th").includes(keyword)
+      ).slice(0, 40);
+      reportStudentOptions.innerHTML = matches.length ? matches.map(student => `
+        <button class="search-option" type="button" data-report-student="${escapeHtml(student.id)}">
+          <span><strong>${escapeHtml(student.fullName)}</strong><small>${escapeHtml(student.room || student.grade || "-")} · ครูที่ปรึกษา ${escapeHtml(student.homeroomTeacher || "-")}</small></span>
+          <code>${escapeHtml(student.id)}</code>
+        </button>`).join("") : `<div class="search-empty">ไม่พบนักเรียนที่ตรงกับคำค้น</div>`;
+      reportStudentOptions.classList.add("open");
     }
 
     function shortTeacherName(name) {
@@ -335,75 +502,39 @@
       selectedCaseOwners = selectedCaseOwners.filter(teacher => teacher !== button.dataset.removeOwner);
       renderOwnerChips();
     });
+    reportStudentSearch.addEventListener("focus", () => renderReportStudents(reportStudentSearch.value));
+    reportStudentSearch.addEventListener("input", () => {
+      selectedReportStudent = null;
+      document.getElementById("selectedReportStudentLabel").textContent = "ยังไม่ได้เลือกนักเรียน";
+      renderReportStudents(reportStudentSearch.value);
+    });
+    reportStudentOptions.addEventListener("click", event => {
+      const button = event.target.closest("[data-report-student]");
+      if (!button) return;
+      selectedReportStudent = masterStudents.find(student => student.id === button.dataset.reportStudent);
+      if (!selectedReportStudent) return;
+      reportStudentSearch.value = `${selectedReportStudent.id} · ${selectedReportStudent.fullName} · ${selectedReportStudent.room || selectedReportStudent.grade || "-"}`;
+      document.getElementById("selectedReportStudentLabel").textContent = `เลือกแล้ว · ${selectedReportStudent.fullName} · ${selectedReportStudent.room || selectedReportStudent.grade || "-"}`;
+      reportStudentOptions.classList.remove("open");
+    });
     document.addEventListener("click", event => {
       if (!document.getElementById("behaviorStudentPicker").contains(event.target)) behaviorStudentOptions.classList.remove("open");
       if (!document.getElementById("behaviorTeacherPicker").contains(event.target)) behaviorTeacherOptions.classList.remove("open");
+      if (!document.getElementById("reportStudentPicker").contains(event.target)) reportStudentOptions.classList.remove("open");
     });
-
-    function loadMasterGviz({ sheet, gid, query, headers = 1 }) {
-      return new Promise((resolve, reject) => {
-        const callback = `behaviorMaster_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-        const script = document.createElement("script");
-        const timeout = setTimeout(() => {
-          cleanup();
-          reject(new Error("Master timeout"));
-        }, 10000);
-        function cleanup() {
-          clearTimeout(timeout);
-          script.remove();
-          delete window[callback];
-        }
-        window[callback] = payload => {
-          cleanup();
-          payload.status === "error" ? reject(new Error("Master error")) : resolve(payload.table);
-        };
-        const params = new URLSearchParams({ tqx: `responseHandler:${callback}`, headers: String(headers) });
-        if (sheet) params.set("sheet", sheet);
-        if (gid) params.set("gid", gid);
-        if (query) params.set("tq", query);
-        script.src = `https://docs.google.com/spreadsheets/d/${MASTER_SHEET_ID}/gviz/tq?${params.toString()}`;
-        script.onerror = () => {
-          cleanup();
-          reject(new Error("Master network error"));
-        };
-        document.head.append(script);
-      });
-    }
 
     async function loadBehaviorMaster() {
       try {
-        const cached = sessionStorage.getItem("spvc-master-data");
-        const local = cached
-          ? JSON.parse(cached)
-          : await fetch("../gender-identity-system/data/master-data.json", { cache: "force-cache" }).then(response => response.json());
-        masterStudents = local.students || [];
-        masterTeachers = local.teachers || [];
-        sessionStorage.setItem("spvc-master-data", JSON.stringify(local));
-        behaviorMasterStatus.textContent = `พร้อมค้นหาทันที · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
+        const master=await behaviorApi.request("master.bootstrap");
+        masterStudents=master.students||[];
+        masterTeachers=master.teachers||[];
+        behaviorMasterStatus.textContent = `เชื่อม Master Student แล้ว · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
       } catch (error) {
-        behaviorMasterStatus.textContent = "กำลังเชื่อมข้อมูล Master ล่าสุด...";
-      }
-
-      try {
-        const [studentTable, teacherTable] = await Promise.all([
-          loadMasterGviz({ sheet: "Students", query: "select A,C,D,E,F,G,H,I,J where J = 'Active'", headers: 1 }),
-          loadMasterGviz({ gid: "667370291", query: "select C offset 3", headers: 0 })
-        ]);
-        const cell = (row, index) => row.c[index]?.v == null ? "" : String(row.c[index].v);
-        const liveStudents = studentTable.rows.map(row => ({
-          id: cell(row, 0), prefix: cell(row, 1), firstName: cell(row, 2), lastName: cell(row, 3),
-          fullName: cell(row, 4), grade: cell(row, 5), room: cell(row, 6),
-          homeroomTeacher: cell(row, 7), status: cell(row, 8)
-        })).filter(student => student.id);
-        const liveTeachers = teacherTable.rows.map(row => cell(row, 0).trim()).filter(Boolean);
-        if (liveStudents.length) masterStudents = liveStudents;
-        if (liveTeachers.length) masterTeachers = liveTeachers;
-        sessionStorage.setItem("spvc-master-data", JSON.stringify({ students: masterStudents, teachers: masterTeachers }));
-        behaviorMasterStatus.textContent = `เชื่อม Google Sheet แล้ว · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
-      } catch (error) {
-        behaviorMasterStatus.textContent = `ใช้ Master สำรองล่าสุด · นักเรียน ${masterStudents.length.toLocaleString("th-TH")} คน · ครู ${masterTeachers.length} คน`;
+        behaviorMasterStatus.textContent = `โหลด Master Student ไม่สำเร็จ: ${error.message}`;
       }
       populateOwnerFilter();
+      populateStudentReportReviewers();
+      renderStudentReportOwnerChecks();
       renderOwnerKpi();
     }
 
@@ -427,18 +558,65 @@
         const matches = (!keyword || row.textContent.toLocaleLowerCase("th").includes(keyword))
           && (!status || cells[6].textContent.includes(status))
           && (!severity || cells[4].textContent.includes(severity))
-          && (!owner || (row.dataset.owners || "").split("|").includes(owner));
+          && (!owner || (row.dataset.owners || "").split("|").includes(owner))
+          && behaviorInSelectedPeriod(Number(row.dataset.incidentTime || 0));
         row.hidden = !matches;
         if (matches) visible += 1;
       });
       document.getElementById("caseCount").textContent = `${visible} รายการ`;
+      updateBehaviorNavCounts();
+    }
+
+    function isClosedBehaviorStatus(status) {
+      return /^(ปิดเคส|เสร็จสิ้น|closed|resolved|done)$/i.test(String(status || "").trim());
+    }
+
+    function sortByIncidentDateDesc(a, b) {
+      const dateA = new Date(a.incidentAt || a.createdAt || 0).getTime() || 0;
+      const dateB = new Date(b.incidentAt || b.createdAt || 0).getTime() || 0;
+      return dateB - dateA;
+    }
+
+    function incidentTime(record) {
+      return new Date(record.incidentAt || record.createdAt || 0).getTime() || 0;
+    }
+
+    function setNavCount(id, value) {
+      const target = document.getElementById(id);
+      if (target) target.textContent = Number(value || 0).toLocaleString("th-TH");
+    }
+
+    function behaviorOwnerCount() {
+      const owners = new Set();
+      [...caseRows.querySelectorAll("tr")].filter(row => !row.hidden).forEach(row => {
+        (row.dataset.owners || "").split("|").filter(Boolean).forEach(owner => owners.add(owner));
+      });
+      return owners.size;
+    }
+
+    function updateBehaviorNavCounts() {
+      const caseRowItems = [...caseRows.querySelectorAll("tr")];
+      const reportRowItems = [...studentReportRows.querySelectorAll("tr")];
+      const visibleCases = caseRowItems.filter(row => !row.hidden).length;
+      const visibleReports = reportRowItems.filter(row => !row.hidden).length;
+      setNavCount("navBehaviorOverview", scopedBehaviorRecords().length);
+      setNavCount("navBehaviorReports", reportRowItems.length ? visibleReports : behaviorReports.size);
+      setNavCount("navBehaviorCases", caseRowItems.length ? visibleCases : behaviorRecords.size);
+      setNavCount("navBehaviorOwners", behaviorOwnerCount());
+      setNavCount("navBehaviorReport", scopedBehaviorRecords().length);
+    }
+
+    function sortRowsByIncidentTime(tbody) {
+      [...tbody.querySelectorAll("tr")]
+        .sort((a, b) => Number(b.dataset.incidentTime || 0) - Number(a.dataset.incidentTime || 0))
+        .forEach(row => tbody.append(row));
     }
 
     function renderOwnerKpi() {
       const stats = new Map();
-      const rows = [...caseRows.querySelectorAll("tr")];
+      const rows = [...caseRows.querySelectorAll("tr")].filter(row => behaviorInSelectedPeriod(Number(row.dataset.incidentTime || 0)));
       rows.forEach(row => {
-        const closed = /ปิดเคส|เคลียร์เรียบร้อย/.test(row.children[6].textContent);
+        const closed = isClosedBehaviorStatus(row.children[6].textContent);
         const severe = /ร้ายแรง|วิกฤต/.test(row.children[4].textContent);
         (row.dataset.owners || "").split("|").filter(Boolean).forEach(owner => {
           const item = stats.get(owner) || { total: 0, open: 0, closed: 0, severe: 0 };
@@ -450,7 +628,7 @@
         });
       });
       const entries = [...stats.entries()].sort((a, b) => b[1].open - a[1].open || b[1].total - a[1].total);
-      const openCases = rows.filter(row => !/ปิดเคส|เคลียร์เรียบร้อย/.test(row.children[6].textContent)).length;
+      const openCases = rows.filter(row => !isClosedBehaviorStatus(row.children[6].textContent)).length;
       const maxEntry = entries[0];
       document.getElementById("ownerKpiTeachers").textContent = entries.length;
       document.getElementById("ownerKpiOpen").textContent = openCases;
@@ -460,6 +638,7 @@
       document.getElementById("ownerKpiRows").innerHTML = entries.length ? entries.map(([owner, item]) => `
         <tr><td><strong>${escapeHtml(owner)}</strong></td><td>${item.total}</td><td>${item.open}</td><td>${item.closed}</td><td>${item.severe}</td><td>${item.total ? Math.round(item.closed / item.total * 100) : 0}%</td></tr>`).join("")
         : `<tr><td colspan="6">ยังไม่มีข้อมูลการมอบหมายเคส</td></tr>`;
+      updateBehaviorNavCounts();
     }
 
     function severityClass(value) {
@@ -469,9 +648,188 @@
     }
 
     function behaviorStatusTone(status) {
-      if (/ปิดเคส|เคลียร์เรียบร้อย/.test(status)) return "";
+      if (isClosedBehaviorStatus(status)) return "";
       if (/รอ/.test(status)) return "amber";
       return "red";
+    }
+
+    function studentReportStatusTone(status) {
+      if (status === "เปิดเป็นเคสแล้ว") return "";
+      if (/รอตรวจสอบ|ขอข้อมูลเพิ่ม/.test(status)) return "amber";
+      if (/ไม่เข้าเกณฑ์|ข้อมูลซ้ำ/.test(status)) return "reject";
+      return "pending";
+    }
+
+    function studentReportSafetyTone(safety) {
+      if (safety === "กำลังมีอันตราย") return "red";
+      if (safety === "ยังรู้สึกไม่ปลอดภัย") return "amber";
+      return "";
+    }
+
+    function studentReportRow(record) {
+      const row = document.createElement("tr");
+      row.dataset.reportId = record.reportId;
+      row.dataset.status = record.status || "รอตรวจสอบ";
+      row.dataset.safety = record.safeNow || "";
+      row.dataset.reporterMode = record.reporterMode || "anonymous";
+      row.dataset.incidentTime = String(incidentTime(record));
+      const reporter = record.reporterMode === "identified"
+        ? `${record.reporterName || "แสดงตัว"}${record.reporterRoom ? ` · ${record.reporterRoom}` : ""}`
+        : "ไม่ระบุตัวตน";
+      row.innerHTML = `
+        <td class="student"><strong>${escapeHtml(record.reportId)}</strong><small>${escapeHtml(formatDate(record.incidentAt || record.createdAt))}</small></td>
+        <td>${escapeHtml(reporter)}</td>
+        <td>${escapeHtml(record.incidentType || "-")}</td>
+        <td>${escapeHtml(record.place || "-")}</td>
+        <td><span class="pill ${studentReportSafetyTone(record.safeNow || "")}">${escapeHtml(record.safeNow || "ไม่ระบุ")}</span></td>
+        <td><span class="pill ${studentReportStatusTone(record.status || "")}">${escapeHtml(record.status || "รอตรวจสอบ")}</span></td>
+        <td><button class="case-action" type="button" data-student-report="${escapeHtml(record.reportId)}">${record.status === "เปิดเป็นเคสแล้ว" ? "ดูผล" : "คัดกรอง"}</button></td>`;
+      return row;
+    }
+
+    function applyStudentReport(record, prepend = false) {
+      record = normalizeStudentReport(record);
+      behaviorReports.set(record.reportId, record);
+      const existing = studentReportRows.querySelector(`[data-report-id="${CSS.escape(record.reportId)}"]`);
+      const row = studentReportRow(record);
+      if (existing) existing.replaceWith(row);
+      else if (prepend) studentReportRows.prepend(row);
+      else studentReportRows.append(row);
+      sortRowsByIncidentTime(studentReportRows);
+      return row;
+    }
+
+    function filterStudentReports() {
+      const keyword = document.getElementById("studentReportSearch").value.trim().toLocaleLowerCase("th");
+      const status = document.getElementById("studentReportStatus").value;
+      const safety = document.getElementById("studentReportSafety").value;
+      const mode = document.getElementById("studentReporterMode").value;
+      let visible = 0;
+      [...studentReportRows.querySelectorAll("tr")].forEach(row => {
+        const matches = (!keyword || row.textContent.toLocaleLowerCase("th").includes(keyword))
+          && (!status || row.dataset.status === status)
+          && (!safety || row.dataset.safety === safety)
+          && (!mode || row.dataset.reporterMode === mode)
+          && behaviorInSelectedPeriod(Number(row.dataset.incidentTime || 0));
+        row.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      document.getElementById("studentReportCount").textContent = `${visible.toLocaleString("th-TH")} รายการ`;
+      document.getElementById("studentReportEmpty").hidden = visible > 0;
+      updateBehaviorNavCounts();
+    }
+
+    function refreshStudentReportUi() {
+      refreshBehaviorPeriodOptions();
+      const records = scopedBehaviorReports();
+      document.getElementById("studentReportTotal").textContent = records.length.toLocaleString("th-TH");
+      document.getElementById("studentReportPending").textContent = records.filter(record => record.status === "รอตรวจสอบ").length.toLocaleString("th-TH");
+      document.getElementById("studentReportUnsafe").textContent = records.filter(record => /กำลังมีอันตราย|ยังรู้สึกไม่ปลอดภัย/.test(record.safeNow || "")).length.toLocaleString("th-TH");
+      document.getElementById("studentReportOpened").textContent = records.filter(record => record.status === "เปิดเป็นเคสแล้ว").length.toLocaleString("th-TH");
+      filterStudentReports();
+    }
+
+    async function loadStudentReports() {
+      if (!behaviorApi?.configured()) {
+        behaviorReportApiStatus.textContent = "ยังไม่ได้ตั้งค่า Apps Script สำหรับคิวเรื่องแจ้ง";
+        return;
+      }
+      behaviorReportApiStatus.textContent = "กำลังซิงก์เรื่องแจ้งจาก Google Sheets...";
+      try {
+        const safetyPriority = value => value === "กำลังมีอันตราย" ? 3 : value === "ยังรู้สึกไม่ปลอดภัย" ? 2 : 0;
+        const records = (await behaviorApi.request("behavior-report.list")).map(normalizeStudentReport).sort((a, b) =>
+          sortByIncidentDateDesc(a, b) || safetyPriority(b.safeNow) - safetyPriority(a.safeNow)
+        );
+        behaviorReports.clear();
+        studentReportRows.innerHTML = "";
+        records.forEach(record => applyStudentReport(record));
+        refreshStudentReportUi();
+        behaviorReportApiStatus.textContent = `เชื่อม Google Sheets แล้ว · ${records.length.toLocaleString("th-TH")} เรื่องแจ้ง · ดึงล่าสุด ${sheetSyncTime()}`;
+      } catch (error) {
+        behaviorReportApiStatus.textContent = `โหลดเรื่องแจ้งไม่สำเร็จ · ${error.message}`;
+        showToast("ไม่สามารถโหลดคิวเรื่องแจ้งได้");
+      }
+    }
+
+    function populateStudentReportReviewers() {
+      const select = document.getElementById("studentReportReviewer");
+      const current = select.value;
+      select.innerHTML = `<option value="">เลือกครูผู้คัดกรอง</option>${masterTeachers.map(teacher => `<option>${escapeHtml(teacher)}</option>`).join("")}`;
+      if (masterTeachers.includes(current)) select.value = current;
+    }
+
+    function renderStudentReportOwnerChecks() {
+      const container = document.getElementById("studentReportOwnerChecks");
+      const checked = new Set([...container.querySelectorAll("input:checked")].map(input => input.value));
+      container.innerHTML = masterTeachers.length ? masterTeachers.map(teacher => `
+        <label class="owner-check"><input type="checkbox" value="${escapeHtml(teacher)}" ${checked.has(teacher) ? "checked" : ""}><span>${escapeHtml(teacher)}</span></label>`).join("")
+        : `<span class="master-status">กำลังโหลดรายชื่อครู...</span>`;
+    }
+
+    function mapReportIncidentType(value) {
+      const mapping = [
+        [/บุหรี่|สารเสพติด|ของมึนเมา/, "บุหรี่หรือบุหรี่ไฟฟ้า"],
+        [/ทะเลาะ|ทำร้าย/, "ทะเลาะวิวาท / ทำร้ายร่างกาย"],
+        [/คุกคาม|ทางเพศ/, "การคุกคามหรือประพฤติไม่เหมาะสมทางเพศ"],
+        [/กลั่นแกล้ง/, "กลั่นแกล้ง / กลั่นแกล้งออนไลน์"],
+        [/ลักทรัพย์|ทำลายทรัพย์/, "ลักทรัพย์ / ทำลายทรัพย์สิน"],
+        [/อาวุธ|วัตถุอันตราย/, "พกพาอาวุธหรือวัตถุอันตราย"],
+        [/หนีเรียน|ฝ่าฝืนระเบียบ/, "หนีเรียน / ออกจากสถานศึกษาโดยไม่ได้รับอนุญาต"]
+      ];
+      return mapping.find(([pattern]) => pattern.test(value || ""))?.[1] || "อื่น ๆ";
+    }
+
+    function openStudentReportModal(reportId) {
+      const record = behaviorReports.get(reportId);
+      if (!record) return;
+      selectedStudentReport = record;
+      selectedReportStudent = null;
+      reportStudentSearch.value = "";
+      document.getElementById("selectedReportStudentLabel").textContent = "ยังไม่ได้เลือกนักเรียน";
+      document.getElementById("selectedReportId").textContent = record.reportId;
+      document.getElementById("selectedReportStatus").textContent = record.status || "รอตรวจสอบ";
+      document.getElementById("selectedReporter").textContent = record.reporterMode === "identified"
+        ? `${record.reporterName || "-"} · ${record.reporterStudentId || "-"}${record.contact ? ` · ${record.contact}` : ""}`
+        : "ไม่ระบุตัวตน";
+      document.getElementById("selectedReportType").textContent = record.incidentType || "-";
+      document.getElementById("selectedReportDate").textContent = formatDate(record.incidentAt || record.createdAt);
+      document.getElementById("selectedReportSafety").textContent = record.safeNow || "ไม่ระบุ";
+      document.getElementById("selectedReportUrgency").textContent = record.urgencySelf || "ไม่แน่ใจ";
+      document.getElementById("selectedReportPlace").textContent = record.place || "-";
+      document.getElementById("selectedReportPeople").textContent = record.peopleInvolved || "-";
+      document.getElementById("selectedReportDetail").textContent = record.detail || "-";
+      document.getElementById("selectedReportDocuments").innerHTML = record.documents?.length
+        ? record.documents.map((file, index) => `<div class="attachment-item"><span class="list-icon">${file.mimeType?.includes("pdf") ? "PDF" : "IMG"}</span><div><strong>${index + 1}. <a href="${escapeHtml(file.url)}" target="_blank" rel="noopener">${escapeHtml(file.name)}</a></strong><small>${escapeHtml(formatDate(file.uploadedAt))}</small></div></div>`).join("")
+        : `<div class="notice">ไม่มีหลักฐานแนบ</div>`;
+      const reviewStatus = normalizeThaiText(record.status) || "รอตรวจสอบ";
+      document.getElementById("studentReviewStatus").value = reviewStatus;
+      if (document.getElementById("studentReviewStatus").value !== reviewStatus) {
+        document.getElementById("studentReviewStatus").value = "รอตรวจสอบ";
+      }
+      populateStudentReportReviewers();
+      document.getElementById("studentReportReviewer").value = masterTeachers.includes(record.reviewer) ? record.reviewer : "";
+      document.getElementById("studentReviewNote").value = record.reviewNote || "";
+      document.getElementById("reportCaseIncidentType").value = mapReportIncidentType(record.incidentType);
+      document.getElementById("reportCaseSeverity").value = record.safeNow === "กำลังมีอันตราย" ? "วิกฤต / ต้องส่งต่อทันที"
+        : record.urgencySelf === "เร่งด่วน" || record.safeNow === "ยังรู้สึกไม่ปลอดภัย" ? "ร้ายแรง" : "ปานกลาง";
+      renderStudentReportOwnerChecks();
+      document.getElementById("studentReportCaseFields").style.display = reviewStatus === "เปิดเป็นเคสแล้ว" ? "block" : "none";
+      const locked = Boolean(record.linkedCaseId);
+      [...document.querySelectorAll("#studentReportReviewForm input, #studentReportReviewForm select, #studentReportReviewForm textarea, #studentReportReviewForm button")].forEach(element => {
+        element.disabled = locked;
+      });
+      const submit = document.querySelector("#studentReportReviewForm button[type='submit']");
+      submit.textContent = locked ? `เปิดเป็นเคส ${record.linkedCaseId} แล้ว` : "บันทึกผลการคัดกรอง";
+      studentReportModal.classList.add("open");
+      studentReportModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeStudentReportModal() {
+      studentReportModal.classList.remove("open");
+      studentReportModal.setAttribute("aria-hidden", "true");
+      selectedStudentReport = null;
+      document.body.classList.toggle("modal-open", caseModal.classList.contains("open"));
     }
 
     function behaviorRow(record) {
@@ -481,6 +839,7 @@
       row.dataset.score = record.score === "" || record.score == null ? "รอพิจารณา" : `${record.score} คะแนน`;
       row.dataset.detail = record.detail || "";
       row.dataset.owners = (record.owners || []).join("|");
+      row.dataset.incidentTime = String(incidentTime(record));
       row.innerHTML = `
         <td>${escapeHtml(record.caseId)}</td>
         <td>${escapeHtml(new Intl.DateTimeFormat("th-TH", { dateStyle: "medium" }).format(new Date(record.incidentAt || record.createdAt)))}</td>
@@ -489,31 +848,55 @@
         <td><span class="severity ${severityClass(record.severity || "")}">${escapeHtml(record.severity || "ไม่ระบุ")}</span></td>
         <td>${(record.owners || []).length ? record.owners.map(shortTeacherName).map(escapeHtml).join(" · ") : "ยังไม่มอบหมาย"}</td>
         <td><span class="pill ${behaviorStatusTone(record.status || "")}">${escapeHtml(record.status || "เปิดเคสใหม่")}</span></td>
-        <td><button class="case-action" data-case="${escapeHtml(record.caseId)}">${record.status === "ปิดเคส" ? "ดูประวัติ" : "ติดตาม"}</button> · <button class="case-action" data-report="${escapeHtml(record.caseId)}">รายงาน</button></td>`;
+        <td><button class="case-action" data-case="${escapeHtml(record.caseId)}">${isClosedBehaviorStatus(record.status) ? "ดูประวัติ" : "ติดตาม"}</button> · <button class="case-action" data-report="${escapeHtml(record.caseId)}">รายงาน</button></td>`;
       return row;
+    }
+
+    function attachmentDedupKey(file) {
+      return [
+        file.fileId || file.driveFileId || "",
+        file.url || "",
+        file.name || "",
+        file.type || file.mimeType || ""
+      ].map(value => String(value || "").trim().toLowerCase()).filter(Boolean).join("|");
+    }
+
+    function uniqueAttachments(files) {
+      const seen = new Set();
+      return (files || []).filter(file => {
+        const key = attachmentDedupKey(file) || String(file.documentId || "").trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
     }
 
     function applyBehaviorRecord(record, prepend = false) {
       behaviorRecords.set(record.caseId, record);
-      caseAttachments[record.caseId] = (record.documents || []).map(file => ({
+      caseAttachments[record.caseId] = uniqueAttachments((record.documents || []).map(file => ({
+        documentId: file.documentId || "",
         name: file.name,
         type: file.mimeType || "application/octet-stream",
         addedAt: formatDate(file.uploadedAt),
-        url: file.url || ""
-      }));
+        url: file.url || "",
+        fileId: file.fileId || "",
+        previewUrl: file.previewUrl || ""
+      })));
       const existing = caseRows.querySelector(`[data-record-id="${CSS.escape(record.caseId)}"]`);
       const row = behaviorRow(record);
       if (existing) existing.replaceWith(row);
       else if (prepend) caseRows.prepend(row);
       else caseRows.append(row);
+      sortRowsByIncidentTime(caseRows);
       if (selectedCaseRow === existing || selectedCaseRow?.dataset.recordId === record.caseId) selectedCaseRow = row;
       return row;
     }
 
     function refreshBehaviorDerivedUi() {
-      const records = [...behaviorRecords.values()];
+      refreshBehaviorPeriodOptions();
+      const records = scopedBehaviorRecords();
       const now = new Date();
-      const isClosed = record => /ปิดเคส|เคลียร์เรียบร้อย/.test(record.status || "");
+      const isClosed = record => isClosedBehaviorStatus(record.status);
       const isCurrentMonth = record => {
         const date = new Date(record.incidentAt || record.createdAt);
         return !Number.isNaN(date.getTime()) && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
@@ -543,7 +926,7 @@
       document.getElementById("behaviorEmptyState").hidden = caseRows.children.length > 0;
       const urgent = records.filter(record => !isClosed(record)).sort((a, b) => {
         const severity = value => /วิกฤต/.test(value) ? 3 : /ร้ายแรง/.test(value) ? 2 : /ปานกลาง/.test(value) ? 1 : 0;
-        return severity(b.severity || "") - severity(a.severity || "") || new Date(b.incidentAt) - new Date(a.incidentAt);
+        return severity(b.severity || "") - severity(a.severity || "") || sortByIncidentDateDesc(a, b);
       }).slice(0, 4);
       document.getElementById("behaviorUrgentBadge").textContent = `${urgent.length.toLocaleString("th-TH")} เคส`;
       document.getElementById("behaviorUrgentRows").innerHTML = urgent.length ? urgent.map(record => `
@@ -561,7 +944,7 @@
       }
       behaviorApiStatus.textContent = "กำลังซิงก์ทะเบียนเคสจาก Google Sheets...";
       try {
-        const records = await behaviorApi.request("behavior.list");
+        const records = (await behaviorApi.request("behavior.list")).sort(sortByIncidentDateDesc);
         behaviorRecords.clear();
         caseRows.innerHTML = "";
         records.forEach(record => applyBehaviorRecord(record));
@@ -630,7 +1013,7 @@
       document.getElementById("reportScore").textContent = selectedCaseRow.dataset.score || document.getElementById("selectedScore").textContent;
       document.getElementById("reportRecorder").textContent = (selectedCaseRow.dataset.owners || "").split("|").filter(Boolean).join(", ") || "ยังไม่ได้มอบหมาย";
       document.getElementById("reportDetail").textContent = selectedCaseRow.dataset.detail || "บันทึกข้อเท็จจริงตามข้อมูลในทะเบียนเคส";
-      document.getElementById("reportConclusion").textContent = cells[6].textContent.includes("ปิดเคส") || cells[6].textContent.includes("เคลียร์")
+      document.getElementById("reportConclusion").textContent = isClosedBehaviorStatus(cells[6].textContent)
         ? "ดำเนินการตามขั้นตอนครบถ้วนและพิจารณาปิดเคสแล้ว"
         : "อยู่ระหว่างดำเนินการติดตามตามขั้นตอนของงานปกครองและความปลอดภัยนักเรียน นักศึกษา";
       document.getElementById("reportSignedDate").textContent = new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date());
@@ -642,16 +1025,122 @@
         const note = separator >= 0 ? detail.slice(separator + 3) : detail;
         return `<tr><td>${index + 1}</td><td>${date}</td><td><strong>${item.querySelector("strong").textContent.trim()}</strong><br>${note}</td></tr>`;
       }).join("");
-      const attachments = caseAttachments[cells[0].textContent.trim()] || [];
+      const attachments = uniqueAttachments(caseAttachments[cells[0].textContent.trim()] || []);
       document.getElementById("reportAppendix").style.display = attachments.length ? "block" : "none";
-      document.getElementById("reportAttachments").innerHTML = attachments.map((file, index) => `
-        <section class="report-attachment">
-          <h4>เอกสารแนบ ${index + 1}: ${file.name}</h4>
-          <p>ประเภทไฟล์: ${file.type || "ไม่ระบุ"} · เพิ่มเมื่อ ${file.addedAt}</p>
-          ${file.previewUrl && file.type.startsWith("image/")
-            ? `<img src="${file.previewUrl}" alt="${file.name}">`
-            : `<div class="report-file-box"><strong>${file.type.includes("pdf") ? "เอกสาร PDF" : "ไฟล์เอกสาร"}</strong><br>${file.url ? `<a href="${escapeHtml(file.url)}" target="_blank" rel="noopener">${escapeHtml(file.name)}</a>` : escapeHtml(file.name)}<br><small>แนบไฟล์ต้นฉบับไว้กับรายการเคสในระบบ</small></div>`}
-        </section>`).join("");
+      document.getElementById("reportAttachments").innerHTML = attachments.length
+        ? `<div class="report-document-loading">กำลังเตรียมเอกสารแนบ ${attachments.length.toLocaleString("th-TH")} ไฟล์...</div>`
+        : "";
+      const renderToken = ++reportRenderToken;
+      reportAttachmentsReady = renderReportDocuments(attachments, renderToken);
+    }
+
+    function attachmentKind(file) {
+      const type = String(file.type || "").toLowerCase();
+      const name = String(file.name || "").toLowerCase();
+      if (type.startsWith("image/") || /\.(png|jpe?g|gif|webp|heic)$/.test(name)) return "image";
+      if (type.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+      return "file";
+    }
+
+    function decodeBase64(base64) {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+      return bytes;
+    }
+
+    function loadDocumentPayload(file) {
+      if (!file.documentId) return Promise.reject(new Error("ไม่พบรหัสเอกสาร"));
+      if (!documentPayloadCache.has(file.documentId)) {
+        documentPayloadCache.set(
+          file.documentId,
+          behaviorApi.request("behavior.document.get", { documentId: file.documentId })
+            .catch(error => {
+              documentPayloadCache.delete(file.documentId);
+              throw error;
+            })
+        );
+      }
+      return documentPayloadCache.get(file.documentId);
+    }
+
+    function reportDocumentPage(file, pageLabel) {
+      const page = document.createElement("section");
+      page.className = "report-document-page";
+      page.innerHTML = `<div class="report-document-caption">${escapeHtml(file.name)}${pageLabel ? ` · ${escapeHtml(pageLabel)}` : ""}</div>`;
+      return page;
+    }
+
+    async function appendImageDocument(container, file, payload) {
+      const page = reportDocumentPage(file);
+      const image = document.createElement("img");
+      image.className = "report-document-image";
+      image.alt = file.name;
+      image.src = file.previewUrl || `data:${payload.mimeType || file.type};base64,${payload.base64}`;
+      page.append(image);
+      container.append(page);
+      if (!image.complete) {
+        await new Promise(resolve => {
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", resolve, { once: true });
+        });
+      }
+    }
+
+    async function appendPdfDocument(container, file, payload) {
+      if (!window.pdfjsLib) throw new Error("PDF.js is not available");
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "../systems/vendor/pdfjs/pdf.worker.min.js";
+      const pdf = await window.pdfjsLib.getDocument({ data: decodeBase64(payload.base64) }).promise;
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        const pdfPage = await pdf.getPage(pageNumber);
+        const viewport = pdfPage.getViewport({ scale: 1.8 });
+        const page = reportDocumentPage(file, `หน้า ${pageNumber}/${pdf.numPages}`);
+        const canvas = document.createElement("canvas");
+        canvas.className = "report-document-canvas";
+        canvas.width = Math.ceil(viewport.width);
+        canvas.height = Math.ceil(viewport.height);
+        page.append(canvas);
+        container.append(page);
+        await pdfPage.render({
+          canvasContext: canvas.getContext("2d", { alpha: false }),
+          viewport
+        }).promise;
+      }
+      await pdf.destroy();
+    }
+
+    function appendDocumentError(container, file, error) {
+      const page = reportDocumentPage(file);
+      page.innerHTML += `<div class="report-file-box"><strong>ไม่สามารถเตรียมไฟล์นี้เพื่อต่อท้ายรายงานได้</strong><br>${escapeHtml(error.message || error)}${file.url ? `<br><a class="report-file-link" href="${escapeHtml(file.url)}" target="_blank" rel="noopener">เปิดไฟล์ต้นฉบับใน Google Drive</a>` : ""}</div>`;
+      container.append(page);
+    }
+
+    async function renderReportDocuments(attachments, renderToken) {
+      const container = document.getElementById("reportAttachments");
+      attachments = uniqueAttachments(attachments);
+      if (!attachments.length) return;
+      container.innerHTML = "";
+      for (const file of attachments) {
+        if (renderToken !== reportRenderToken) return;
+        try {
+          const kind = attachmentKind(file);
+          if (kind === "file") throw new Error("รองรับการต่อท้ายอัตโนมัติเฉพาะรูปภาพและ PDF");
+          const payload = file.previewUrl
+            ? { mimeType: file.type, base64: "" }
+            : await loadDocumentPayload(file);
+          if (renderToken !== reportRenderToken) return;
+          if (kind === "image") await appendImageDocument(container, file, payload);
+          else await appendPdfDocument(container, file, payload);
+          if (renderToken !== reportRenderToken) return;
+        } catch (error) {
+          if (renderToken !== reportRenderToken) return;
+          appendDocumentError(container, file, error);
+        }
+      }
+    }
+
+    async function waitForReportMedia() {
+      await reportAttachmentsReady;
     }
 
     function renderCaseOwnerChecks() {
@@ -706,6 +1195,96 @@
         updateReport();
         openView("report");
       }
+    });
+    studentReportRows.addEventListener("click", event => {
+      const button = event.target.closest("[data-student-report]");
+      if (button) openStudentReportModal(button.dataset.studentReport);
+    });
+    document.getElementById("studentReviewStatus").addEventListener("change", event => {
+      document.getElementById("studentReportCaseFields").style.display = event.target.value === "เปิดเป็นเคสแล้ว" ? "block" : "none";
+    });
+    document.getElementById("studentReportReviewForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!selectedStudentReport) return;
+      const status = normalizeThaiText(document.getElementById("studentReviewStatus").value);
+      const reviewer = document.getElementById("studentReportReviewer").value;
+      const reviewNote = document.getElementById("studentReviewNote").value.trim();
+      const owners = [...document.querySelectorAll("#studentReportOwnerChecks input:checked")].map(input => input.value);
+      if (status === "เปิดเป็นเคสแล้ว" && !selectedReportStudent) {
+        showToast("กรุณาเลือกนักเรียนที่เป็นเจ้าของเคสจาก Master Student");
+        reportStudentSearch.focus();
+        return;
+      }
+      if (status === "เปิดเป็นเคสแล้ว" && !owners.length) {
+        showToast("กรุณาเลือกครูรับผิดชอบแก้ไขเคสอย่างน้อย 1 คน");
+        return;
+      }
+      const submitButton = event.target.querySelector("[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = status === "เปิดเป็นเคสแล้ว" ? "กำลังเปิดเคสและเชื่อมเรื่องแจ้ง..." : "กำลังบันทึกผลคัดกรอง...";
+      try {
+        const payload = {
+          reportId: selectedStudentReport.reportId,
+          version: selectedStudentReport.version,
+          status,
+          reviewer,
+          reviewNote
+        };
+        if (status === "เปิดเป็นเคสแล้ว") {
+          payload.case = {
+            studentId: selectedReportStudent.id,
+            studentName: selectedReportStudent.fullName,
+            room: selectedReportStudent.room || selectedReportStudent.grade || "",
+            incidentType: document.getElementById("reportCaseIncidentType").value,
+            severity: document.getElementById("reportCaseSeverity").value,
+            incidentAt: selectedStudentReport.incidentAt || selectedStudentReport.createdAt,
+            place: selectedStudentReport.place || "",
+            detail: selectedStudentReport.detail || "",
+            owners
+          };
+        }
+        const result = await behaviorApi.request("behavior-report.review", payload);
+        applyStudentReport(result.report);
+        if (result.behaviorCase) {
+          applyBehaviorRecord(result.behaviorCase, true);
+          refreshBehaviorDerivedUi();
+        }
+        refreshStudentReportUi();
+        behaviorReportApiStatus.textContent = `ซิงก์ Google Sheets แล้ว · ${result.report.reportId} · ${sheetSyncTime()}`;
+        closeStudentReportModal();
+        showToast(result.behaviorCase
+          ? `เปิดเคส ${result.behaviorCase.caseId} และเชื่อมเรื่องแจ้งแล้ว`
+          : `บันทึกผลคัดกรอง ${result.report.reportId} แล้ว`);
+      } catch (error) {
+        showToast(`บันทึกผลคัดกรองไม่สำเร็จ: ${error.message}`);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "บันทึกผลการคัดกรอง";
+      }
+    });
+    document.getElementById("deleteStudentReport").addEventListener("click", async () => {
+      if (!selectedStudentReport) return;
+      const reportId = selectedStudentReport.reportId;
+      if (!window.confirm(`ยืนยันซ่อน ${reportId} ออกจากคิว? ระบบจะเก็บประวัติการตรวจสอบไว้`)) return;
+      try {
+        await behaviorApi.request("behavior-report.delete", {
+          reportId,
+          version: selectedStudentReport.version,
+          actor: document.getElementById("studentReportReviewer").value || selectedStudentReport.reviewer || ""
+        });
+        behaviorReports.delete(reportId);
+        studentReportRows.querySelector(`[data-report-id="${CSS.escape(reportId)}"]`)?.remove();
+        refreshStudentReportUi();
+        closeStudentReportModal();
+        behaviorReportApiStatus.textContent = `ซิงก์ Google Sheets แล้ว · ซ่อน ${reportId} · ${sheetSyncTime()}`;
+        showToast(`ซ่อน ${reportId} ออกจากคิวแล้ว`);
+      } catch (error) {
+        showToast(`ซ่อนเรื่องแจ้งไม่สำเร็จ: ${error.message}`);
+      }
+    });
+    document.getElementById("reloadStudentReports").addEventListener("click", loadStudentReports);
+    ["studentReportSearch", "studentReportStatus", "studentReportSafety", "studentReporterMode"].forEach(id => {
+      document.getElementById(id).addEventListener(id === "studentReportSearch" ? "input" : "change", filterStudentReports);
     });
 
     setDefaultDate(document.getElementById("incidentDate"));
@@ -895,29 +1474,64 @@
       }
     });
 
-    document.getElementById("printCaseReport").addEventListener("click", () => {
+    document.getElementById("printCaseReport").addEventListener("click", async event => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      button.textContent = "กำลังเตรียมเอกสารแนบ...";
       updateReport();
+      await waitForReportMedia();
+      button.disabled = false;
+      button.textContent = "พิมพ์ / บันทึก PDF";
       window.print();
     });
 
     document.getElementById("closeCaseModal").addEventListener("click", closeCaseModal);
+    document.getElementById("closeStudentReportModal").addEventListener("click", closeStudentReportModal);
     caseModal.addEventListener("click", event => {
       if (event.target === caseModal) closeCaseModal();
     });
+    studentReportModal.addEventListener("click", event => {
+      if (event.target === studentReportModal) closeStudentReportModal();
+    });
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape") closeCaseModal();
+      if (event.key === "Escape") {
+        closeCaseModal();
+        closeStudentReportModal();
+      }
     });
 
     ["caseFilterSearch", "caseFilterStatus", "caseFilterSeverity", "caseFilterOwner"].forEach(id => {
       document.getElementById(id).addEventListener(id === "caseFilterSearch" ? "input" : "change", filterCaseRows);
     });
-    renderOwnerChips();
-    populateOwnerFilter();
-    renderOwnerKpi();
-    filterCaseRows();
-    updateReport();
-    loadBehaviorMaster();
-    loadBehaviorRecords();
+    ["behaviorPeriodTerm", "behaviorPeriodYear"].forEach(id => {
+      document.getElementById(id).addEventListener("change", () => {
+        refreshBehaviorPeriodOptions();
+        refreshBehaviorDerivedUi();
+        refreshStudentReportUi();
+      });
+    });
+    async function bootBehaviorSystem() {
+      refreshBehaviorPeriodOptions();
+      renderOwnerChips();
+      populateOwnerFilter();
+      renderOwnerKpi();
+      filterCaseRows();
+      updateReport();
+      try {
+        await window.StudentAffairsAuth.require({
+          systemId: "behavior",
+          systemName: "ระบบบริหารจัดการพฤติกรรมนักเรียน"
+        });
+      } catch (error) {
+        behaviorApiStatus.textContent = `รอเข้าสู่ระบบ Gmail · ${error.message}`;
+        return;
+      }
+      loadBehaviorMaster();
+      loadBehaviorRecords();
+      loadStudentReports();
+    }
+
+    bootBehaviorSystem();
   </script>
 </body>
 </html>

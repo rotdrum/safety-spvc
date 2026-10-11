@@ -28,6 +28,8 @@ a { color: inherit; text-decoration: none; }
 .nav { display: grid; gap: 6px; margin-top: 18px; }
 .nav button, .back-link { display: flex; width: 100%; min-height: 44px; align-items: center; gap: 10px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: #d5e4e1; font-weight: 800; text-align: left; cursor: pointer; }
 .nav button:hover, .nav button.active { background: rgba(255,255,255,.12); color: #fff; }
+.nav-count { display: inline-flex; min-width: 26px; height: 22px; align-items: center; justify-content: center; margin-left: auto; padding: 0 8px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.14); color: #fff; font-size: 11px; font-weight: 950; line-height: 1; }
+.nav button.active .nav-count { border-color: rgba(255,255,255,.28); background: #fff; color: var(--brand-dark); }
 .nav svg, .back-link svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .back-link { position: absolute; right: 16px; bottom: 18px; left: 16px; width: auto; border: 1px solid rgba(255,255,255,.14); }
 .main { min-width: 0; padding: 24px; }
@@ -147,10 +149,13 @@ body.modal-open { overflow: hidden; }
 .attachment-item strong, .attachment-item small { display: block; }
 .attachment-item strong { font-size: 11px; }
 .attachment-item small { margin-top: 2px; color: var(--muted); font-size: 10px; }
-.report-appendix { break-before: page; page-break-before: always; margin-top: 50px; }
-.report-attachment { margin-top: 18px; padding-top: 14px; border-top: 1px solid #777; break-inside: avoid; page-break-inside: avoid; }
-.report-attachment img { display: block; max-width: 100%; max-height: 780px; margin: 12px auto 0; object-fit: contain; }
+.report-appendix { margin-top: 0; }
 .report-file-box { margin-top: 10px; padding: 18px; border: 1px dashed #777; text-align: center; }
+.report-document-loading { margin-top: 24px; padding: 18px; border: 1px dashed #777; text-align: center; }
+.report-document-page { display: grid; min-height: 260mm; align-items: center; margin-top: 20mm; padding: 8mm 0 0; border-top: 1px solid #aaa; break-before: page; page-break-before: always; break-inside: avoid; page-break-inside: avoid; }
+.report-document-caption { align-self: start; margin-bottom: 5mm; color: #555; font-size: 10px; text-align: right; }
+.report-document-image,.report-document-canvas { display: block; width: auto; max-width: 100%; max-height: 245mm; margin: auto; object-fit: contain; }
+.report-file-link { color: #174f46; font-weight: 800; }
 .population-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
 .population-card { position: relative; overflow: hidden; padding: 18px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
 .population-card::after { position: absolute; right: -18px; bottom: -28px; width: 90px; height: 90px; border-radius: 50%; background: var(--brand-soft); content: ""; }
@@ -237,4 +242,7 @@ body.modal-open { overflow: hidden; }
   .view { display: none !important; }
   #view-report.active { display: block !important; }
   .report-paper { width: 100%; min-height: auto; padding: 0; border: 0; box-shadow: none; }
+  .report-document-page { min-height: 0; margin: 0; padding: 0; border: 0; }
+  .report-document-caption { display: none; }
+  .report-document-image,.report-document-canvas { max-width: 100%; max-height: 270mm; }
 }

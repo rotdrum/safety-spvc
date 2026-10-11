@@ -878,6 +878,103 @@
       line-height: 1.7;
     }
 
+    .report-mode-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-right: auto;
+    }
+
+    .report-mode-tabs button {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .report-mode-tabs button.active {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .report-document {
+      display: none;
+    }
+
+    .report-document.active {
+      display: block;
+    }
+
+    .official-report-subtitle {
+      margin: -8px 0 16px;
+      color: #555;
+      font-size: 11px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .official-report-chart {
+      padding: 10px 8px 4px;
+      border: 1px solid #777;
+    }
+
+    .official-report-chart svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .executive-detail-page {
+      margin-top: 24px;
+      break-before: page;
+      page-break-before: always;
+    }
+
+    .advisor-report-page {
+      margin-top: 24px;
+      break-before: page;
+      page-break-before: always;
+    }
+
+    .advisor-report-page:first-child {
+      margin-top: 0;
+      break-before: auto;
+      page-break-before: auto;
+    }
+
+    .advisor-room-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 14px 0 16px;
+    }
+
+    .advisor-room-meta div {
+      padding: 9px 10px;
+      border: 1px solid #777;
+      font-size: 11px;
+    }
+
+    .advisor-room-meta span,
+    .advisor-room-meta strong {
+      display: block;
+    }
+
+    .advisor-room-meta span {
+      color: #555;
+      font-size: 9px;
+    }
+
+    .advisor-room-meta strong {
+      margin-top: 3px;
+      font-size: 12px;
+    }
+
     @media (max-width: 1180px) {
       .app-shell {
         grid-template-columns: 1fr;
@@ -968,7 +1065,9 @@
       .topbar,
       .filter-panel,
       .actions,
-      .report-actions {
+      .report-actions,
+      .spvc-auth-userbar,
+      .spvc-auth-overlay {
         display: none !important;
       }
 
@@ -992,6 +1091,14 @@
         display: block !important;
       }
 
+      .report-document {
+        display: none !important;
+      }
+
+      .report-document.active {
+        display: block !important;
+      }
+
       .official-report {
         width: 100%;
         min-height: 0;
@@ -1003,7 +1110,9 @@
 
       .official-report-head,
       .official-report-title,
-      .official-report-metrics {
+      .official-report-metrics,
+      .official-report-chart,
+      .executive-detail-page h4 {
         break-inside: avoid;
       }
 
@@ -1031,14 +1140,14 @@
       <nav class="nav" aria-label="Dashboard menu">
         <button class="active" type="button" data-view="overview">ภาพรวม <span class="nav-count" id="navOverview">0</span></button>
         <button type="button" data-view="daily">รายวัน <span class="nav-count" id="navDaily">0</span></button>
-        <button type="button" data-view="monthly">รายเดือน <span class="nav-count" id="navMonthly">0</span></button>
+        <button type="button" data-view="monthly">สรุปช่วงเวลา <span class="nav-count" id="navMonthly">0</span></button>
         <button type="button" data-view="risk">เด็กมาสายบ่อย <span class="nav-count" id="navRisk">0</span></button>
         <button type="button" data-view="recorders">KPI ผู้บันทึก <span class="nav-count" id="navRecorders">0</span></button>
         <button type="button" data-view="transactions">ข้อมูลรายการ <span class="nav-count" id="navRows">0</span></button>
         <button type="button" data-view="report">รายงาน <span class="nav-count" id="navReport">0</span></button>
       </nav>
       <div class="sidebar-note" id="sourceLabel">ยังไม่พบข้อมูล · กำลังโหลดข้อมูลจริงจาก Google Sheet</div>
-      <a class="portal-link" href="../../index.html">‹ กลับศูนย์ข้อมูลกลาง</a>
+      <!-- <a class="portal-link" href="../../index.html">‹ กลับศูนย์ข้อมูลกลาง</a> -->
     </aside>
 
     <main class="main">
@@ -1066,7 +1175,8 @@
         <div class="filter-head">
           <strong>ตัวกรองกลาง</strong>
           <div class="quick-tabs" id="rangeTabs">
-            <button class="active" type="button" data-range="month">เดือนที่เลือก</button>
+            <button class="active" type="button" data-range="term">ภาคเรียน</button>
+            <button type="button" data-range="month">เดือนที่เลือก</button>
             <button type="button" data-range="today">วันที่เลือก</button>
             <button type="button" data-range="7days">7 วันล่าสุด</button>
             <button type="button" data-range="custom">กำหนดเอง</button>
@@ -1074,6 +1184,14 @@
           </div>
         </div>
         <form class="filters" id="filters">
+          <div class="field" id="termField">
+            <label for="termSelect">ภาคเรียน</label>
+            <select id="termSelect"><option value="1">ภาคเรียนที่ 1</option><option value="2" selected>ภาคเรียนที่ 2</option><option value="summer">ภาคฤดูร้อน</option></select>
+          </div>
+          <div class="field" id="academicYearField">
+            <label for="academicYearSelect">ปีการศึกษา</label>
+            <select id="academicYearSelect"></select>
+          </div>
           <div class="field" id="monthField">
             <label for="monthSelect">เดือน</label>
             <select id="monthSelect"></select>
@@ -1231,11 +1349,11 @@
       <section class="view" id="view-monthly">
         <article class="panel">
           <div class="panel-head">
-            <h3>รายงานรายเดือนสำหรับผู้บริหาร</h3>
-            <span class="pill" id="monthlyPill">เดือนที่เลือก</span>
+            <h3>รายงานตามช่วงที่เลือกสำหรับผู้บริหาร</h3>
+            <span class="pill" id="monthlyPill">ช่วงที่เลือก</span>
           </div>
           <div class="report-summary">
-            <div class="report-box"><div>Recorded ทั้งเดือน</div><strong id="monthlyTotal">0</strong></div>
+            <div class="report-box"><div>Recorded ในช่วง</div><strong id="monthlyTotal">0</strong></div>
             <div class="report-box"><div>เฉลี่ยต่อวัน</div><strong id="monthlyAvg">0</strong></div>
             <div class="report-box"><div>เด็ก 3+ ครั้ง</div><strong id="monthlyHighRisk">0</strong></div>
             <div class="report-box"><div>ห้องหนักสุด</div><strong id="monthlyTopRoom">-</strong></div>
@@ -1244,11 +1362,11 @@
 
         <div class="grid two-col">
           <article class="panel">
-            <div class="panel-head"><h3>แนวโน้มรายวันของเดือน</h3><span class="pill">Monthly trend</span></div>
+            <div class="panel-head"><h3>แนวโน้มรายวันของช่วง</h3><span class="pill">Timeline</span></div>
             <div id="monthlyChart"></div>
           </article>
           <article class="panel">
-            <div class="panel-head"><h3>บทสรุปเดือนนี้</h3><span class="pill">ใช้พรีได้</span></div>
+            <div class="panel-head"><h3>บทสรุปช่วงนี้</h3><span class="pill">ใช้พรีได้</span></div>
             <div class="insight-list" id="monthlyInsights"></div>
           </article>
         </div>
@@ -1313,59 +1431,75 @@
 
       <section class="view" id="view-report">
         <div class="actions report-actions">
+          <div class="report-mode-tabs" aria-label="เลือกประเภทรายงาน">
+            <button class="active" type="button" data-report-mode="executive">รายงานผู้บริหาร</button>
+            <button type="button" data-report-mode="advisor-all">รายงานครูที่ปรึกษาทั้งหมด</button>
+            <button type="button" data-report-mode="advisor-risk">รายงานครูที่ปรึกษานักเรียนสายเกิน 3 ครั้ง</button>
+          </div>
           <button class="button primary" type="button" id="printLateReport">พิมพ์ / บันทึก PDF</button>
         </div>
-        <article class="official-report">
+        <article class="official-report report-document active" id="executiveReport">
           <header class="official-report-head">
             <img src="assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
             <div>
               <h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2>
-              <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานสรุปข้อมูลนักเรียนมาสาย</p>
+              <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานผู้บริหาร ระบบตรวจสอบนักเรียนมาสาย</p>
             </div>
             <img src="assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
           </header>
           <div class="official-report-title">
-            <h3>รายงานสรุปข้อมูลนักเรียนมาสาย</h3>
-            <p id="lateReportPeriod">ไม่พบข้อมูล</p>
+            <h3>รายงานสรุปสำหรับผู้บริหาร</h3>
+            <p id="executiveReportPeriod">ไม่พบข้อมูล</p>
           </div>
+          <p class="official-report-subtitle">สรุปข้อมูลเชิงบริหารจากรายการมาสายที่บันทึกจริง แสดงเฉพาะข้อมูลที่จำเป็นต่อการติดตาม ดูแล และมอบหมายงานต่อ</p>
           <div class="official-report-metrics">
-            <div class="official-report-metric"><span>รายการ Recorded</span><strong id="lateReportRecorded">0</strong></div>
-            <div class="official-report-metric"><span>นักเรียนไม่ซ้ำ</span><strong id="lateReportStudents">0</strong></div>
-            <div class="official-report-metric"><span>มาสายซ้ำ 2+ ครั้ง</span><strong id="lateReportRepeat">0</strong></div>
-            <div class="official-report-metric"><span>ข้อมูลต้องตรวจ</span><strong id="lateReportIssues">0</strong></div>
+            <div class="official-report-metric"><span>รายการ Recorded</span><strong id="executiveReportRecorded">0</strong></div>
+            <div class="official-report-metric"><span>นักเรียนไม่ซ้ำ</span><strong id="executiveReportStudents">0</strong></div>
+            <div class="official-report-metric"><span>มาสาย 3 ครั้งขึ้นไป</span><strong id="executiveReportHighRisk">0</strong></div>
+            <div class="official-report-metric"><span>ห้องที่มีนักเรียน 3+</span><strong id="executiveReportHighRiskRooms">0</strong></div>
           </div>
           <section class="official-report-section">
-            <h4>รายละเอียดตามช่วงและตัวกรองที่เลือก</h4>
-            <table>
-              <thead><tr><th style="width:16%">วันที่/เวลา</th><th style="width:17%">รหัส</th><th style="width:25%">นักเรียน</th><th style="width:28%">ระดับชั้น/ห้อง</th><th style="width:14%">เหตุผล</th></tr></thead>
-              <tbody id="lateReportRows"><tr><td colspan="5" class="empty">ไม่พบข้อมูล</td></tr></tbody>
-            </table>
+            <h4>กราฟ Timeline การเข้าสายรายวัน</h4>
+            <div class="official-report-chart" id="executiveMonthlyChart"></div>
+          </section>
+          <section class="official-report-section">
+            <h4>กราฟแสดงเหตุผลการมาสาย</h4>
+            <div class="official-report-chart" id="executiveReasonChart"></div>
+          </section>
+          <section class="official-report-section executive-detail-page">
+            <h4>บัญชีรายชื่อนักเรียนกลุ่มเฝ้าระวังการมาสาย แยกตามห้องเรียนและครูที่ปรึกษา</h4>
+            <div id="executiveHighRiskGroups"><div class="empty">ไม่พบข้อมูล</div></div>
           </section>
           <div class="official-signature">
             <div>
               <div>ลงชื่อ ______________________________</div>
               <div>(นางสาวปัทมพร แสงศรี)</div>
               <div>หัวหน้างานปกครองและความปลอดภัย ฯ</div>
-              <div style="margin-top:12px">วันที่ <span id="lateReportSignedDate">7 มิถุนายน 2569</span></div>
+              <div style="margin-top:12px">วันที่ <span id="executiveReportSignedDate">7 มิถุนายน 2569</span></div>
             </div>
           </div>
         </article>
+        <div class="report-document" id="advisorAllReport">
+          <div id="advisorAllReportPages"></div>
+        </div>
+        <div class="report-document" id="advisorHighRiskReport">
+          <div id="advisorHighRiskReportPages"></div>
+        </div>
       </section>
     </main>
   </div>
 
+  <script src="../../systems/data-api-config.js?v=20261011-secure"></script>
+  <script src="../../systems/data-api.js?v=20261011-secure"></script>
+  <script src="../../systems/auth-guard.js?v=20261011-secure"></script>
   <script>
-    const LOCAL_DATA_JSON_URL = "data/late_transactions.json";
-    const LOCAL_DATA_CSV_URL = "data/late_transactions.csv";
-    const SHEET_ID = "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw";
-    const SHEET_GID = "1977681832";
-    const SHEET_NAME = "Late_Transactions";
+    const lateApi = window.StudentAffairsDataApi;
     const COLORS = ["#0f766e", "#2563eb", "#d97706", "#dc2626", "#16a34a", "#0891b2", "#7c3aed"];
     const DEFAULT_STATUS = "Recorded";
     const PAGE_COPY = {
       overview: ["ภาพรวมงานนักเรียนมาสาย", "รวม KPI สำคัญเพื่อรู้ทันทีว่าวันนี้เกิดอะไร เดือนนี้หนักตรงไหน เด็กคนไหนควรติดตาม และข้อมูลที่ครูบันทึกมีคุณภาพแค่ไหน"],
       daily: ["รายงานรายวัน", "ใช้ดูงานหน้าเสาธงหรือหลังรับข้อมูลวันนี้: ใครมาสาย ห้องไหนเยอะ เหตุผลอะไร และมีข้อมูลผิดพลาดต้องแก้ไหม"],
-      monthly: ["รายงานรายเดือน", "สรุปสำหรับผู้บริหาร พร้อม Top 10 ห้อง เหตุผล และนักเรียนที่ควรติดตามในเดือนที่เลือก"],
+      monthly: ["สรุปตามช่วงที่เลือก", "สรุปสำหรับผู้บริหาร พร้อม Top 10 ห้อง เหตุผล และนักเรียนที่ควรติดตามตามภาคเรียน เดือน หรือช่วงวันที่ที่เลือก"],
       risk: ["เด็กมาสายบ่อย", "จัดลำดับนักเรียนที่มาสายซ้ำ เพื่อใช้ติดตามรายบุคคลและประสานครูประจำชั้น"],
       recorders: ["KPI ผู้บันทึก", "ดูภาระงานและคุณภาพการกรอกของครูแต่ละคน เช่นจำนวนที่บันทึก error rate และวันที่ทำงานล่าสุด"],
       transactions: ["ข้อมูลรายการ", "ตารางตรวจสอบรายละเอียดตามฟิลเตอร์ ใช้ค้นหารหัสนักเรียน ชื่อ ห้อง ผู้บันทึก หรือสถานะข้อมูล"],
@@ -1375,7 +1509,10 @@
     let transactions = [];
     let usingRealData = false;
     let currentView = "overview";
-    let rangeMode = "month";
+    let rangeMode = "term";
+    let reportMode = "executive";
+    let studentMasterById = new Map();
+    let roomAdvisorMap = new Map();
 
     const el = (id) => document.getElementById(id);
     const fmt = (value) => Number(value || 0).toLocaleString("th-TH");
@@ -1454,6 +1591,56 @@
       }).filter((row) => row.late_date);
     }
 
+    function normalizeRoomKey(value) {
+      return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function advisorFor(rowOrRoom) {
+      const row = typeof rowOrRoom === "string" ? { room: rowOrRoom } : rowOrRoom || {};
+      const student = row.student_id ? studentMasterById.get(String(row.student_id).trim()) : null;
+      return student?.homeroomTeacher || roomAdvisorMap.get(normalizeRoomKey(student?.room || row.room)) || "-";
+    }
+
+    async function loadAdvisorMaster() {
+      try {
+        const master=await lateApi.request("master.bootstrap");
+        studentMasterById = new Map((master?.students || []).map((student) => [String(student.id || "").trim(), student]));
+        roomAdvisorMap = new Map();
+        (master?.students || []).forEach((student) => {
+          if (student.room && student.homeroomTeacher) roomAdvisorMap.set(normalizeRoomKey(student.room), student.homeroomTeacher);
+        });
+        if (transactions.length) render();
+      } catch (error) {
+        console.warn("Advisor master unavailable", error);
+      }
+    }
+
+    async function loadSheetData() {
+      const button = el("loadSheetButton");
+      button.disabled = true;
+      button.textContent = "กำลังโหลด...";
+      setSourceLabel("กำลังโหลดข้อมูลจริงจาก Google Sheet");
+      try {
+        const rows = await lateApi.request("late.transactions.list");
+        transactions = normalizeRows(Array.isArray(rows) ? rows : []);
+        usingRealData = true;
+        refreshOptions();
+        render();
+        const loadedAt = new Intl.DateTimeFormat("th-TH", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }).format(new Date());
+        setSourceLabel(`ข้อมูลจริง ${fmt(transactions.length)} รายการ · อัปเดต ${loadedAt}`);
+      } catch (error) {
+        usingRealData = false;
+        setSourceLabel(`โหลดข้อมูลจริงไม่สำเร็จ · ${error.message}`);
+        console.error("Late transactions unavailable", error);
+      } finally {
+        button.disabled = false;
+        button.textContent = "โหลดข้อมูลจริง";
+      }
+    }
+
     function extractTime(value) {
       const match = String(value || "").match(/(\d{1,2}:\d{2})/);
       return match ? match[1] : "";
@@ -1482,11 +1669,20 @@
     }
 
     function refreshOptions() {
+      const selectedAcademicYear = el("academicYearSelect").value || "2569";
+      const selectedTerm = el("termSelect").value || "2";
       const months = [...new Set(transactions.map((row) => {
         const date = parseDate(row.late_date);
         return date ? monthKey(date) : null;
       }).filter(Boolean))].sort();
       fillSelect("monthSelect", months.map((key) => [key, thaiMonth(key)]), false);
+      const academicYears = [...new Set([
+        2568, 2569, 2570,
+        ...transactions.map((row) => academicYearForDate(row.late_date)).filter(Boolean)
+      ])].sort((a, b) => a - b);
+      fillSelect("academicYearSelect", academicYears.map((year) => [String(year), String(year)]), false);
+      el("academicYearSelect").value = academicYears.includes(Number(selectedAcademicYear)) ? selectedAcademicYear : "2569";
+      el("termSelect").value = selectedTerm;
       const latest = latestDateKey(transactions);
       if (months.length) el("monthSelect").value = monthKey(parseDate(latest));
       el("focusDate").value = latest || "";
@@ -1507,7 +1703,18 @@
 
     function updateRangeFilterVisibility() {
       const visibility = {
+        term: {
+          termField: true,
+          academicYearField: true,
+          monthField: false,
+          focusDateField: false,
+          startDateField: false,
+          endDateField: false,
+          focusLabel: "วันที่"
+        },
         month: {
+          termField: false,
+          academicYearField: false,
           monthField: true,
           focusDateField: false,
           startDateField: false,
@@ -1515,6 +1722,8 @@
           focusLabel: "วันที่"
         },
         today: {
+          termField: false,
+          academicYearField: false,
           monthField: false,
           focusDateField: true,
           startDateField: false,
@@ -1522,6 +1731,8 @@
           focusLabel: "วันที่"
         },
         "7days": {
+          termField: false,
+          academicYearField: false,
           monthField: false,
           focusDateField: true,
           startDateField: false,
@@ -1529,6 +1740,8 @@
           focusLabel: "สิ้นสุดวันที่"
         },
         custom: {
+          termField: false,
+          academicYearField: false,
           monthField: false,
           focusDateField: false,
           startDateField: true,
@@ -1536,6 +1749,8 @@
           focusLabel: "วันที่"
         },
         all: {
+          termField: false,
+          academicYearField: false,
           monthField: false,
           focusDateField: false,
           startDateField: false,
@@ -1544,7 +1759,7 @@
         }
       }[rangeMode];
 
-      ["monthField", "focusDateField", "startDateField", "endDateField"].forEach((id) => {
+      ["termField", "academicYearField", "monthField", "focusDateField", "startDateField", "endDateField"].forEach((id) => {
         el(id).classList.toggle("hidden", !visibility[id]);
       });
       setText("focusDateLabel", visibility.focusLabel);
@@ -1554,11 +1769,27 @@
       return rows.map((row) => row.late_date).filter(Boolean).sort().pop() || "";
     }
 
+    function academicYearForDate(value) {
+      const date = parseDate(value);
+      if (!date) return 0;
+      return date.getFullYear() + (date.getMonth() >= 4 ? 543 : 542);
+    }
+
+    function termRange() {
+      const year = Number(el("academicYearSelect").value || 2569) - 543;
+      const term = el("termSelect").value || "2";
+      if (term === "1") return { start: `${year}-05-01`, end: `${year}-10-31` };
+      if (term === "2") return { start: `${year}-11-01`, end: `${year + 1}-04-30` };
+      return { start: `${year + 1}-03-01`, end: `${year + 1}-05-15` };
+    }
+
     function getRange() {
       const latest = latestDateKey(transactions);
       let start = "";
       let end = "";
-      if (rangeMode === "today") {
+      if (rangeMode === "term") {
+        ({ start, end } = termRange());
+      } else if (rangeMode === "today") {
         start = el("focusDate").value || latest;
         end = start;
       } else if (rangeMode === "7days") {
@@ -1607,11 +1838,7 @@
     }
 
     function monthRows() {
-      const selected = el("monthSelect").value;
-      return transactions.filter((row) => {
-        const date = parseDate(row.late_date);
-        return date && monthKey(date) === selected;
-      });
+      return filteredRows();
     }
 
     function studentStats(rows) {
@@ -1697,25 +1924,260 @@
 
     function updateLateReport(rows = filteredRows()) {
       const recorded = recordedRows(rows);
-      const issues = issueRows(rows);
       const students = studentStats(rows);
-      const repeat = students.filter(student => student.count >= 2);
-      setText("lateReportRecorded", fmt(recorded.length));
-      setText("lateReportStudents", fmt(students.length));
-      setText("lateReportRepeat", fmt(repeat.length));
-      setText("lateReportIssues", fmt(issues.length));
-      setText("lateReportPeriod", rows.length ? `${rangeLabel()} · ${fmt(rows.length)} รายการตามตัวกรอง` : "ไม่พบข้อมูลตามช่วงและตัวกรองที่เลือก");
-      setText("lateReportSignedDate", new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date()));
-      const sorted = [...recorded].sort((a, b) => `${a.late_date} ${a.time_in}`.localeCompare(`${b.late_date} ${b.time_in}`));
-      renderTable("lateReportRows", sorted.map(row => `
-        <tr>
-          <td>${escapeHtml(`${thaiDate(row.late_date)} ${row.time_in || ""}`.trim())}</td>
-          <td>${escapeHtml(row.student_id || "-")}</td>
-          <td>${escapeHtml(row.full_name || "-")}</td>
-          <td>${escapeHtml(row.room || row.grade || "-")}</td>
-          <td>${escapeHtml(row.reason || "-")}</td>
-        </tr>
-      `), 5, "ไม่พบข้อมูล");
+      const highRisk = students.filter(student => student.count >= 3);
+      const highRiskGroups = groupHighRiskStudents(highRisk);
+      const signedDate = new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date());
+      setText("executiveReportRecorded", fmt(recorded.length));
+      setText("executiveReportStudents", fmt(students.length));
+      setText("executiveReportHighRisk", fmt(highRisk.length));
+      setText("executiveReportHighRiskRooms", fmt(highRiskGroups.length));
+      setText("executiveReportPeriod", rows.length ? `${rangeLabel()} · ${fmt(rows.length)} รายการตามตัวกรอง` : "ไม่พบข้อมูลตามช่วงและตัวกรองที่เลือก");
+      setText("executiveReportSignedDate", signedDate);
+      renderExecutiveDailyTimeline("executiveMonthlyChart", recorded);
+      renderExecutiveReasonChart("executiveReasonChart", recorded);
+      renderExecutiveHighRiskGroups(highRiskGroups);
+      updateAdvisorReport(rows, signedDate);
+      setReportMode(reportMode);
+    }
+
+    function groupHighRiskStudents(students) {
+      const map = new Map();
+      students.forEach(student => {
+        const room = normalizeRoomKey(student.room || student.grade || "ไม่ระบุห้อง");
+        const advisor = advisorFor(student);
+        const key = `${room}|${advisor}`;
+        if (!map.has(key)) map.set(key, { room, advisor, students: [] });
+        map.get(key).students.push(student);
+      });
+      return [...map.values()]
+        .map(group => ({ ...group, students: group.students.sort((a, b) => b.count - a.count || a.full_name.localeCompare(b.full_name, "th")) }))
+        .sort((a, b) => b.students.length - a.students.length || a.room.localeCompare(b.room, "th", { numeric: true }));
+    }
+
+    function renderExecutiveHighRiskGroups(groups) {
+      el("executiveHighRiskGroups").innerHTML = groups.length ? groups.map(group => `
+        <div class="official-report-section" style="margin-top:14px">
+          <h4>${escapeHtml(group.room)} · ครูที่ปรึกษา ${escapeHtml(group.advisor)} · ${fmt(group.students.length)} คน</h4>
+          <table>
+            <thead><tr><th style="width:8%">ที่</th><th style="width:20%">รหัส</th><th style="width:42%">นักเรียน</th><th style="width:15%">ครั้ง</th><th style="width:15%">ระดับ</th></tr></thead>
+            <tbody>${group.students.map((student, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${escapeHtml(student.student_id || "-")}</td>
+                <td>${escapeHtml(student.full_name || "-")}</td>
+                <td><strong>${fmt(student.count)}</strong></td>
+                <td>${escapeHtml(lateWatchLevel(student.count))}</td>
+              </tr>
+            `).join("")}</tbody>
+          </table>
+        </div>
+      `).join("") : `<div class="empty">ไม่พบนักเรียนมาสาย 3 ครั้งขึ้นไป</div>`;
+    }
+
+    function renderExecutiveDailyTimeline(targetId, rows) {
+      const entries = groupCount(rows, row => row.late_date).sort((a, b) => a[0].localeCompare(b[0]));
+      const values = entries.length ? entries : [["-", 0]];
+      const width = 680;
+      const height = 220;
+      const pad = { top: 22, right: 18, bottom: 48, left: 38 };
+      const chartW = width - pad.left - pad.right;
+      const chartH = height - pad.top - pad.bottom;
+      const max = Math.max(2, ...values.map(([, count]) => count));
+      const x = index => pad.left + (values.length === 1 ? chartW / 2 : (index / (values.length - 1)) * chartW);
+      const y = value => pad.top + chartH - (value / max) * chartH;
+      const points = values.map(([, count], index) => `${x(index)},${y(count)}`).join(" ");
+      const area = `${pad.left},${pad.top + chartH} ${points} ${pad.left + chartW},${pad.top + chartH}`;
+      el(targetId).innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="กราฟ Timeline การเข้าสายรายวัน">
+          <defs>
+            <linearGradient id="executiveDailyArea" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#0f766e" stop-opacity="0.22"></stop>
+              <stop offset="100%" stop-color="#0f766e" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <line x1="${pad.left}" x2="${pad.left + chartW}" y1="${pad.top + chartH}" y2="${pad.top + chartH}" stroke="#777"></line>
+          ${[0, Math.ceil(max / 2), max].map(tick => `
+            <line x1="${pad.left}" x2="${pad.left + chartW}" y1="${y(tick)}" y2="${y(tick)}" stroke="#e5e7eb"></line>
+            <text x="${pad.left - 8}" y="${y(tick) + 4}" font-size="10" text-anchor="end" fill="#555">${tick}</text>
+          `).join("")}
+          <polygon points="${area}" fill="url(#executiveDailyArea)"></polygon>
+          <polyline points="${points}" fill="none" stroke="#0f766e" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          ${values.map(([day, count], index) => {
+            const showLabel = values.length <= 10 || index === 0 || index === values.length - 1 || index % Math.ceil(values.length / 6) === 0;
+            return `
+              <circle cx="${x(index)}" cy="${y(count)}" r="4" fill="#fff" stroke="#0f766e" stroke-width="2"></circle>
+              ${showLabel ? `<text x="${x(index)}" y="${height - 22}" font-size="9" text-anchor="middle" fill="#555">${escapeHtml(shortDate(day))}</text>` : ""}
+              ${count ? `<text x="${x(index)}" y="${y(count) - 7}" font-size="9" text-anchor="middle" fill="#111">${count}</text>` : ""}
+            `;
+          }).join("")}
+        </svg>
+      `;
+    }
+
+    function renderExecutiveReasonChart(targetId, rows) {
+      const entries = groupCount(rows, row => row.reason || "ไม่ระบุ").slice(0, 8);
+      const values = entries.length ? entries : [["ไม่พบข้อมูล", 0]];
+      const width = 680;
+      const rowHeight = 28;
+      const height = 48 + values.length * rowHeight;
+      const pad = { top: 18, right: 54, bottom: 18, left: 150 };
+      const chartW = width - pad.left - pad.right;
+      const max = Math.max(1, ...values.map(([, count]) => count));
+      el(targetId).innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="กราฟแสดงเหตุผลการมาสาย">
+          ${values.map(([reason, count], index) => {
+            const y = pad.top + index * rowHeight;
+            const barW = (count / max) * chartW;
+            return `
+              <text x="${pad.left - 10}" y="${y + 17}" font-size="10" text-anchor="end" fill="#333">${escapeHtml(truncateText(reason, 28))}</text>
+              <rect x="${pad.left}" y="${y + 5}" width="${barW}" height="16" rx="8" fill="${COLORS[index % COLORS.length]}"></rect>
+              <text x="${pad.left + barW + 7}" y="${y + 17}" font-size="10" fill="#111">${fmt(count)}</text>
+            `;
+          }).join("")}
+        </svg>
+      `;
+    }
+
+    function truncateText(value, maxLength) {
+      const text = String(value || "");
+      return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
+    }
+
+    function shortThaiMonth(key) {
+      if (!key || key === "-") return "-";
+      const [year, month] = key.split("-").map(Number);
+      return new Intl.DateTimeFormat("th-TH", { month: "short", year: "2-digit" }).format(new Date(year, month - 1, 1));
+    }
+
+    function updateAdvisorReport(rows, signedDate) {
+      const byRoom = groupRowsByRoom(rows);
+      const allPages = byRoom.map(([room, roomRows]) => advisorReportPage(room, roomRows, signedDate, {
+        mode: "all",
+        title: "รายงานครูที่ปรึกษา - นักเรียนมาสายทั้งหมด",
+        emptyText: "ไม่พบนักเรียนมาสายในห้องนี้"
+      }));
+      const riskPages = byRoom
+        .map(([room, roomRows]) => advisorReportPage(room, roomRows, signedDate, {
+          mode: "risk",
+          title: "รายงานครูที่ปรึกษา - นักเรียนสาย 3 ครั้งขึ้นไป",
+          emptyText: "ไม่พบนักเรียนสาย 3 ครั้งขึ้นไปในห้องนี้"
+        }))
+        .filter(Boolean);
+      el("advisorAllReportPages").innerHTML = allPages.length ? allPages.join("") : emptyAdvisorReportPage(signedDate, "รายงานครูที่ปรึกษา - นักเรียนมาสายทั้งหมด");
+      el("advisorHighRiskReportPages").innerHTML = riskPages.length ? riskPages.join("") : emptyAdvisorReportPage(signedDate, "รายงานครูที่ปรึกษา - นักเรียนสาย 3 ครั้งขึ้นไป");
+    }
+
+    function groupRowsByRoom(rows) {
+      const map = new Map();
+      rows.forEach(row => {
+        const room = normalizeRoomKey(row.room || row.grade || "ไม่ระบุห้อง");
+        if (!map.has(room)) map.set(room, []);
+        map.get(room).push(row);
+      });
+      return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], "th", { numeric: true }));
+    }
+
+    function advisorStudentStats(rows) {
+      const map = new Map();
+      recordedRows(rows).forEach(row => {
+        const key = row.student_id || row.full_name || "ไม่ระบุ";
+        const item = map.get(key) || {
+          student_id: row.student_id || "-",
+          full_name: row.full_name || row.student_id || "ไม่ระบุชื่อ",
+          count: 0,
+          latest: "",
+          reasons: new Map(),
+          statuses: new Map()
+        };
+        item.count += 1;
+        item.latest = !item.latest || row.late_date > item.latest ? row.late_date : item.latest;
+        item.reasons.set(row.reason || "ไม่ระบุ", (item.reasons.get(row.reason || "ไม่ระบุ") || 0) + 1);
+        map.set(key, item);
+      });
+      return [...map.values()].sort((a, b) => b.count - a.count || a.full_name.localeCompare(b.full_name, "th"));
+    }
+
+    function topMapLabel(map) {
+      const top = [...map.entries()].sort((a, b) => b[1] - a[1])[0];
+      return top ? `${top[0]} (${top[1]})` : "-";
+    }
+
+    function lateWatchLevel(count) {
+      if (count >= 5) return "เร่งติดตาม";
+      if (count >= 3) return "เฝ้าระวัง";
+      if (count >= 2) return "ติดตาม";
+      return "รับทราบ";
+    }
+
+    function advisorReportPage(room, rows, signedDate, options = {}) {
+      const recorded = recordedRows(rows);
+      const allStats = advisorStudentStats(rows);
+      const stats = options.mode === "risk" ? allStats.filter(student => student.count >= 3) : allStats;
+      if (options.mode === "risk" && !stats.length) return "";
+      const advisor = advisorFor(room);
+      return `
+        <article class="official-report advisor-report-page">
+          <header class="official-report-head">
+            <img src="assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+            <div>
+              <h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2>
+              <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานสำหรับครูที่ปรึกษา</p>
+            </div>
+            <img src="assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+          </header>
+          <div class="official-report-title">
+            <h3>${escapeHtml(options.title || "รายงานนักเรียนมาสายในชั้นเรียน")}</h3>
+            <p>${escapeHtml(rangeLabel())}</p>
+          </div>
+          <div class="advisor-room-meta">
+            <div><span>ห้องเรียน</span><strong>${escapeHtml(room)}</strong></div>
+            <div><span>ครูที่ปรึกษา</span><strong>${escapeHtml(advisor)}</strong></div>
+            <div><span>รายการมาสาย</span><strong>${fmt(options.mode === "risk" ? stats.reduce((sum, student) => sum + student.count, 0) : recorded.length)} รายการ</strong></div>
+            <div><span>${options.mode === "risk" ? "นักเรียนสาย 3 ครั้งขึ้นไป" : "นักเรียนที่มีประวัติมาสาย"}</span><strong>${fmt(stats.length)} คน</strong></div>
+          </div>
+          <section class="official-report-section">
+            <h4>รายชื่อนักเรียนที่มีรายการมาสาย</h4>
+            <table>
+              <thead><tr><th style="width:6%">ที่</th><th style="width:17%">รหัส</th><th style="width:31%">นักเรียน</th><th style="width:10%">ครั้ง</th><th style="width:14%">ล่าสุด</th><th style="width:12%">เหตุผลหลัก</th><th style="width:10%">ระดับ</th></tr></thead>
+              <tbody>${stats.length ? stats.map((student, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${escapeHtml(student.student_id)}</td>
+                  <td>${escapeHtml(student.full_name)}</td>
+                  <td><strong>${fmt(student.count)}</strong></td>
+                  <td>${escapeHtml(thaiDate(student.latest))}</td>
+                  <td>${escapeHtml(topMapLabel(student.reasons))}</td>
+                  <td>${escapeHtml(lateWatchLevel(student.count))}</td>
+                </tr>
+              `).join("") : `<tr><td colspan="7" class="empty">${escapeHtml(options.emptyText || "ไม่พบนักเรียนมาสายในห้องนี้")}</td></tr>`}</tbody>
+            </table>
+          </section>
+          <div class="official-signature">
+            <div>
+              <div>ลงชื่อ ______________________________</div>
+              <div>(นางสาวปัทมพร แสงศรี)</div>
+              <div>หัวหน้างานปกครองและความปลอดภัย ฯ</div>
+              <div style="margin-top:12px">วันที่ ${escapeHtml(signedDate)}</div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function emptyAdvisorReportPage(signedDate, title = "รายงานนักเรียนมาสายในชั้นเรียน") {
+      return `
+        <article class="official-report advisor-report-page">
+          <header class="official-report-head">
+            <img src="assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+            <div><h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2><p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานสำหรับครูที่ปรึกษา</p></div>
+            <img src="assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+          </header>
+          <div class="official-report-title"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(rangeLabel())}</p></div>
+          <section class="official-report-section"><h4>ข้อมูลรายห้อง</h4><p>ไม่พบข้อมูลตามช่วงและตัวกรองที่เลือก</p></section>
+          <div class="official-signature"><div><div>ลงชื่อ ______________________________</div><div>(นางสาวปัทมพร แสงศรี)</div><div>หัวหน้างานปกครองและความปลอดภัย ฯ</div><div style="margin-top:12px">วันที่ ${escapeHtml(signedDate)}</div></div></div>
+        </article>
+      `;
     }
 
     function setText(id, value) {
@@ -1725,6 +2187,11 @@
     function rangeLabel() {
       const { start, end } = getRange();
       if (rangeMode === "all") return "ข้อมูลทั้งหมด";
+      if (rangeMode === "term") {
+        const term = el("termSelect").value;
+        const label = term === "summer" ? "ภาคฤดูร้อน" : `ภาคเรียนที่ ${term}`;
+        return `${label} ปีการศึกษา ${el("academicYearSelect").value}`;
+      }
       if (rangeMode === "month") return `เดือน ${thaiMonth(el("monthSelect").value)}`;
       if (start && end && start === end) return thaiDate(start);
       if (start && end) return `${thaiDate(start)} - ${thaiDate(end)}`;
@@ -1801,7 +2268,7 @@
       const reasonCounts = groupCount(recorded, (row) => row.reason);
       const days = new Set(recorded.map((row) => row.late_date)).size;
       const highRisk = students.filter((student) => student.count >= 3);
-      setText("monthlyPill", thaiMonth(el("monthSelect").value));
+      setText("monthlyPill", rangeLabel());
       setText("monthlyTotal", fmt(recorded.length));
       setText("monthlyAvg", days ? (recorded.length / days).toFixed(1) : "0");
       setText("monthlyHighRisk", fmt(highRisk.length));
@@ -1815,21 +2282,21 @@
           <td>${escapeHtml([student.grade, student.room].filter(Boolean).join(" / ") || "-")}</td>
           <td><strong>${fmt(student.count)}</strong></td>
         </tr>
-      `), 3, "ยังไม่มีข้อมูลนักเรียนในเดือนนี้");
+      `), 3, "ยังไม่มีข้อมูลนักเรียนในช่วงที่เลือก");
       renderInsights("monthlyInsights", buildMonthlyInsights(recorded, students, roomCounts, reasonCounts));
     }
 
     function buildMonthlyInsights(recorded, students, roomCounts, reasonCounts) {
       const insights = [];
       if (!recorded.length) {
-        insights.push(["ยังไม่มีข้อมูลรายเดือน", "เดือนที่เลือกยังไม่มีรายการ Recorded", "warning"]);
+        insights.push(["ยังไม่มีข้อมูลในช่วงนี้", "ช่วงที่เลือกยังไม่มีรายการ Recorded", "warning"]);
         return insights;
       }
       const [roomName, roomCount] = roomCounts[0] || ["-", 0];
       const [reasonName, reasonCount] = reasonCounts[0] || ["-", 0];
       const highRisk = students.filter((student) => student.count >= 3);
-      insights.push(["ภาพรวมเดือนนี้", `มี Recorded ${fmt(recorded.length)} รายการ จากนักเรียนไม่ซ้ำ ${fmt(students.length)} คน`, ""]);
-      insights.push(["จุดหนักของเดือน", `${roomName} สูงสุด ${fmt(roomCount)} ครั้ง คิดเป็น ${percent(roomCount, recorded.length)}`, "warning"]);
+      insights.push(["ภาพรวมช่วงนี้", `มี Recorded ${fmt(recorded.length)} รายการ จากนักเรียนไม่ซ้ำ ${fmt(students.length)} คน`, ""]);
+      insights.push(["จุดหนักของช่วง", `${roomName} สูงสุด ${fmt(roomCount)} ครั้ง คิดเป็น ${percent(roomCount, recorded.length)}`, "warning"]);
       insights.push(["สาเหตุหลัก", `${reasonName} สูงสุด ${fmt(reasonCount)} ครั้ง คิดเป็น ${percent(reasonCount, recorded.length)}`, ""]);
       insights.push(["กลุ่มต้องติดตาม", highRisk.length ? `มีเด็กมาสาย 3 ครั้งขึ้นไป ${fmt(highRisk.length)} คน` : "ยังไม่พบเด็กที่มาสาย 3 ครั้งขึ้นไป", highRisk.length ? "danger" : ""]);
       return insights;
@@ -2033,191 +2500,25 @@
       }[char]));
     }
 
-    function parseCSV(text) {
-      const rows = [];
-      let row = [];
-      let field = "";
-      let quoted = false;
-      for (let i = 0; i < text.length; i += 1) {
-        const char = text[i];
-        const next = text[i + 1];
-        if (char === "\"" && quoted && next === "\"") {
-          field += "\"";
-          i += 1;
-        } else if (char === "\"") {
-          quoted = !quoted;
-        } else if (char === "," && !quoted) {
-          row.push(field);
-          field = "";
-        } else if ((char === "\n" || char === "\r") && !quoted) {
-          if (char === "\r" && next === "\n") i += 1;
-          row.push(field);
-          if (row.some((cell) => cell.trim())) rows.push(row);
-          row = [];
-          field = "";
-        } else {
-          field += char;
-        }
-      }
-      row.push(field);
-      if (row.some((cell) => cell.trim())) rows.push(row);
-      const headers = (rows.shift() || []).map((header) => header.trim());
-      return rows.map((cells) => Object.fromEntries(headers.map((header, index) => [header, cells[index] || ""])));
-    }
-
-    async function loadSheetData() {
-      setSourceLabel("กำลังโหลดข้อมูลจริงจาก Google Sheet...");
-      try {
-        const payload = await loadGoogleSheetData();
-        transactions = normalizeRows(payload.rows);
-        usingRealData = true;
-        const updated = payload.updated_at ? ` | อัปเดต ${payload.updated_at}` : "";
-        setSourceLabel(`ข้อมูลจริงจาก ${payload.source}: ${fmt(transactions.length)} รายการ${updated}`);
-        refreshOptions();
-        render();
-        return true;
-      } catch (error) {
-        return loadFallbackData(error);
-      }
-    }
-
-    async function loadGoogleSheetData() {
-      const response = await loadGoogleSheetGviz();
-      if (!response || response.status === "error") {
-        const message = response && response.errors && response.errors[0]
-          ? response.errors[0].detailed_message || response.errors[0].message
-          : "Google Sheet ไม่ตอบกลับข้อมูล";
-        throw new Error(message);
-      }
-      if (!response.table) {
-        throw new Error("ไม่พบตาราง Late_Transactions ใน Google Sheet");
-      }
-      return {
-        source: `${SHEET_NAME} ใน Google Sheet`,
-        updated_at: new Date().toLocaleString("th-TH"),
-        rows: gvizTableToObjects(response.table)
-      };
-    }
-
-    function loadGoogleSheetGviz() {
-      return new Promise((resolve, reject) => {
-        const callbackName = `lateSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-        const script = document.createElement("script");
-        const params = new URLSearchParams({
-          gid: SHEET_GID,
-          tq: "select *",
-          tqx: `responseHandler:${callbackName}`,
-          headers: "1",
-          _: String(Date.now())
-        });
-        const timeout = window.setTimeout(() => {
-          cleanup();
-          reject(new Error("หมดเวลารอข้อมูลจาก Google Sheet"));
-        }, 20000);
-
-        function cleanup() {
-          window.clearTimeout(timeout);
-          delete window[callbackName];
-          script.remove();
-        }
-
-        window[callbackName] = (payload) => {
-          cleanup();
-          resolve(payload);
-        };
-
-        script.onerror = () => {
-          cleanup();
-          reject(new Error("เชื่อมต่อ Google Sheet ไม่ได้ หรือเครื่องนี้ยังไม่มีสิทธิ์อ่านชีต"));
-        };
-
-        script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?${params.toString()}`;
-        document.head.appendChild(script);
-      });
-    }
-
-    function gvizTableToObjects(table) {
-      const headers = (table.cols || []).map((col, index) => String(col.label || col.id || `Column ${index + 1}`).trim());
-      return (table.rows || [])
-        .map((row) => Object.fromEntries(headers.map((header, index) => [header, gvizCellValue(row.c && row.c[index])])))
-        .filter((row) => Object.values(row).some((value) => String(value || "").trim()));
-    }
-
-    function gvizCellValue(cell) {
-      if (!cell) return "";
-      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") return cell.f;
-      const value = cell.v;
-      if (value === undefined || value === null) return "";
-      if (Object.prototype.toString.call(value) === "[object Date]" && !Number.isNaN(value)) {
-        return dateKey(value);
-      }
-      return String(value);
-    }
-
-    async function loadFallbackData(sheetError) {
-      try {
-        const payload = await loadLocalData();
-        transactions = normalizeRows(payload.rows);
-        usingRealData = false;
-        const updated = payload.updated_at ? ` | อัปเดต ${payload.updated_at}` : "";
-        setSourceLabel(`ดึง Google Sheet ไม่ได้ (${sheetError.message}) ใช้ข้อมูลสำรองจาก ${payload.source}: ${fmt(transactions.length)} รายการ${updated}`);
-        refreshOptions();
-        render();
-        return false;
-      } catch (localError) {
-        usingRealData = false;
-        setSourceLabel(`โหลดข้อมูลจริงไม่สำเร็จ: ${sheetError.message}. และไม่พบข้อมูลสำรอง local`);
-        return false;
-      }
-    }
-
-    async function loadLocalData() {
-      const jsonResponse = await fetch(LOCAL_DATA_JSON_URL, { cache: "no-store" });
-      if (jsonResponse.ok) {
-        const payload = await jsonResponse.json();
-        const jsonRows = Array.isArray(payload) ? payload : (payload.rows || []);
-        if (jsonRows.length) {
-          return {
-            source: LOCAL_DATA_JSON_URL,
-            updated_at: payload.updated_at || "",
-            rows: jsonRows
-          };
-        }
-
-        const csvPayload = await loadLocalCsvIfAvailable();
-        if (csvPayload) return csvPayload;
-
-        return {
-          source: LOCAL_DATA_JSON_URL,
-          updated_at: payload.updated_at || "",
-          rows: jsonRows
-        };
-      }
-
-      const csvPayload = await loadLocalCsvIfAvailable();
-      if (csvPayload) return csvPayload;
-
-      throw new Error("ไม่พบ data/late_transactions.json หรือ data/late_transactions.csv");
-    }
-
-    async function loadLocalCsvIfAvailable() {
-      try {
-        const csvResponse = await fetch(LOCAL_DATA_CSV_URL, { cache: "no-store" });
-        if (!csvResponse.ok) return null;
-        const rows = parseCSV(await csvResponse.text());
-        if (!rows.length) return null;
-        return {
-          source: LOCAL_DATA_CSV_URL,
-          updated_at: "",
-          rows
-        };
-      } catch (error) {
-        return null;
-      }
-    }
-
     function setSourceLabel(text) {
       el("sourceLabel").textContent = text;
+    }
+
+    function setReportMode(mode) {
+      reportMode = mode || "executive";
+      document.querySelectorAll("[data-report-mode]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.reportMode === reportMode);
+      });
+      el("executiveReport").classList.toggle("active", reportMode === "executive");
+      el("advisorAllReport").classList.toggle("active", reportMode === "advisor-all");
+      el("advisorHighRiskReport").classList.toggle("active", reportMode === "advisor-risk");
+    }
+
+    function hideAuthUserbarForPrint() {
+      document.querySelectorAll(".spvc-auth-userbar, .spvc-auth-overlay").forEach((node) => {
+        node.setAttribute("data-print-hidden", "true");
+        node.style.setProperty("display", "none", "important");
+      });
     }
 
     function setView(view) {
@@ -2234,6 +2535,13 @@
       button.addEventListener("click", () => setView(button.dataset.view));
     });
 
+    document.querySelectorAll("[data-report-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setReportMode(button.dataset.reportMode);
+        updateLateReport();
+      });
+    });
+
       document.querySelectorAll("#rangeTabs button").forEach((button) => {
       button.addEventListener("click", () => {
         rangeMode = button.dataset.range;
@@ -2243,7 +2551,7 @@
       });
     });
 
-    ["monthSelect", "focusDate", "startDate", "endDate", "gradeSelect", "roomSelect", "reasonSelect", "recorderSelect", "statusSelect", "minLate", "searchInput", "dailyDate"].forEach((id) => {
+    ["termSelect", "academicYearSelect", "monthSelect", "focusDate", "startDate", "endDate", "gradeSelect", "roomSelect", "reasonSelect", "recorderSelect", "statusSelect", "minLate", "searchInput", "dailyDate"].forEach((id) => {
       el(id).addEventListener("input", render);
       el(id).addEventListener("change", render);
     });
@@ -2251,16 +2559,32 @@
     el("loadSheetButton").addEventListener("click", loadSheetData);
     el("printLateReport").addEventListener("click", () => {
       updateLateReport();
+      hideAuthUserbarForPrint();
       window.print();
     });
 
-    refreshOptions();
-    updateRangeFilterVisibility();
-    render();
-    if (new URLSearchParams(window.location.search).get("print") === "report") {
-      setView("report");
+    window.addEventListener("beforeprint", hideAuthUserbarForPrint);
+
+    async function bootLateSystem() {
+      refreshOptions();
+      updateRangeFilterVisibility();
+      render();
+      if (new URLSearchParams(window.location.search).get("print") === "report") {
+        setView("report");
+      }
+      try {
+        await window.StudentAffairsAuth.require({
+          systemId: "late",
+          systemName: "ระบบตรวจสอบนักเรียนมาสาย"
+        });
+      } catch (error) {
+        setSourceLabel(`รอเข้าสู่ระบบ Gmail · ${error.message}`);
+        return;
+      }
+      await Promise.all([loadAdvisorMaster(),loadSheetData()]);
     }
-    loadSheetData();
+
+    bootLateSystem();
   </script>
 </body>
 </html>

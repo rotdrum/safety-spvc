@@ -145,7 +145,7 @@
     .sidebar-note {
       position: absolute;
       right: 16px;
-      bottom: 18px;
+      bottom: 76px;
       left: 16px;
       padding: 12px;
       border: 1px solid rgba(255, 255, 255, 0.13);
@@ -153,6 +153,28 @@
       color: #cfe1de;
       font-size: 12px;
       line-height: 1.45;
+    }
+
+    .portal-link {
+      position: absolute;
+      right: 16px;
+      bottom: 18px;
+      left: 16px;
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      color: #e1efec;
+      font-size: 12px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .portal-link:hover {
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .main {
@@ -340,6 +362,10 @@
       display: grid;
       gap: 6px;
       min-width: 0;
+    }
+
+    .field.hidden {
+      display: none;
     }
 
     .field label {
@@ -742,6 +768,116 @@
       font-size: 24px;
     }
 
+    .official-report {
+      width: min(100%, 794px);
+      min-height: 1123px;
+      margin: 0 auto;
+      padding: 48px 58px;
+      border: 1px solid #d8d8d8;
+      background: #fff;
+      color: #111;
+      box-shadow: var(--shadow);
+    }
+
+    .official-report-head {
+      display: grid;
+      grid-template-columns: 76px 1fr 76px;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #222;
+      text-align: center;
+    }
+
+    .official-report-head img {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      object-fit: contain;
+    }
+
+    .official-report-head h2,
+    .official-report-title h3 {
+      margin: 0;
+    }
+
+    .official-report-head p,
+    .official-report-title p {
+      margin: 5px 0 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .official-report-title {
+      margin: 24px 0 18px;
+      text-align: center;
+    }
+
+    .official-report-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .official-report-metric {
+      padding: 12px;
+      border: 1px solid #777;
+      text-align: center;
+    }
+
+    .official-report-metric span,
+    .official-report-metric strong {
+      display: block;
+    }
+
+    .official-report-metric span {
+      color: #555;
+      font-size: 10px;
+    }
+
+    .official-report-metric strong {
+      margin-top: 5px;
+      font-size: 18px;
+    }
+
+    .official-report-section {
+      margin-top: 18px;
+    }
+
+    .official-report-section h4 {
+      margin: 0 0 9px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #777;
+      font-size: 13px;
+    }
+
+    .official-report table {
+      table-layout: fixed;
+      font-size: 10px;
+    }
+
+    .official-report th,
+    .official-report td {
+      padding: 7px;
+      border: 1px solid #777;
+      overflow-wrap: anywhere;
+      vertical-align: top;
+    }
+
+    .official-signature {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 70px;
+      text-align: center;
+    }
+
+    .official-signature > div {
+      width: 310px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
     @media (max-width: 1180px) {
       .app-shell {
         grid-template-columns: 1fr;
@@ -755,6 +891,11 @@
       .sidebar-note {
         position: static;
         margin-top: 14px;
+      }
+
+      .portal-link {
+        position: static;
+        margin-top: 10px;
       }
 
       .nav {
@@ -806,7 +947,15 @@
     }
 
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      html,
       body {
+        width: 100%;
+        margin: 0;
         background: white;
       }
 
@@ -815,9 +964,12 @@
       }
 
       .sidebar,
+      .unit-banner,
+      .topbar,
       .filter-panel,
-      .actions {
-        display: none;
+      .actions,
+      .report-actions {
+        display: none !important;
       }
 
       .main {
@@ -836,8 +988,31 @@
         display: none !important;
       }
 
-      .view.active {
-        display: grid !important;
+      #view-report {
+        display: block !important;
+      }
+
+      .official-report {
+        width: 100%;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .official-report-head,
+      .official-report-title,
+      .official-report-metrics {
+        break-inside: avoid;
+      }
+
+      .official-report thead {
+        display: table-header-group;
+      }
+
+      .official-report tr {
+        break-inside: avoid;
       }
     }
   </style>
@@ -850,8 +1025,8 @@
           <img class="brand-logo" src="assets/protection-logo.jpg" alt="โลโก้งานปกครองและความปลอดภัยนักเรียน นักศึกษา">
           <img class="brand-logo secondary" src="assets/college-logo.jpg" alt="โลโก้วิทยาลัยอาชีวศึกษาสุพรรณบุรี">
         </div>
-        <h1>งานปกครองและความปลอดภัยนักเรียน นักศึกษา</h1>
-        <p>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
+        <h1>ระบบนักเรียนมาสาย</h1>
+        <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
       </div>
       <nav class="nav" aria-label="Dashboard menu">
         <button class="active" type="button" data-view="overview">ภาพรวม <span class="nav-count" id="navOverview">0</span></button>
@@ -860,18 +1035,20 @@
         <button type="button" data-view="risk">เด็กมาสายบ่อย <span class="nav-count" id="navRisk">0</span></button>
         <button type="button" data-view="recorders">KPI ผู้บันทึก <span class="nav-count" id="navRecorders">0</span></button>
         <button type="button" data-view="transactions">ข้อมูลรายการ <span class="nav-count" id="navRows">0</span></button>
+        <button type="button" data-view="report">รายงาน <span class="nav-count" id="navReport">0</span></button>
       </nav>
-      <div class="sidebar-note" id="sourceLabel">กำลังโหลดข้อมูล local จากโฟลเดอร์ data</div>
+      <div class="sidebar-note" id="sourceLabel">ยังไม่พบข้อมูล · กำลังโหลดข้อมูลจริงจาก Google Sheet</div>
+      <!-- <a class="portal-link" href="../../index.html">‹ กลับศูนย์ข้อมูลกลาง</a> -->
     </aside>
 
     <main class="main">
       <section class="unit-banner" aria-label="School unit banner">
         <img src="assets/protection-logo.jpg" alt="โลโก้งานปกครองและความปลอดภัยนักเรียน นักศึกษา">
         <div>
-          <h2>งานปกครองและความปลอดภัยนักเรียน นักศึกษา</h2>
-          <p>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
+          <h2>ระบบนักเรียนมาสาย</h2>
+          <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา | วิทยาลัยอาชีวศึกษาสุพรรณบุรี</p>
         </div>
-        <img class="college-logo" src="assets/college-logo.jpg" alt="โลโก้วิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+        <!-- <img class="college-logo" src="assets/college-logo.jpg" alt="โลโก้วิทยาลัยอาชีวศึกษาสุพรรณบุรี"> -->
       </section>
 
       <header class="topbar">
@@ -881,13 +1058,7 @@
           <p id="pageDescription">รวม KPI สำคัญเพื่อรู้ทันทีว่าวันนี้เกิดอะไร เดือนนี้หนักตรงไหน เด็กคนไหนควรติดตาม และข้อมูลที่ครูบันทึกมีคุณภาพแค่ไหน</p>
         </div>
         <div class="actions">
-          <button class="button primary" type="button" id="loadSheetButton">โหลดข้อมูล local</button>
-          <label class="file-label">
-            นำเข้า CSV
-            <input id="csvInput" type="file" accept=".csv,text/csv">
-          </label>
-          <button class="button" type="button" id="resetDemoButton">ข้อมูลตัวอย่าง</button>
-          <button class="button primary" type="button" id="printButton">พิมพ์ / Save PDF</button>
+          <button class="button primary" type="button" id="loadSheetButton">โหลดข้อมูลจริง</button>
         </div>
       </header>
 
@@ -903,19 +1074,19 @@
           </div>
         </div>
         <form class="filters" id="filters">
-          <div class="field">
+          <div class="field" id="monthField">
             <label for="monthSelect">เดือน</label>
             <select id="monthSelect"></select>
           </div>
-          <div class="field">
-            <label for="focusDate">วันที่</label>
+          <div class="field" id="focusDateField">
+            <label for="focusDate" id="focusDateLabel">วันที่</label>
             <input id="focusDate" type="date">
           </div>
-          <div class="field">
+          <div class="field" id="startDateField">
             <label for="startDate">เริ่ม</label>
             <input id="startDate" type="date">
           </div>
-          <div class="field">
+          <div class="field" id="endDateField">
             <label for="endDate">ถึง</label>
             <input id="endDate" type="date">
           </div>
@@ -1139,13 +1310,59 @@
           </div>
         </article>
       </section>
+
+      <section class="view" id="view-report">
+        <div class="actions report-actions">
+          <button class="button primary" type="button" id="printLateReport">พิมพ์ / บันทึก PDF</button>
+        </div>
+        <article class="official-report">
+          <header class="official-report-head">
+            <img src="assets/protection-logo.jpg" alt="ตรางานปกครองและความปลอดภัยนักเรียน นักศึกษา">
+            <div>
+              <h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2>
+              <p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>รายงานสรุปข้อมูลนักเรียนมาสาย</p>
+            </div>
+            <img src="assets/college-logo.jpg" alt="ตราวิทยาลัยอาชีวศึกษาสุพรรณบุรี">
+          </header>
+          <div class="official-report-title">
+            <h3>รายงานสรุปข้อมูลนักเรียนมาสาย</h3>
+            <p id="lateReportPeriod">ไม่พบข้อมูล</p>
+          </div>
+          <div class="official-report-metrics">
+            <div class="official-report-metric"><span>รายการ Recorded</span><strong id="lateReportRecorded">0</strong></div>
+            <div class="official-report-metric"><span>นักเรียนไม่ซ้ำ</span><strong id="lateReportStudents">0</strong></div>
+            <div class="official-report-metric"><span>มาสายซ้ำ 2+ ครั้ง</span><strong id="lateReportRepeat">0</strong></div>
+            <div class="official-report-metric"><span>ข้อมูลต้องตรวจ</span><strong id="lateReportIssues">0</strong></div>
+          </div>
+          <section class="official-report-section">
+            <h4>รายละเอียดตามช่วงและตัวกรองที่เลือก</h4>
+            <table>
+              <thead><tr><th style="width:16%">วันที่/เวลา</th><th style="width:17%">รหัส</th><th style="width:25%">นักเรียน</th><th style="width:28%">ระดับชั้น/ห้อง</th><th style="width:14%">เหตุผล</th></tr></thead>
+              <tbody id="lateReportRows"><tr><td colspan="5" class="empty">ไม่พบข้อมูล</td></tr></tbody>
+            </table>
+          </section>
+          <div class="official-signature">
+            <div>
+              <div>ลงชื่อ ______________________________</div>
+              <div>(นางสาวปัทมพร แสงศรี)</div>
+              <div>หัวหน้างานปกครองและความปลอดภัย ฯ</div>
+              <div style="margin-top:12px">วันที่ <span id="lateReportSignedDate">7 มิถุนายน 2569</span></div>
+            </div>
+          </div>
+        </article>
+      </section>
     </main>
   </div>
 
+  <script src="systems/data-api-config.js?v=20260611-google-only"></script>
+  <script src="systems/data-api.js?v=20260611-google-only"></script>
+  <script src="systems/auth-guard.js?v=20260611-google-only"></script>
   <script>
     const LOCAL_DATA_JSON_URL = "data/late_transactions.json";
     const LOCAL_DATA_CSV_URL = "data/late_transactions.csv";
     const SHEET_ID = "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw";
+    const SHEET_GID = "1977681832";
+    const SHEET_NAME = "Late_Transactions";
     const COLORS = ["#0f766e", "#2563eb", "#d97706", "#dc2626", "#16a34a", "#0891b2", "#7c3aed"];
     const DEFAULT_STATUS = "Recorded";
     const PAGE_COPY = {
@@ -1154,35 +1371,11 @@
       monthly: ["รายงานรายเดือน", "สรุปสำหรับผู้บริหาร พร้อม Top 10 ห้อง เหตุผล และนักเรียนที่ควรติดตามในเดือนที่เลือก"],
       risk: ["เด็กมาสายบ่อย", "จัดลำดับนักเรียนที่มาสายซ้ำ เพื่อใช้ติดตามรายบุคคลและประสานครูประจำชั้น"],
       recorders: ["KPI ผู้บันทึก", "ดูภาระงานและคุณภาพการกรอกของครูแต่ละคน เช่นจำนวนที่บันทึก error rate และวันที่ทำงานล่าสุด"],
-      transactions: ["ข้อมูลรายการ", "ตารางตรวจสอบรายละเอียดตามฟิลเตอร์ ใช้ค้นหารหัสนักเรียน ชื่อ ห้อง ผู้บันทึก หรือสถานะข้อมูล"]
+      transactions: ["ข้อมูลรายการ", "ตารางตรวจสอบรายละเอียดตามฟิลเตอร์ ใช้ค้นหารหัสนักเรียน ชื่อ ห้อง ผู้บันทึก หรือสถานะข้อมูล"],
+      report: ["รายงานข้อมูลนักเรียนมาสาย", "จัดทำเอกสารรายงานจากข้อมูลจริงตามช่วงเวลาและตัวกรองที่เลือก พร้อมส่วนลงนามหัวหน้างาน"]
     };
 
-    const sampleTransactions = [
-      ["2026-05-20 07:52", "2026-05-20", "07:52", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูเวรเช้า", "Recorded", "", "เข้าหลังเพลงชาติ"],
-      ["2026-05-20 07:58", "2026-05-20", "07:58", "ST-002", "นักเรียนตัวอย่าง 02", "ม.2", "ม.2/1", "ตื่นสาย", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-21 08:04", "2026-05-21", "08:04", "ST-003", "นักเรียนตัวอย่าง 03", "ม.1", "ม.1/1", "ฝนตก", "ครูฝ่ายปกครอง", "Recorded", "", ""],
-      ["2026-05-21 08:08", "2026-05-21", "08:08", "ST-004", "นักเรียนตัวอย่าง 04", "ม.2", "ม.2/2", "รถติด", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-22 07:55", "2026-05-22", "07:55", "ST-005", "นักเรียนตัวอย่าง 05", "ม.3", "ม.3/1", "ภารกิจครอบครัว", "ครูประจำชั้น", "Recorded", "", ""],
-      ["2026-05-22 08:01", "2026-05-22", "08:01", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-23 07:48", "2026-05-23", "07:48", "ST-006", "นักเรียนตัวอย่าง 06", "ม.3", "ม.3/2", "ตื่นสาย", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-23 08:10", "2026-05-23", "08:10", "ST-007", "นักเรียนตัวอย่าง 07", "ม.2", "ม.2/1", "อื่น ๆ", "ครูฝ่ายปกครอง", "Recorded", "", "รอสอบถามเพิ่มเติม"],
-      ["2026-05-24 08:03", "2026-05-24", "08:03", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-24 08:06", "2026-05-24", "08:06", "99999", "", "", "", "อื่น ๆ", "ครูเวรเช้า", "Student not found", "", "กรอกรหัสผิด"],
-      ["2026-05-25 07:51", "2026-05-25", "07:51", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-25 07:54", "2026-05-25", "07:54", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูเวรเช้า", "Duplicate", "2026-05-25|ST-001", "บันทึกซ้ำ"],
-      ["2026-05-26 08:12", "2026-05-26", "08:12", "ST-008", "นักเรียนตัวอย่าง 08", "ม.1", "ม.1/2", "รถติด", "ครูเวรกลางวัน", "Recorded", "", ""],
-      ["2026-05-27 08:00", "2026-05-27", "08:00", "ST-009", "นักเรียนตัวอย่าง 09", "ม.2", "ม.2/2", "ตื่นสาย", "ครูฝ่ายปกครอง", "Recorded", "", ""],
-      ["2026-05-28 07:59", "2026-05-28", "07:59", "ST-010", "นักเรียนตัวอย่าง 10", "ม.4", "ม.4/1", "รถติด", "ครูประจำชั้น", "Recorded", "", ""],
-      ["2026-05-29 08:09", "2026-05-29", "08:09", "ST-011", "นักเรียนตัวอย่าง 11", "ม.5", "ม.5/1", "ฝนตก", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-05-30 08:02", "2026-05-30", "08:02", "ST-002", "นักเรียนตัวอย่าง 02", "ม.2", "ม.2/1", "ตื่นสาย", "ครูฝ่ายปกครอง", "Recorded", "", ""],
-      ["2026-05-31 08:05", "2026-05-31", "08:05", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-06-01 07:56", "2026-06-01", "07:56", "ST-012", "นักเรียนตัวอย่าง 12", "ม.6", "ม.6/2", "ตื่นสาย", "ครูเวรเช้า", "Recorded", "", ""],
-      ["2026-06-01 08:11", "2026-06-01", "08:11", "ST-001", "นักเรียนตัวอย่าง 01", "ม.1", "ม.1/1", "รถติด", "ครูฝ่ายปกครอง", "Recorded", "", ""]
-    ].map(([submitted_at, late_date, time_in, student_id, full_name, grade, room, reason, recorder, status, duplicate_key, notes]) => ({
-      submitted_at, late_date, time_in, student_id, full_name, grade, room, reason, recorder, status, duplicate_key, notes
-    }));
-
-    let transactions = normalizeRows(sampleTransactions);
+    let transactions = [];
     let usingRealData = false;
     let currentView = "overview";
     let rangeMode = "month";
@@ -1197,7 +1390,11 @@
       const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
       const thai = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-      if (thai) return new Date(Number(thai[3]), Number(thai[2]) - 1, Number(thai[1]));
+      if (thai) {
+        let year = Number(thai[3]);
+        if (year > 2400) year -= 543;
+        return new Date(year, Number(thai[2]) - 1, Number(thai[1]));
+      }
       const parsed = new Date(text);
       return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
@@ -1304,10 +1501,56 @@
       fillSelect("reasonSelect", uniqueSorted(transactions, "reason").map((x) => [x, x]));
       fillSelect("recorderSelect", uniqueSorted(transactions, "recorder").map((x) => [x, x]));
       fillSelect("statusSelect", uniqueSorted(transactions, "status").map((x) => [x, x]));
+      updateRangeFilterVisibility();
     }
 
     function fillSelect(id, options, includeAll = true) {
       el(id).innerHTML = `${includeAll ? `<option value="">ทั้งหมด</option>` : ""}${options.map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}`;
+    }
+
+    function updateRangeFilterVisibility() {
+      const visibility = {
+        month: {
+          monthField: true,
+          focusDateField: false,
+          startDateField: false,
+          endDateField: false,
+          focusLabel: "วันที่"
+        },
+        today: {
+          monthField: false,
+          focusDateField: true,
+          startDateField: false,
+          endDateField: false,
+          focusLabel: "วันที่"
+        },
+        "7days": {
+          monthField: false,
+          focusDateField: true,
+          startDateField: false,
+          endDateField: false,
+          focusLabel: "สิ้นสุดวันที่"
+        },
+        custom: {
+          monthField: false,
+          focusDateField: false,
+          startDateField: true,
+          endDateField: true,
+          focusLabel: "วันที่"
+        },
+        all: {
+          monthField: false,
+          focusDateField: false,
+          startDateField: false,
+          endDateField: false,
+          focusLabel: "วันที่"
+        }
+      }[rangeMode];
+
+      ["monthField", "focusDateField", "startDateField", "endDateField"].forEach((id) => {
+        el(id).classList.toggle("hidden", !visibility[id]);
+      });
+      setText("focusDateLabel", visibility.focusLabel);
     }
 
     function latestDateKey(rows) {
@@ -1440,6 +1683,7 @@
       setText("navRisk", fmt(riskList.length));
       setText("navRecorders", fmt(recorders.length));
       setText("navRows", fmt(rows.length));
+      setText("navReport", fmt(recorded.length));
 
       renderLineChart("lineChart", recorded);
       renderBars("roomBars", roomCounts);
@@ -1451,6 +1695,30 @@
       renderRisk(rows);
       renderRecorders(rows);
       renderTransactions(rows);
+      updateLateReport(rows);
+    }
+
+    function updateLateReport(rows = filteredRows()) {
+      const recorded = recordedRows(rows);
+      const issues = issueRows(rows);
+      const students = studentStats(rows);
+      const repeat = students.filter(student => student.count >= 2);
+      setText("lateReportRecorded", fmt(recorded.length));
+      setText("lateReportStudents", fmt(students.length));
+      setText("lateReportRepeat", fmt(repeat.length));
+      setText("lateReportIssues", fmt(issues.length));
+      setText("lateReportPeriod", rows.length ? `${rangeLabel()} · ${fmt(rows.length)} รายการตามตัวกรอง` : "ไม่พบข้อมูลตามช่วงและตัวกรองที่เลือก");
+      setText("lateReportSignedDate", new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date()));
+      const sorted = [...recorded].sort((a, b) => `${a.late_date} ${a.time_in}`.localeCompare(`${b.late_date} ${b.time_in}`));
+      renderTable("lateReportRows", sorted.map(row => `
+        <tr>
+          <td>${escapeHtml(`${thaiDate(row.late_date)} ${row.time_in || ""}`.trim())}</td>
+          <td>${escapeHtml(row.student_id || "-")}</td>
+          <td>${escapeHtml(row.full_name || "-")}</td>
+          <td>${escapeHtml(row.room || row.grade || "-")}</td>
+          <td>${escapeHtml(row.reason || "-")}</td>
+        </tr>
+      `), 5, "ไม่พบข้อมูล");
     }
 
     function setText(id, value) {
@@ -1801,19 +2069,107 @@
     }
 
     async function loadSheetData() {
-      setSourceLabel("กำลังโหลดข้อมูล local จากโฟลเดอร์ data...");
+      setSourceLabel("กำลังโหลดข้อมูลจริงจาก Google Sheet...");
       try {
-        const payload = await loadLocalData();
+        const payload = await loadGoogleSheetData();
         transactions = normalizeRows(payload.rows);
         usingRealData = true;
         const updated = payload.updated_at ? ` | อัปเดต ${payload.updated_at}` : "";
-        setSourceLabel(`ข้อมูล local จาก ${payload.source}: ${fmt(transactions.length)} รายการ${updated}`);
+        setSourceLabel(`ข้อมูลจริงจาก ${payload.source}: ${fmt(transactions.length)} รายการ${updated}`);
         refreshOptions();
         render();
         return true;
       } catch (error) {
+        return loadFallbackData(error);
+      }
+    }
+
+    async function loadGoogleSheetData() {
+      const response = await loadGoogleSheetGviz();
+      if (!response || response.status === "error") {
+        const message = response && response.errors && response.errors[0]
+          ? response.errors[0].detailed_message || response.errors[0].message
+          : "Google Sheet ไม่ตอบกลับข้อมูล";
+        throw new Error(message);
+      }
+      if (!response.table) {
+        throw new Error("ไม่พบตาราง Late_Transactions ใน Google Sheet");
+      }
+      return {
+        source: `${SHEET_NAME} ใน Google Sheet`,
+        updated_at: new Date().toLocaleString("th-TH"),
+        rows: gvizTableToObjects(response.table)
+      };
+    }
+
+    function loadGoogleSheetGviz() {
+      return new Promise((resolve, reject) => {
+        const callbackName = `lateSheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const params = new URLSearchParams({
+          gid: SHEET_GID,
+          tq: "select *",
+          tqx: `responseHandler:${callbackName}`,
+          headers: "1",
+          _: String(Date.now())
+        });
+        const timeout = window.setTimeout(() => {
+          cleanup();
+          reject(new Error("หมดเวลารอข้อมูลจาก Google Sheet"));
+        }, 20000);
+
+        function cleanup() {
+          window.clearTimeout(timeout);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = (payload) => {
+          cleanup();
+          resolve(payload);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("เชื่อมต่อ Google Sheet ไม่ได้ หรือเครื่องนี้ยังไม่มีสิทธิ์อ่านชีต"));
+        };
+
+        script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?${params.toString()}`;
+        document.head.appendChild(script);
+      });
+    }
+
+    function gvizTableToObjects(table) {
+      const headers = (table.cols || []).map((col, index) => String(col.label || col.id || `Column ${index + 1}`).trim());
+      return (table.rows || [])
+        .map((row) => Object.fromEntries(headers.map((header, index) => [header, gvizCellValue(row.c && row.c[index])])))
+        .filter((row) => Object.values(row).some((value) => String(value || "").trim()));
+    }
+
+    function gvizCellValue(cell) {
+      if (!cell) return "";
+      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") return cell.f;
+      const value = cell.v;
+      if (value === undefined || value === null) return "";
+      if (Object.prototype.toString.call(value) === "[object Date]" && !Number.isNaN(value)) {
+        return dateKey(value);
+      }
+      return String(value);
+    }
+
+    async function loadFallbackData(sheetError) {
+      try {
+        const payload = await loadLocalData();
+        transactions = normalizeRows(payload.rows);
         usingRealData = false;
-        setSourceLabel(`โหลดข้อมูล local ไม่สำเร็จ: ${error.message}. ใช้ปุ่มนำเข้า CSV หรือข้อมูลตัวอย่างได้`);
+        const updated = payload.updated_at ? ` | อัปเดต ${payload.updated_at}` : "";
+        setSourceLabel(`ดึง Google Sheet ไม่ได้ (${sheetError.message}) ใช้ข้อมูลสำรองจาก ${payload.source}: ${fmt(transactions.length)} รายการ${updated}`);
+        refreshOptions();
+        render();
+        return false;
+      } catch (localError) {
+        usingRealData = false;
+        setSourceLabel(`โหลดข้อมูลจริงไม่สำเร็จ: ${sheetError.message}. และไม่พบข้อมูลสำรอง local`);
         return false;
       }
     }
@@ -1874,16 +2230,18 @@
       const [title, desc] = PAGE_COPY[view];
       setText("pageTitle", title);
       setText("pageDescription", desc);
+      if (view === "report") updateLateReport();
     }
 
     document.querySelectorAll(".nav button").forEach((button) => {
       button.addEventListener("click", () => setView(button.dataset.view));
     });
 
-    document.querySelectorAll("#rangeTabs button").forEach((button) => {
+      document.querySelectorAll("#rangeTabs button").forEach((button) => {
       button.addEventListener("click", () => {
         rangeMode = button.dataset.range;
         document.querySelectorAll("#rangeTabs button").forEach((item) => item.classList.toggle("active", item === button));
+        updateRangeFilterVisibility();
         render();
       });
     });
@@ -1893,31 +2251,32 @@
       el(id).addEventListener("change", render);
     });
 
-    el("csvInput").addEventListener("change", async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      const rows = parseCSV(await file.text());
-      transactions = normalizeRows(rows);
-      usingRealData = false;
-      setSourceLabel(`Imported CSV: ${file.name} (${fmt(transactions.length)} rows)`);
-      refreshOptions();
-      render();
-    });
-
-    el("resetDemoButton").addEventListener("click", () => {
-      transactions = normalizeRows(sampleTransactions);
-      usingRealData = false;
-      setSourceLabel("ใช้ข้อมูลตัวอย่างอยู่ กดโหลดข้อมูล local เพื่อกลับไปอ่านไฟล์ในโฟลเดอร์ data");
-      refreshOptions();
-      render();
-    });
-
     el("loadSheetButton").addEventListener("click", loadSheetData);
-    el("printButton").addEventListener("click", () => window.print());
+    el("printLateReport").addEventListener("click", () => {
+      updateLateReport();
+      window.print();
+    });
 
-    refreshOptions();
-    render();
-    loadSheetData();
+    async function bootLateSystem() {
+      refreshOptions();
+      updateRangeFilterVisibility();
+      render();
+      if (new URLSearchParams(window.location.search).get("print") === "report") {
+        setView("report");
+      }
+      try {
+        await window.StudentAffairsAuth.require({
+          systemId: "late",
+          systemName: "ระบบตรวจสอบนักเรียนมาสาย"
+        });
+      } catch (error) {
+        setSourceLabel(`รอเข้าสู่ระบบ Gmail · ${error.message}`);
+        return;
+      }
+      loadSheetData();
+    }
+
+    bootLateSystem();
   </script>
 </body>
 </html>

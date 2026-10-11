@@ -1,5 +1,6 @@
 (function () {
   const config = window.SPVC_DATA_API_CONFIG || {};
+  let authContext = null;
 
   function configured() {
     return /^https:\/\/script\.google\.com\/macros\/s\//.test(config.endpoint || "") && Boolean(config.token);
@@ -13,7 +14,7 @@
       const response = await fetch(config.endpoint, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action, token: config.token, payload }),
+        body: JSON.stringify({ action, token: config.token, auth: authContext, payload }),
         signal: controller.signal
       });
       if (!response.ok) throw new Error(`API HTTP ${response.status}`);
@@ -51,7 +52,13 @@
     configured,
     request,
     filesToPayload,
-    config
+    config,
+    getAuthContext: () => authContext,
+    setAuthContext: (context) => {
+      authContext = context || null;
+    },
+    clearAuthContext: () => {
+      authContext = null;
+    }
   };
 })();
-

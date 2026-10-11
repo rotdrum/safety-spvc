@@ -1,2 +1,9 @@
-# This local file contains the Apps Script API token.
-systems/data-api-config.js
+# Local configuration contains the Apps Script API token.
+data-api-config.js
+**/data-api-config.js
+
+# Local and generated metadata.
+.DS_Store
+**/.DS_Store
+**/.netlify/
+student-late-system/web-dashboard/dashboard-netlify.zip

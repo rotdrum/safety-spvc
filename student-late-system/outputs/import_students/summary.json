@@ -1,10 +1,10 @@
 {
   "workbook": "/Users/kkiattikun/Downloads/89121_26052213133250.xlsx",
   "sheet_count": 90,
-  "student_count": 1524,
+  "student_count": 1525,
   "room_count": 80,
   "status_counts": {
-    "กำลังศึกษา": 1524
+    "กำลังศึกษา": 1525
   },
   "duplicate_student_ids": {},
   "sheets": [
@@ -46,7 +46,7 @@
     },
     {
       "sheet": "ปวช.1_1_692070101_6",
-      "students": 27,
+      "students": 28,
       "room": "ปวช.1 การโรงแรม",
       "advisor": "นางสาวกษมา ว่องไว"
     },

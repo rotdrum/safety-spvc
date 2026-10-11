@@ -13,6 +13,8 @@
    - Execute as: Me
    - เว็บ static ที่เรียกข้ามโดเมนต้องใช้ `Who has access: Anyone` และตรวจ token ทุกคำขอ
 7. ใส่ Deployment URL และ token ใน `systems/data-api-config.js`
+8. ตั้งรหัสฝ่ายปกครองด้วย `setStudentAffairsDisciplinePassword("PASSWORD")`
+   โดยใช้รหัสอย่างน้อย 8 ตัวอักษร รหัสจะเก็บใน Script Properties และต้องไม่ใส่ในไฟล์เว็บ
 
 ไฟล์ `systems/data-api-config.js` ถูก ignore จาก Git เพราะมี token จริง ให้ใช้
 `systems/data-api-config.example.js` เป็นแม่แบบเมื่อย้ายเครื่องหรือ deploy ใหม่
@@ -21,6 +23,7 @@
 
 - `Behavior_Cases`
 - `Behavior_Timeline`
+- `Behavior_Reports`
 - `Gender_Requests`
 - `Gender_Timeline`
 - `Student_Affairs_Documents`
@@ -30,8 +33,8 @@
 
 ## ความปลอดภัย
 
-ข้อมูลสองระบบนี้เป็นข้อมูลจำกัดสิทธิ์ ไม่ควรเผยแพร่ Spreadsheet, โฟลเดอร์ Drive,
-Deployment URL หรือ token ต่อสาธารณะ การ deploy แบบ `Anyone` เหมาะกับเว็บภายในที่
-เก็บไฟล์ config ไว้เฉพาะเครื่อง/เซิร์ฟเวอร์ที่ควบคุมได้เท่านั้น ห้ามนำ token ไปฝังใน
-repository หรือเว็บ public และควรหมุน token ด้วย `rotateStudentAffairsApiToken()`
-เมื่อสงสัยว่ารั่วไหล
+ข้อมูลในระบบเป็นข้อมูลจำกัดสิทธิ์ ไม่ควรเผยแพร่ Spreadsheet, โฟลเดอร์ Drive หรือ
+token ต่อสาธารณะ การ deploy แบบ `Anyone` ใช้เพื่อให้หน้าแจ้งเหตุของนักเรียนเรียก
+`behavior-report.create` ได้โดยไม่ต้องมี token ส่วนคำสั่งอ่าน คัดกรอง และ CRUD
+รายการอื่นยังตรวจ token ทุกครั้ง ห้ามนำ token ไปฝังใน repository หรือหน้าเว็บ public
+และควรหมุน token ด้วย `rotateStudentAffairsApiToken()` เมื่อสงสัยว่ารั่วไหล

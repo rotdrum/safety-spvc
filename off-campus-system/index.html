@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#18324a">
+  <title>ระบบขออนุญาตออกนอกสถานศึกษา</title>
+  <link rel="stylesheet" href="../systems/shared.css">
+  <style>
+    :root { --brand:#2563a8; --brand-dark:#18324a; --brand-soft:#eaf3ff; --accent:#f59e0b; }
+    body { background:linear-gradient(145deg,#f5f8fb,#eef5f4); }
+    .sidebar { background:linear-gradient(180deg,#10283d,#1a4660 62%,#164e63); }
+    .mock-badge { display:inline-flex; margin-bottom:10px; padding:5px 9px; border-radius:999px; background:#fff4d6; color:#8a5700; font-size:10px; font-weight:900; }
+    .range-panel { display:grid; grid-template-columns:minmax(260px,1fr) auto; gap:14px; align-items:end; margin:4px 0 18px; padding:16px; border:1px solid #cbdfe8; border-radius:16px; background:linear-gradient(135deg,#fff,#f0f7fb); box-shadow:0 8px 24px rgba(24,50,74,.06); }
+    .range-copy strong,.range-copy small { display:block; }
+    .range-copy strong { color:var(--brand-dark); font-size:13px; }
+    .range-copy small { margin-top:4px; color:var(--muted); font-size:10px; }
+    .range-controls { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+    .range-tabs { display:flex; flex-wrap:wrap; gap:5px; padding:4px; border-radius:12px; background:#e8f0f4; }
+    .range-tabs button { min-height:34px; padding:6px 12px; border:0; border-radius:9px; background:transparent; color:#52656e; font:inherit; font-size:10px; font-weight:900; cursor:pointer; }
+    .range-tabs button.active { background:#fff; color:var(--brand); box-shadow:0 2px 8px rgba(24,50,74,.12); }
+    .range-field { display:grid; gap:4px; color:var(--muted); font-size:9px; font-weight:800; }
+    .range-field[hidden],.report-visual-grid[hidden] { display:none!important; }
+    .range-field input,.range-field select { min-width:145px; min-height:42px; padding:8px 10px; border:1px solid #cbd8dc; border-radius:10px; background:#fff; color:var(--ink); font:inherit; font-size:10px; }
+    .kpi.blue .kpi-value { color:#2563a8; }
+    .kpi.amber .kpi-value { color:#c56b00; }
+    .kpi.green .kpi-value { color:#16824d; }
+    .kpi.red .kpi-value { color:#c3362f; }
+    .chart-shell { min-height:250px; }
+    .chart { width:100%; height:auto; min-height:220px; overflow:visible; }
+    .chart text { fill:#687774; font-size:10px; }
+    .chart .grid-line { stroke:#e4ebe9; stroke-width:1; }
+    .chart .trend-area { fill:url(#trendFill); }
+    .chart .trend-line { fill:none; stroke:var(--brand); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    .chart .trend-point { fill:#fff; stroke:var(--brand); stroke-width:2.5; }
+    .status-tag { display:inline-flex; min-width:94px; justify-content:center; padding:5px 8px; border-radius:999px; font-size:10px; font-weight:900; white-space:nowrap; }
+    .status-tag.waiting { background:#fff1cf; color:#955900; }
+    .status-tag.approved { background:#dcfce7; color:#166534; }
+    .status-tag.returned { background:#f1f5f9; color:#475569; }
+    .queue-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .queue-card { padding:16px; border:1px solid var(--line); border-radius:15px; background:#fff; }
+    .queue-card-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .queue-card h3 { margin:0; font-size:14px; }
+    .queue-card p { margin:5px 0 0; color:var(--muted); font-size:10px; line-height:1.5; }
+    .queue-number { display:grid; min-width:34px; height:34px; place-items:center; border-radius:11px; background:var(--brand-soft); color:var(--brand); font-weight:950; }
+    .queue-list { display:grid; gap:7px; margin-top:13px; }
+    .queue-mini { padding:9px 10px; border-radius:10px; background:#f7f9f9; }
+    .queue-mini strong,.queue-mini small { display:block; }
+    .queue-mini strong { font-size:10px; }
+    .queue-mini small { margin-top:2px; color:var(--muted); font-size:9px; }
+    .filters { display:grid; grid-template-columns:minmax(230px,1.6fr) repeat(3,minmax(150px,1fr)); gap:10px; margin-bottom:14px; padding:14px; border:1px solid var(--line); border-radius:14px; background:#fff; }
+    .filters input,.filters select { width:100%; min-height:40px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; background:#fff; }
+    .report-tabs { display:flex; flex-wrap:wrap; gap:8px; }
+    .report-tabs .active { border-color:var(--brand); background:var(--brand); color:#fff; }
+    .report-chart { margin:18px 0; padding:14px; border:1px solid #777; }
+    .report-chart h4 { margin:0 0 10px; font-size:12px; }
+    .report-visual-grid { display:grid; grid-template-columns:1.25fr .75fr; gap:12px; }
+    .report-trend { min-height:205px; }
+    .report-trend .chart { min-height:180px; }
+    .report-bars { display:grid; gap:7px; }
+    .report-bar { display:grid; grid-template-columns:150px 1fr 32px; gap:8px; align-items:center; font-size:10px; }
+    .report-bar-track { height:8px; overflow:hidden; border-radius:999px; background:#ececec; }
+    .report-bar-fill { height:100%; border-radius:inherit; background:#2563a8; }
+    .report-table { width:100%; font-size:10px; }
+    .report-table th,.report-table td { padding:7px; border:1px solid #777; }
+    .advisor-groups { display:grid; gap:16px; }
+    .advisor-group { break-inside:avoid; page-break-inside:avoid; }
+    .advisor-group h4 { margin:0; padding:9px 10px; border:1px solid #777; border-bottom:0; background:#f2f2f2; font-size:11px; }
+    .detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .detail-grid div { padding:11px; border:1px solid var(--line); border-radius:11px; background:#fafcfc; }
+    .detail-grid span,.detail-grid strong { display:block; }
+    .detail-grid span { color:var(--muted); font-size:9px; }
+    .detail-grid strong { margin-top:3px; font-size:11px; white-space:pre-wrap; }
+    .detail-grid .full { grid-column:1/-1; }
+    .flow-line { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin:16px 0; }
+    .flow-step { padding:10px 7px; border:1px solid var(--line); border-radius:10px; background:#f8faf9; color:var(--muted); font-size:9px; text-align:center; }
+    .flow-step strong { display:block; margin-bottom:2px; color:var(--ink); font-size:10px; }
+    .flow-step.done { border-color:#acd9bf; background:#edf9f2; color:#27734c; }
+    .flow-step.active { border-color:#a9c5ed; background:#edf4ff; color:#315f9c; }
+    .detail-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:16px; }
+    .btn.danger { border-color:#efb1a5; background:#fff1ee; color:#a52f21; }
+    .empty { padding:24px; color:var(--muted); font-size:11px; text-align:center; }
+    @media (max-width:1050px) { .range-panel { grid-template-columns:1fr; align-items:start; } .range-controls { justify-content:flex-start; } .queue-grid { grid-template-columns:1fr; } .filters { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:760px) { .range-controls,.range-tabs { width:100%; } .range-tabs { display:grid; grid-template-columns:repeat(4,1fr); } .range-field { width:100%; } .range-field input,.range-field select { width:100%; } .filters,.detail-grid,.flow-line,.report-visual-grid { grid-template-columns:1fr; } .detail-grid .full { grid-column:auto; } .queue-grid { grid-template-columns:1fr; } .report-bar { grid-template-columns:100px 1fr 28px; } }
+    @media print {
+      .range-panel,.mock-badge,.report-tabs { display:none!important; }
+      .report-table[hidden],.advisor-groups[hidden] { display:none!important; }
+      .report-paper { font-family:"TH Sarabun New","Sarabun",Tahoma,sans-serif; }
+      .report-detail-page { break-before:page; page-break-before:always; padding-top:8mm; }
+      .report-visual-grid { grid-template-columns:1.15fr .85fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../student-late-system/web-dashboard/assets/protection-logo.jpg" alt="">
+        <div><strong>ระบบขออนุญาต<br>ออกนอกสถานศึกษา</strong><small>Off-campus Permission</small></div>
+      </div>
+      <nav class="nav" aria-label="เมนูระบบ">
+        <button class="active" type="button" data-view="overview">ภาพรวม <span class="nav-count" id="navOverview">0</span></button>
+        <button type="button" data-view="requests">ทะเบียนคำขอ <span class="nav-count" id="navRequests">0</span></button>
+        <button type="button" data-view="approvals">คิวรับรองและอนุมัติ <span class="nav-count" id="navApprovals">0</span></button>
+        <button type="button" data-view="report">รายงาน <span class="nav-count" id="navReport">0</span></button>
+      </nav>
+      <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><span class="eyebrow">Off-campus Permission Management</span><h1 id="pageTitle">ภาพรวมการขอออกนอกสถานศึกษา</h1><p class="lead" id="pageLead">ติดตามคำขอตั้งแต่นักเรียนยื่น ครูประจำวิชารับรอง ครูที่ปรึกษาตรวจสอบ จนถึงฝ่ายปกครองอนุมัติ</p></div>
+        <div class="actions"><a class="btn" href="../student-portal/index.html" target="_blank" rel="noopener">พื้นที่นักเรียน</a><button class="btn primary" type="button" id="topReportButton">เปิดรายงาน</button></div>
+      </header>
+      <div class="privacy-note"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>ข้อมูลนี้ใช้เพื่อควบคุมความปลอดภัยและยืนยันการออกนอกสถานศึกษาเท่านั้น เจ้าหน้าที่ต้องตรวจชื่อ เวลา และสถานะอนุมัติก่อนให้ออก</div>
+      <div class="mock-badge">เชื่อม Google Sheets แล้ว · ภาคเรียนที่ 2/2569</div>
+      <section class="range-panel" aria-label="ตัวกรองช่วงข้อมูล">
+        <div class="range-copy"><strong>ช่วงข้อมูลที่กำลังแสดง</strong><small id="rangeSummary">กำลังเตรียมข้อมูล...</small></div>
+        <div class="range-controls">
+          <div class="range-tabs" role="group" aria-label="รูปแบบช่วงเวลา">
+            <button type="button" data-range-mode="day">รายวัน</button>
+            <button type="button" data-range-mode="month">รายเดือน</button>
+            <button class="active" type="button" data-range-mode="term">ภาคเรียน</button>
+            <button type="button" data-range-mode="all">ทั้งหมด</button>
+          </div>
+          <label class="range-field" id="rangeDayField">วันที่<input id="rangeDay" type="date"></label>
+          <label class="range-field" id="rangeMonthField">เดือน<input id="rangeMonth" type="month"></label>
+          <label class="range-field" id="rangeTermField">ภาคเรียน<select id="rangeTerm"><option value="1">ภาคเรียนที่ 1</option><option value="2">ภาคเรียนที่ 2</option><option value="summer">ภาคฤดูร้อน</option></select></label>
+          <label class="range-field" id="rangeYearField">ปีการศึกษา<select id="rangeAcademicYear"></select></label>
+        </div>
+      </section>
+
+      <section class="view active" id="view-overview">
+        <div class="grid kpis">
+          <article class="card kpi blue"><div class="kpi-label">คำขอในช่วงที่เลือก</div><div class="kpi-value" id="kpiTotal">0</div><div class="kpi-note" id="kpiRangeNote">ตามตัวกรองช่วงข้อมูล</div></article>
+          <article class="card kpi amber"><div class="kpi-label">รอครูรับรอง</div><div class="kpi-value" id="kpiTeacherPending">0</div><div class="kpi-note">ครูประจำวิชาและครูที่ปรึกษา</div></article>
+          <article class="card kpi red"><div class="kpi-label">รอฝ่ายปกครอง</div><div class="kpi-value" id="kpiDisciplinePending">0</div><div class="kpi-note">รอพิจารณาอนุมัติขั้นสุดท้าย</div></article>
+          <article class="card kpi green"><div class="kpi-label">อนุมัติแล้ว</div><div class="kpi-value" id="kpiApproved">0</div><div class="kpi-note">สิ้นสุดกระบวนการอนุญาต</div></article>
+        </div>
+        <div class="grid two-col" style="margin-top:16px">
+          <article class="panel chart-shell"><div class="panel-head"><h2 id="trendTitle">แนวโน้มคำขอรายวัน</h2><span class="pill" id="trendPill">รายเดือน</span></div><div id="dailyChart"></div></article>
+          <article class="panel"><div class="panel-head"><h2>เหตุผลที่ขอออก</h2><span class="pill">ช่วงที่เลือก</span></div><div id="reasonBars"></div></article>
+        </div>
+        <article class="panel" style="margin-top:16px"><div class="panel-head"><h2>รายการที่ต้องดำเนินการก่อน</h2><button class="case-action" type="button" data-open-view="approvals">ดูคิวทั้งหมด</button></div><div class="table-wrap"><table><thead><tr><th>เลขคำขอ / เวลา</th><th>นักเรียน</th><th>สถานที่ / เหตุผล</th><th>ขั้นตอนล่าสุด</th><th></th></tr></thead><tbody id="urgentRows"></tbody></table></div></article>
+      </section>
+
+      <section class="view" id="view-requests">
+        <div class="filters">
+          <input id="filterSearch" type="search" placeholder="ค้นหาเลขคำขอ รหัส ชื่อ ห้อง หรือสถานที่">
+          <select id="filterStatus"><option value="">ทุกสถานะ</option></select>
+          <select id="filterReason"><option value="">ทุกเหตุผล</option></select>
+          <select id="filterAdviser"><option value="">ครูที่ปรึกษาทุกคน</option></select>
+        </div>
+        <article class="panel"><div class="panel-head"><h2>ทะเบียนคำขอออกนอกสถานศึกษา</h2><span class="pill" id="requestResultCount">0 รายการ</span></div><div class="table-wrap"><table><thead><tr><th>เลขคำขอ</th><th>วันที่ / เวลา</th><th>นักเรียน</th><th>สถานที่ / เหตุผล</th><th>ครูประจำวิชา</th><th>สถานะ</th><th></th></tr></thead><tbody id="requestRows"></tbody></table></div></article>
+      </section>
+
+      <section class="view" id="view-approvals">
+        <div class="queue-grid" id="approvalQueues"></div>
+        <article class="panel" style="margin-top:16px"><div class="panel-head"><h2>รายการที่รอการดำเนินการ</h2><span class="pill amber">เรียงตามเวลายื่น</span></div><div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>วันและเวลาออก</th><th>จุดหมาย</th><th>ผู้รับผิดชอบขั้นตอนนี้</th><th>สถานะ</th><th></th></tr></thead><tbody id="approvalRows"></tbody></table></div></article>
+      </section>
+
+      <section class="view" id="view-report">
+        <div class="actions report-actions" style="justify-content:space-between;margin-bottom:14px">
+          <div class="report-tabs"><button class="btn active" type="button" data-report-mode="executive">รายงานผู้บริหาร</button><button class="btn" type="button" data-report-mode="security">รายงานประจำวันสำหรับ รปภ.</button><button class="btn" type="button" data-report-mode="advisor">รายงานครูที่ปรึกษา</button></div>
+          <button class="btn primary" type="button" id="printReport">พิมพ์ / บันทึก PDF</button>
+        </div>
+        <article class="report-paper">
+          <header class="report-head"><img src="../student-late-system/web-dashboard/assets/protection-logo.jpg" alt=""><div><h2>วิทยาลัยอาชีวศึกษาสุพรรณบุรี</h2><p>งานปกครองและความปลอดภัยนักเรียน นักศึกษา<br>ระบบขออนุญาตออกนอกสถานศึกษา</p></div><img src="../student-late-system/web-dashboard/assets/college-logo.jpg" alt=""></header>
+          <div class="report-title"><h3 id="reportTitle">รายงานสรุปสำหรับผู้บริหาร</h3><p id="reportPeriod"></p></div>
+          <div class="report-metrics"><div class="report-metric"><span>คำขอที่อนุมัติ</span><strong id="reportTotal">0</strong></div><div class="report-metric"><span>นักเรียนไม่ซ้ำ</span><strong id="reportApproved">0</strong></div><div class="report-metric"><span>มีกำหนดกลับ</span><strong id="reportOutside">0</strong></div><div class="report-metric"><span>ไม่กลับภายในวัน</span><strong id="reportReturned">0</strong></div></div>
+          <section class="report-visual-grid" id="reportExecutiveOnly">
+            <div class="report-chart report-trend"><h4 id="reportTrendTitle">แนวโน้มจำนวนคำขอ</h4><div id="reportTrendChart"></div></div>
+            <div class="report-chart"><h4>สรุปเหตุผลการขอออกนอกสถานศึกษา</h4><div class="report-bars" id="reportReasonBars"></div></div>
+          </section>
+          <section class="report-section report-detail-page" id="reportDetailSection"><h4 id="reportTableTitle">รายการคำขอที่ได้รับอนุมัติ</h4><table class="report-table" id="reportSecurityOnly"><thead><tr><th>ลำดับ</th><th>นักเรียน / ห้อง</th><th>เวลาออก / กำหนดกลับ</th><th>สถานที่ / เหตุผล</th></tr></thead><tbody id="reportRows"></tbody></table><div class="advisor-groups" id="advisorReportGroups" hidden></div></section>
+          <div class="report-note" id="reportNote">รายงานฉบับนี้ใช้สำหรับติดตามการอนุญาตและความปลอดภัยของนักเรียน โดยตรวจสอบสถานะจากขั้นตอนรับรองและอนุมัติในระบบ</div>
+          <div class="signature-area"><div class="signature-box"><div class="signature-line">ลงชื่อ ______________________________</div><div>(นางสาวปัทมพร แสงศรี)</div><div>หัวหน้างานปกครองและความปลอดภัย ฯ</div><div class="report-date">วันที่ <span id="reportSignedDate"></span></div></div></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="detailModal" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-head"><h2 id="detailTitle">รายละเอียดคำขอออกนอกสถานศึกษา</h2><button class="modal-close" type="button" id="closeDetail" aria-label="ปิด">×</button></div>
+      <div class="modal-body">
+        <div class="panel-head"><h3 id="detailId">-</h3><span class="status-tag waiting" id="detailStatus">-</span></div>
+        <div class="flow-line" id="detailFlow"></div>
+        <div class="detail-grid" id="detailGrid"></div>
+        <div class="detail-actions"><button class="btn danger" type="button" id="returnRequest">ไม่รับรอง / ส่งกลับ</button><button class="btn primary" type="button" id="advanceRequest">ดำเนินการขั้นถัดไป</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="../systems/data-api-config.js?v=20261011-secure"></script>
+  <script src="../systems/data-api.js?v=20261011-secure"></script>
+  <script src="../systems/auth-guard.js?v=20261011-secure"></script>
+  <script>
+    const offCampusApi = window.StudentAffairsDataApi;
+    const STATUS = {
+      waiting_subject_teacher: ["รอครูประจำวิชารับรอง","waiting"],
+      waiting_adviser: ["รอครูที่ปรึกษารับรอง","waiting"],
+      waiting_discipline: ["รอฝ่ายปกครองอนุมัติ","waiting"],
+      approved: ["อนุมัติแล้ว","approved"],
+      returned_to_student: ["ส่งกลับให้นักเรียนแก้ไข","returned"],
+      rejected: ["ไม่อนุมัติ","returned"]
+    };
+    const PAGE_COPY = {
+      overview:["ภาพรวมการขอออกนอกสถานศึกษา","ติดตามคำขอตั้งแต่นักเรียนยื่น ครูประจำวิชารับรอง ครูที่ปรึกษาตรวจสอบ จนถึงฝ่ายปกครองอนุมัติ"],
+      requests:["ทะเบียนคำขอ","ค้นหาและตรวจสอบคำขอทั้งหมด พร้อมสถานะล่าสุดของแต่ละขั้นตอน"],
+      approvals:["คิวรับรองและอนุมัติ","แยกภาระงานตามครูประจำวิชา ครูที่ปรึกษา และฝ่ายปกครอง"],
+      report:["รายงานการขอออกนอกสถานศึกษา","จัดทำรายงานผู้บริหาร รายงานประจำวันสำหรับเจ้าหน้าที่รักษาความปลอดภัย และรายงานแยกตามครูที่ปรึกษา"]
+    };
+    let records = [];
+    let selectedId = "";
+    let currentView = "overview";
+    let reportMode = "executive";
+    let rangeMode = "term";
+
+    function localDate(offset=0) { const date=new Date(); date.setDate(date.getDate()+offset); return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+    function normalizeRecord(record) { return ["out","overdue","returned_to_college"].includes(record.status)?{...record,status:"approved"}:record; }
+    function escapeHtml(value) { return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]); }
+    function fmt(value) { return Number(value||0).toLocaleString("th-TH"); }
+    function thaiDate(value,withTime=false) { if(!value)return"-"; const date=new Date(value.length===10?`${value}T00:00:00`:value); return new Intl.DateTimeFormat("th-TH",withTime?{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}:{day:"numeric",month:"short",year:"numeric"}).format(date); }
+    function statusLabel(record) { return STATUS[record.status]||[record.status,"returned"]; }
+    function isPending(record) { return record.status.startsWith("waiting_"); }
+    function isApprovedRecord(record) { return record.status==="approved"; }
+    function tag(record) { const [label,tone]=statusLabel(record); return `<span class="status-tag ${tone}">${escapeHtml(label)}</span>`; }
+    function actionButton(record) { return `<button class="case-action" type="button" data-detail="${escapeHtml(record.id)}">รายละเอียด</button>`; }
+    function toast(message) { const node=document.getElementById("toast"); node.textContent=message; node.classList.add("show"); clearTimeout(toast.timer); toast.timer=setTimeout(()=>node.classList.remove("show"),2200); }
+
+    function termBounds() {
+      const academicYear=Number(document.getElementById("rangeAcademicYear").value)-543;
+      const term=document.getElementById("rangeTerm").value;
+      if(term==="1")return [`${academicYear}-05-01`,`${academicYear}-10-31`];
+      if(term==="2")return [`${academicYear}-11-01`,`${academicYear+1}-04-30`];
+      return [`${academicYear+1}-03-01`,`${academicYear+1}-05-15`];
+    }
+    function rangeBounds() {
+      if(rangeMode==="day") { const day=document.getElementById("rangeDay").value||localDate(); return [day,day]; }
+      if(rangeMode==="month") { const month=document.getElementById("rangeMonth").value||localDate().slice(0,7); const [year,number]=month.split("-").map(Number); const last=String(new Date(year,number,0).getDate()).padStart(2,"0"); return [`${month}-01`,`${month}-${last}`]; }
+      if(rangeMode==="term")return termBounds();
+      return ["0000-01-01","9999-12-31"];
+    }
+    function rangeLabel() {
+      const [start,end]=rangeBounds();
+      if(rangeMode==="day")return `ประจำวันที่ ${thaiDate(start)}`;
+      if(rangeMode==="month")return `ประจำเดือน ${new Intl.DateTimeFormat("th-TH",{month:"long",year:"numeric"}).format(new Date(start+"T00:00:00"))}`;
+      if(rangeMode==="term") { const term=document.getElementById("rangeTerm").value; const year=document.getElementById("rangeAcademicYear").value; return `${term==="summer"?"ภาคฤดูร้อน":`ภาคเรียนที่ ${term}`} ปีการศึกษา ${year}`; }
+      return "ข้อมูลทุกช่วงเวลา";
+    }
+    function rangeRecords() { const [start,end]=rangeBounds(); return records.filter(item=>item.date>=start&&item.date<=end); }
+    function setRangeMode(mode) {
+      rangeMode=mode;
+      document.querySelectorAll("[data-range-mode]").forEach(button=>button.classList.toggle("active",button.dataset.rangeMode===mode));
+      document.getElementById("rangeDayField").hidden=mode!=="day";
+      document.getElementById("rangeMonthField").hidden=mode!=="month";
+      document.getElementById("rangeTermField").hidden=mode!=="term";
+      document.getElementById("rangeYearField").hidden=mode!=="term";
+      renderAll();
+    }
+    function setupRangeFilters() {
+      document.getElementById("rangeDay").value=localDate();
+      document.getElementById("rangeMonth").value=localDate().slice(0,7);
+      document.getElementById("rangeAcademicYear").innerHTML=[2568,2569,2570].map(year=>`<option value="${year}" ${year===2569?"selected":""}>${year}</option>`).join("");
+      document.getElementById("rangeTerm").value="2";
+      document.getElementById("rangeDayField").hidden=true;
+      document.getElementById("rangeMonthField").hidden=true;
+      document.getElementById("rangeTermField").hidden=false;
+      document.getElementById("rangeYearField").hidden=false;
+    }
+    function offCampusAcademicYear(value) { const date=new Date(`${value}T00:00:00`); return Number.isNaN(date.getTime())?0:date.getFullYear()+(date.getMonth()>=4?543:542); }
+    function refreshOffCampusAcademicYears() { const select=document.getElementById("rangeAcademicYear"),current=select.value||"2569",years=[...new Set([2568,2569,2570,...records.map(item=>offCampusAcademicYear(item.date)).filter(Boolean)])].sort((a,b)=>a-b); select.innerHTML=years.map(year=>`<option value="${year}">${year}</option>`).join(""); select.value=years.includes(Number(current))?current:"2569"; }
+    function monthKeys(start,end) {
+      const keys=[]; const cursor=new Date(`${start.slice(0,7)}-01T00:00:00`); const limit=new Date(`${end.slice(0,7)}-01T00:00:00`);
+      while(cursor<=limit&&keys.length<24) { keys.push(`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,"0")}`); cursor.setMonth(cursor.getMonth()+1); }
+      return keys;
+    }
+    function trendBuckets(items) {
+      const [start,end]=rangeBounds();
+      if(rangeMode==="day")return Array.from({length:11},(_,index)=>{const hour=7+index;return {key:String(hour).padStart(2,"0"),label:`${String(hour).padStart(2,"0")}:00`,value:items.filter(item=>Number(item.leaveTime?.slice(0,2))===hour).length};});
+      if(rangeMode==="month") { const days=Number(end.slice(8,10)); return Array.from({length:days},(_,index)=>{const day=String(index+1).padStart(2,"0"),key=`${start.slice(0,8)}${day}`;return {key,label:index%3===0||index===days-1?String(index+1):"",value:items.filter(item=>item.date===key).length};}); }
+      let keys=monthKeys(start,end);
+      if(rangeMode==="all")keys=[...new Set(records.map(item=>item.date.slice(0,7)))].sort();
+      return keys.map(key=>({key,label:new Intl.DateTimeFormat("th-TH",{month:"short",year:"2-digit"}).format(new Date(`${key}-01T00:00:00`)),value:items.filter(item=>item.date.startsWith(key)).length}));
+    }
+    function chartSvg(buckets,gradientId="trendFill",height=220) {
+      if(!buckets.length)return '<div class="empty">ยังไม่มีข้อมูลในช่วงที่เลือก</div>';
+      const values=buckets.map(item=>item.value),max=Math.max(1,...values),width=650,left=38,right=14,top=18,bottom=38,plotW=width-left-right,plotH=height-top-bottom,divisor=Math.max(1,buckets.length-1);
+      const points=buckets.map((item,index)=>({x:left+(plotW*index/divisor),y:top+plotH-(item.value/max*plotH),...item}));
+      const line=points.map(point=>`${point.x},${point.y}`).join(" "),area=`${left},${top+plotH} ${line} ${left+plotW},${top+plotH}`,radius=buckets.length>16?2.4:4;
+      return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="กราฟแนวโน้มจำนวนคำขอ"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563a8" stop-opacity=".28"/><stop offset="1" stop-color="#2563a8" stop-opacity=".02"/></linearGradient></defs>${[0,.25,.5,.75,1].map(r=>`<line class="grid-line" x1="${left}" y1="${top+plotH*r}" x2="${left+plotW}" y2="${top+plotH*r}"/>`).join("")}<polygon points="${area}" fill="url(#${gradientId})"/><polyline class="trend-line" points="${line}"/>${points.map(point=>`<circle class="trend-point" cx="${point.x}" cy="${point.y}" r="${radius}"/>${point.value?`<text x="${point.x}" y="${point.y-9}" text-anchor="middle">${point.value}</text>`:""}${point.label?`<text x="${point.x}" y="${height-12}" text-anchor="middle">${escapeHtml(point.label)}</text>`:""}`).join("")}</svg>`;
+    }
+    function renderAll() {
+      const scoped=rangeRecords(),pending=scoped.filter(isPending),teacherPending=scoped.filter(item=>["waiting_subject_teacher","waiting_adviser"].includes(item.status)),disciplinePending=scoped.filter(item=>item.status==="waiting_discipline"),approved=scoped.filter(isApprovedRecord);
+      document.getElementById("rangeSummary").textContent=`${rangeLabel()} · พบ ${fmt(scoped.length)} คำขอ`;
+      document.getElementById("kpiRangeNote").textContent=rangeLabel(); document.getElementById("kpiTotal").textContent=fmt(scoped.length);
+      document.getElementById("kpiTeacherPending").textContent=fmt(teacherPending.length); document.getElementById("kpiDisciplinePending").textContent=fmt(disciplinePending.length); document.getElementById("kpiApproved").textContent=fmt(approved.length);
+      document.getElementById("navOverview").textContent=scoped.length; document.getElementById("navRequests").textContent=scoped.length; document.getElementById("navApprovals").textContent=pending.length; document.getElementById("navReport").textContent=approved.length;
+      renderDailyChart(scoped); renderReasonBars(scoped); renderUrgent(scoped); renderRequests(); renderApprovals(scoped); renderReport();
+    }
+    function renderDailyChart(items) {
+      const titles={day:["แนวโน้มช่วงเวลาที่ขอออก","รายชั่วโมง"],month:["แนวโน้มคำขอรายวัน","รายเดือน"],term:["แนวโน้มคำขอรายเดือน","ภาคเรียน"],all:["แนวโน้มคำขอทั้งหมด","รายเดือน"]};
+      document.getElementById("trendTitle").textContent=titles[rangeMode][0]; document.getElementById("trendPill").textContent=titles[rangeMode][1]; document.getElementById("dailyChart").innerHTML=chartSvg(trendBuckets(items));
+    }
+    function reasonCounts(items=rangeRecords()) { const map=new Map(); items.forEach(item=>map.set(item.reason,(map.get(item.reason)||0)+1)); return [...map.entries()].sort((a,b)=>b[1]-a[1]); }
+    function renderReasonBars(items) { const rows=reasonCounts(items),max=Math.max(1,...rows.map(row=>row[1])); document.getElementById("reasonBars").innerHTML=rows.length?rows.slice(0,6).map(([label,value])=>`<div class="bar-row"><span>${escapeHtml(label)}</span><div class="bar-track"><div class="bar-fill" style="width:${value/max*100}%"></div></div><strong>${value}</strong></div>`).join(""):'<div class="empty">ยังไม่มีข้อมูลเหตุผลในช่วงที่เลือก</div>'; }
+    function requestRow(record,compact=false) { return `<tr><td><strong>${escapeHtml(record.id)}</strong>${compact?`<small style="display:block;color:var(--muted)">${escapeHtml(record.leaveTime)} น.</small>`:""}</td>${compact?"":`<td>${thaiDate(record.date)}<br><small>${escapeHtml(record.leaveTime)} น.</small></td>`}<td class="student"><strong>${escapeHtml(record.studentName)}</strong><small>${escapeHtml(record.studentId)} · ${escapeHtml(record.room)}</small></td><td><strong>${escapeHtml(record.destination)}</strong><br><small>${escapeHtml(record.reason)}</small></td>${compact?"":`<td>${escapeHtml(record.subjectTeacher||"-")}</td>`}<td>${tag(record)}</td><td>${actionButton(record)}</td></tr>`; }
+    function renderUrgent(scoped) { const items=[...scoped].filter(isPending).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).slice(0,6); document.getElementById("urgentRows").innerHTML=items.length?items.map(item=>requestRow(item,true)).join(""):'<tr><td colspan="6" class="empty">ไม่มีรายการรอรับรองหรืออนุมัติ</td></tr>'; }
+    function filteredRecords() { const query=document.getElementById("filterSearch").value.trim().toLowerCase(),status=document.getElementById("filterStatus").value,reason=document.getElementById("filterReason").value,adviser=document.getElementById("filterAdviser").value; return rangeRecords().filter(item=>(!query||[item.id,item.studentId,item.studentName,item.room,item.destination,item.adviser].join(" ").toLowerCase().includes(query))&&(!status||item.status===status)&&(!reason||item.reason===reason)&&(!adviser||item.adviser===adviser)); }
+    function renderRequests() { const items=filteredRecords(); document.getElementById("requestResultCount").textContent=`${fmt(items.length)} รายการ`; document.getElementById("requestRows").innerHTML=items.length?items.map(item=>requestRow(item)).join(""):'<tr><td colspan="7" class="empty">ไม่พบรายการตามตัวกรอง</td></tr>'; }
+    function renderApprovals(scoped) {
+      const stages=[["waiting_subject_teacher","ครูประจำวิชา","รับทราบการออกจากชั้นเรียน"],["waiting_adviser","ครูที่ปรึกษา","ตรวจสอบนักเรียนและความจำเป็น"],["waiting_discipline","ฝ่ายปกครอง","พิจารณาอนุมัติและออกบัตร"]];
+      document.getElementById("approvalQueues").innerHTML=stages.map(([status,title,desc])=>{const items=scoped.filter(item=>item.status===status);return `<article class="queue-card"><div class="queue-card-head"><div><h3>${title}</h3><p>${desc}</p></div><span class="queue-number">${items.length}</span></div><div class="queue-list">${items.slice(0,3).map(item=>`<div class="queue-mini"><strong>${escapeHtml(item.studentName)}</strong><small>${escapeHtml(item.leaveTime)} น. · ${escapeHtml(item.destination)}</small></div>`).join("")||'<div class="empty">ไม่มีรายการรอ</div>'}</div></article>`;}).join("");
+      const items=scoped.filter(isPending).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)); document.getElementById("approvalRows").innerHTML=items.length?items.map(item=>`<tr><td class="student"><strong>${escapeHtml(item.studentName)}</strong><small>${escapeHtml(item.room)}</small></td><td>${thaiDate(item.date)}<br>${escapeHtml(item.leaveTime)} น.</td><td>${escapeHtml(item.destination)}</td><td>${item.status==="waiting_subject_teacher"?escapeHtml(item.subjectTeacher):item.status==="waiting_adviser"?escapeHtml(item.adviser):"งานปกครองฯ"}</td><td>${tag(item)}</td><td>${actionButton(item)}</td></tr>`).join(""):'<tr><td colspan="6" class="empty">ไม่มีคำขอรอรับรองหรืออนุมัติ</td></tr>';
+    }
+    function renderReport() {
+      const scoped=rangeRecords().filter(isApprovedRecord),securityDay=document.getElementById("rangeDay").value||localDate(),rows=reportMode==="security"?records.filter(item=>item.date===securityDay&&isApprovedRecord(item)):scoped;
+      const titles={executive:"รายงานสรุปสำหรับผู้บริหาร",security:"รายงานประจำวันสำหรับเจ้าหน้าที่รักษาความปลอดภัย",advisor:"รายงานคำขอออกนอกสถานศึกษาสำหรับครูที่ปรึกษา"};
+      document.getElementById("reportTitle").textContent=titles[reportMode]; document.getElementById("reportPeriod").textContent=reportMode==="security"?`ประจำวันที่ ${thaiDate(securityDay)}`:rangeLabel();
+      document.getElementById("reportTotal").textContent=rows.length; document.getElementById("reportApproved").textContent=new Set(rows.map(item=>item.studentId)).size; document.getElementById("reportOutside").textContent=rows.filter(item=>item.returnMode!=="no-return").length; document.getElementById("reportReturned").textContent=rows.filter(item=>item.returnMode==="no-return").length;
+      document.getElementById("reportExecutiveOnly").hidden=reportMode!=="executive"; document.getElementById("reportTableTitle").textContent=reportMode==="security"?"รายชื่อนักเรียนที่ได้รับอนุญาตประจำวัน":reportMode==="advisor"?"แยกรายชื่อที่ได้รับอนุญาตตามครูที่ปรึกษาและห้อง":"รายการคำขอที่ได้รับอนุมัติ";
+      const counts=reasonCounts(scoped),max=Math.max(1,...counts.map(row=>row[1])); document.getElementById("reportReasonBars").innerHTML=counts.length?counts.map(([label,value])=>`<div class="report-bar"><span>${escapeHtml(label)}</span><div class="report-bar-track"><div class="report-bar-fill" style="width:${value/max*100}%"></div></div><strong>${value}</strong></div>`).join(""):'<div>ไม่มีข้อมูล</div>';
+      document.getElementById("reportTrendTitle").textContent=`แนวโน้มจำนวนคำขอ · ${rangeLabel()}`; document.getElementById("reportTrendChart").innerHTML=chartSvg(trendBuckets(scoped),"reportTrendFill",190);
+      const table=document.getElementById("reportSecurityOnly"),advisorGroups=document.getElementById("advisorReportGroups"); table.hidden=reportMode==="advisor"; advisorGroups.hidden=reportMode!=="advisor";
+      document.getElementById("reportDetailSection").classList.toggle("report-detail-page",reportMode==="executive");
+      document.getElementById("reportRows").innerHTML=[...rows].sort((a,b)=>b.date.localeCompare(a.date)||a.leaveTime.localeCompare(b.leaveTime)).map((item,index)=>`<tr><td>${index+1}</td><td>${escapeHtml(item.studentName)}<br>${escapeHtml(item.room)}</td><td>${thaiDate(item.date)}<br>${escapeHtml(item.leaveTime)}-${item.returnMode==="no-return"?"ไม่กลับ":escapeHtml(item.returnTime||"-")}</td><td>${escapeHtml(item.destination)}<br>${escapeHtml(item.reason)}</td></tr>`).join("")||'<tr><td colspan="4">ไม่มีคำขอที่ได้รับอนุมัติ</td></tr>';
+      if(reportMode==="advisor")renderAdvisorReport(rows);
+      document.getElementById("reportNote").textContent=reportMode==="security"?"รายงานนี้แสดงเฉพาะคำขอที่ฝ่ายปกครองอนุมัติแล้ว เจ้าหน้าที่รักษาความปลอดภัยต้องตรวจชื่อ วันที่ และเวลาในระบบก่อนอนุญาตให้ออกทุกครั้ง":reportMode==="advisor"?"รายงานนี้แสดงเฉพาะคำขอที่อนุมัติแล้ว เพื่อให้ครูที่ปรึกษารับทราบข้อมูลนักเรียนในความดูแล":"รายงานฉบับนี้สรุปเฉพาะคำขอที่ฝ่ายปกครองอนุมัติแล้วตามช่วงเวลาที่เลือก";
+      document.getElementById("reportSignedDate").textContent=thaiDate(localDate());
+    }
+    function renderAdvisorReport(items) {
+      const groups=new Map(); items.forEach(item=>{const key=`${item.adviser||"ไม่ระบุครูที่ปรึกษา"}||${item.room||"ไม่ระบุห้อง"}`;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item);});
+      document.getElementById("advisorReportGroups").innerHTML=[...groups.entries()].sort(([a],[b])=>a.localeCompare(b,"th")).map(([key,rows])=>{const [adviser,room]=key.split("||");return `<section class="advisor-group"><h4>${escapeHtml(room)} · ครูที่ปรึกษา ${escapeHtml(adviser)} · ${rows.length} คำขอ</h4><table class="report-table"><thead><tr><th>ลำดับ</th><th>นักเรียน</th><th>วันที่ / เวลาออก-กำหนดกลับ</th><th>สถานที่ / เหตุผล</th></tr></thead><tbody>${rows.sort((a,b)=>b.date.localeCompare(a.date)).map((item,index)=>`<tr><td>${index+1}</td><td>${escapeHtml(item.studentName)}<br>${escapeHtml(item.studentId)}</td><td>${thaiDate(item.date)}<br>${escapeHtml(item.leaveTime)}-${item.returnMode==="no-return"?"ไม่กลับ":escapeHtml(item.returnTime||"-")}</td><td>${escapeHtml(item.destination)}<br>${escapeHtml(item.reason)}</td></tr>`).join("")}</tbody></table></section>`;}).join("")||'<div class="empty">ไม่มีคำขอที่ได้รับอนุมัติในช่วงที่เลือก</div>';
+    }
+
+    function setView(view) { currentView=view; document.querySelectorAll(".nav button").forEach(button=>button.classList.toggle("active",button.dataset.view===view)); document.querySelectorAll(".view").forEach(section=>section.classList.toggle("active",section.id===`view-${view}`)); document.getElementById("pageTitle").textContent=PAGE_COPY[view][0]; document.getElementById("pageLead").textContent=PAGE_COPY[view][1]; if(view==="report")renderReport(); window.scrollTo({top:0,behavior:"smooth"}); }
+    function populateFilters() { document.getElementById("filterStatus").innerHTML='<option value="">ทุกสถานะ</option>'+[...new Set(records.map(item=>item.status))].map(value=>`<option value="${value}">${escapeHtml(STATUS[value]?.[0]||value)}</option>`).join(""); document.getElementById("filterReason").innerHTML='<option value="">ทุกเหตุผล</option>'+[...new Set(records.map(item=>item.reason))].sort().map(value=>`<option>${escapeHtml(value)}</option>`).join(""); document.getElementById("filterAdviser").innerHTML='<option value="">ครูที่ปรึกษาทุกคน</option>'+[...new Set(records.map(item=>item.adviser).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"th")).map(value=>`<option>${escapeHtml(value)}</option>`).join(""); }
+    function flowHtml(record) { const order=["waiting_subject_teacher","waiting_adviser","waiting_discipline","approved"]; let active=order.indexOf(record.status); if(record.status==="approved")active=order.length; if(active<0)active=0; const labels=[["1","นักเรียน","ยื่นคำขอ"],["2","ครูประจำวิชา","รับรอง"],["3","ครูที่ปรึกษา","รับรอง"],["4","ฝ่ายปกครอง","อนุมัติ"]]; return labels.map((item,index)=>`<div class="flow-step ${index<active?"done":index===active?"active":""}"><strong>${item[0]}. ${item[1]}</strong>${item[2]}</div>`).join(""); }
+    function openDetail(id) { const record=records.find(item=>item.id===id); if(!record)return; selectedId=id; document.getElementById("detailId").textContent=record.id; const status=document.getElementById("detailStatus"),meta=statusLabel(record); status.textContent=meta[0]; status.className=`status-tag ${meta[1]}`; document.getElementById("detailFlow").innerHTML=flowHtml(record); document.getElementById("detailGrid").innerHTML=`<div><span>นักเรียน</span><strong>${escapeHtml(record.studentName)}\n${escapeHtml(record.studentId)} · ${escapeHtml(record.room)}</strong></div><div><span>ครูที่ปรึกษา</span><strong>${escapeHtml(record.adviser)}</strong></div><div><span>วันที่ / เวลาออก</span><strong>${thaiDate(record.date)} · ${escapeHtml(record.leaveTime)} น.</strong></div><div><span>กำหนดการกลับ</span><strong>${record.returnMode==="no-return"?"ไม่กลับเข้าวิทยาลัยในวันนี้":`ภายใน ${escapeHtml(record.returnTime||"-")} น.`}</strong></div><div><span>สถานที่</span><strong>${escapeHtml(record.destination)}</strong></div><div><span>เหตุผล</span><strong>${escapeHtml(record.reason)}</strong></div><div><span>ครูประจำวิชา</span><strong>${escapeHtml(record.subjectTeacher||"-")}</strong></div><div><span>ผู้อนุมัติ</span><strong>${escapeHtml(record.disciplineTeacher||"-")}</strong></div><div class="full"><span>รายละเอียด</span><strong>${escapeHtml(record.detail)}</strong></div>`; const next={waiting_subject_teacher:"รับรองและส่งครูที่ปรึกษา",waiting_adviser:"รับรองและส่งฝ่ายปกครอง",waiting_discipline:"อนุมัติคำขอ"}[record.status]; document.getElementById("advanceRequest").hidden=!next; document.getElementById("advanceRequest").textContent=next||"ดำเนินการขั้นถัดไป"; document.getElementById("returnRequest").hidden=!isPending(record); const modal=document.getElementById("detailModal"); modal.classList.add("open"); modal.setAttribute("aria-hidden","false"); document.body.classList.add("modal-open"); }
+    function closeDetail() { const modal=document.getElementById("detailModal"); modal.classList.remove("open"); modal.setAttribute("aria-hidden","true"); document.body.classList.remove("modal-open"); }
+    function reviewStage(record) { return {waiting_subject_teacher:"subject_teacher",waiting_adviser:"adviser",waiting_discipline:"discipline"}[record.status]||""; }
+    async function loadOffCampusRecords() {
+      records=(await offCampusApi.request("off-campus.list")).map(normalizeRecord);
+      refreshOffCampusAcademicYears(); populateFilters(); renderAll();
+    }
+    async function advanceSelected() {
+      const record=records.find(item=>item.id===selectedId); if(!record)return;
+      const stage=reviewStage(record); if(!stage)return;
+      const button=document.getElementById("advanceRequest"); button.disabled=true;
+      try {
+        await offCampusApi.request("off-campus.admin.update",{requestId:record.id,version:record.version,stage,decision:"approve",note:"ตรวจสอบรายละเอียดแล้ว เห็นควรรับรองและดำเนินการขั้นถัดไป"});
+        closeDetail(); await loadOffCampusRecords(); toast(stage==="discipline"?"อนุมัติคำขอเรียบร้อยแล้ว":"อัปเดตสถานะคำขอแล้ว");
+      } catch(error) { toast(`บันทึกไม่สำเร็จ: ${error.message}`); }
+      finally { button.disabled=false; }
+    }
+    async function returnSelected() {
+      const record=records.find(item=>item.id===selectedId); if(!record)return;
+      const note=window.prompt("ระบุเหตุผลที่ไม่รับรองหรือส่งกลับให้นักเรียนแก้ไข","");
+      if(note===null)return;
+      if(note.trim().length<5) { toast("กรุณาระบุเหตุผลอย่างน้อย 5 ตัวอักษร"); return; }
+      const button=document.getElementById("returnRequest"); button.disabled=true;
+      try {
+        await offCampusApi.request("off-campus.admin.update",{requestId:record.id,version:record.version,stage:reviewStage(record),decision:"reject",note:note.trim()});
+        closeDetail(); await loadOffCampusRecords(); toast("ส่งคำขอกลับให้นักเรียนแก้ไขแล้ว");
+      } catch(error) { toast(`บันทึกไม่สำเร็จ: ${error.message}`); }
+      finally { button.disabled=false; }
+    }
+
+    document.querySelectorAll(".nav button").forEach(button=>button.addEventListener("click",()=>setView(button.dataset.view)));
+    document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>setView(button.dataset.openView)));
+    document.addEventListener("click",event=>{ const button=event.target.closest("[data-detail]"); if(button)openDetail(button.dataset.detail); });
+    ["filterSearch","filterStatus","filterReason","filterAdviser"].forEach(id=>document.getElementById(id).addEventListener(id==="filterSearch"?"input":"change",renderRequests));
+    document.querySelectorAll("[data-range-mode]").forEach(button=>button.addEventListener("click",()=>setRangeMode(button.dataset.rangeMode)));
+    ["rangeDay","rangeMonth","rangeTerm","rangeAcademicYear"].forEach(id=>document.getElementById(id).addEventListener("change",renderAll));
+    document.querySelectorAll("[data-report-mode]").forEach(button=>button.addEventListener("click",()=>{reportMode=button.dataset.reportMode;document.querySelectorAll("[data-report-mode]").forEach(item=>item.classList.toggle("active",item===button));if(reportMode==="security"&&rangeMode!=="day")setRangeMode("day");else renderReport();}));
+    document.getElementById("topReportButton").addEventListener("click",()=>setView("report")); document.getElementById("printReport").addEventListener("click",()=>window.print());
+    document.getElementById("closeDetail").addEventListener("click",closeDetail); document.getElementById("detailModal").addEventListener("click",event=>{if(event.target.id==="detailModal")closeDetail();}); document.addEventListener("keydown",event=>{if(event.key==="Escape")closeDetail();});
+    document.getElementById("advanceRequest").addEventListener("click",advanceSelected); document.getElementById("returnRequest").addEventListener("click",returnSelected);
+
+    async function initializeOffCampusSystem() {
+      setupRangeFilters(); renderAll();
+      try {
+        await window.StudentAffairsAuth.require({systemId:"off-campus",systemName:"ระบบขออนุญาตออกนอกสถานศึกษา"});
+        await loadOffCampusRecords();
+      } catch(error) { toast(`เปิดระบบไม่สำเร็จ: ${error.message}`); }
+    }
+    initializeOffCampusSystem();
+  </script>
+</body>
+</html>

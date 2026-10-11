@@ -23,14 +23,14 @@
         <div><strong>ระบบข้อมูลเพศภาพ<br>และการดูแลที่เท่าเทียม</strong><small>Respect · Consent · Privacy</small></div>
       </div>
       <nav class="nav">
-        <button class="active" data-view="overview">ภาพรวมนักเรียน</button>
-        <button data-view="requests">ทะเบียนและสถานะการอนุญาต</button>
-        <button data-view="teacher-kpi">KPI การดำเนินงานครู</button>
-        <button data-view="record">เพิ่มข้อมูลรายบุคคล</button>
-        <button data-view="insights">สถิติเพื่อออกแบบกิจกรรม</button>
-        <button data-view="report">รายงาน</button>
+        <button class="active" data-view="overview">ภาพรวมนักเรียน <span class="nav-count" id="navGenderOverview">0</span></button>
+        <button data-view="requests">ทะเบียนและสถานะการอนุญาต <span class="nav-count" id="navGenderRequests">0</span></button>
+        <button data-view="teacher-kpi">KPI การดำเนินงานครู <span class="nav-count" id="navGenderTeachers">0</span></button>
+        <button data-view="record">เพิ่มข้อมูลรายบุคคล <span class="nav-count" id="navGenderRecord">0</span></button>
+        <button data-view="insights">สถิติเพื่อออกแบบกิจกรรม <span class="nav-count" id="navGenderInsights">0</span></button>
+        <button data-view="report">รายงาน <span class="nav-count" id="navGenderReport">0</span></button>
       </nav>
-      <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a>
+      <!-- <a class="back-link" href="../index.html"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>กลับศูนย์ข้อมูลกลาง</a> -->
     </aside>
     <main class="main">
       <div class="rainbow-line"></div>
@@ -40,6 +40,13 @@
       </header>
       <div class="privacy-note"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>ระบบสำหรับเจ้าหน้าที่ผู้มีสิทธิ์ ข้อมูลเชื่อมจากทะเบียนนักเรียนกลางและใช้เพื่ออนุมัติสิทธิ ดูแลนักเรียน และวางแผนกิจกรรมของวิทยาลัย</div>
       <div class="master-status" id="genderApiStatus">กำลังโหลดข้อมูลจริงจาก Google Sheets...</div>
+      <div class="filter-panel-compact" aria-label="ตัวกรองภาคเรียน">
+        <div class="filter-grid">
+          <div class="field"><label for="genderPeriodTerm">ภาคเรียน</label><select id="genderPeriodTerm"><option value="1">ภาคเรียนที่ 1</option><option value="2" selected>ภาคเรียนที่ 2</option><option value="summer">ภาคฤดูร้อน</option></select></div>
+          <div class="field"><label for="genderPeriodYear">ปีการศึกษา</label><select id="genderPeriodYear"></select></div>
+          <div class="field"><label>ช่วงข้อมูลที่กำลังแสดง</label><div class="master-status" id="genderPeriodLabel">ภาคเรียนที่ 2 ปีการศึกษา 2569</div></div>
+        </div>
+      </div>
 
       <section class="view active" id="view-overview">
         <div class="population-grid">
@@ -194,7 +201,7 @@
         </div>
       </div>
 
-      <section class="view" id="view-insights"><div class="grid two-col"><article class="panel"><div class="panel-head"><h2>โครงสร้างนักเรียนสำหรับวางแผนกิจกรรม</h2><span class="pill">ภาคเรียน 1/2569</span></div>
+      <section class="view" id="view-insights"><div class="grid two-col"><article class="panel"><div class="panel-head"><h2>โครงสร้างนักเรียนสำหรับวางแผนกิจกรรม</h2><span class="pill" id="genderInsightPeriod">ภาคเรียนที่ 2/2569</span></div>
         <div class="bar-row"><span>นักเรียนชาย</span><div class="bar-track"><div class="bar-fill" id="insightMaleBar" style="width:0%"></div></div><b id="insightMaleCount">0</b></div>
         <div class="bar-row"><span>นักเรียนหญิง</span><div class="bar-track"><div class="bar-fill" id="insightFemaleBar" style="width:0%"></div></div><b id="insightFemaleCount">0</b></div>
         <div class="bar-row"><span>LGBTQ ที่บันทึก</span><div class="bar-track"><div class="bar-fill" id="insightLgbtqBar" style="width:0%"></div></div><b id="insightLgbtqCount">0</b></div>
@@ -252,8 +259,9 @@
     </main>
   </div>
   <div class="toast" id="toast">บันทึกข้อมูลแล้ว</div>
-  <script src="../systems/data-api-config.js"></script>
-  <script src="../systems/data-api.js"></script>
+  <script src="../systems/data-api-config.js?v=20261011-secure"></script>
+  <script src="../systems/data-api.js?v=20261011-secure"></script>
+  <script src="../systems/auth-guard.js?v=20261011-secure"></script>
   <script>
     const views = document.querySelectorAll(".view");
     const navButtons = document.querySelectorAll(".nav button");
@@ -267,7 +275,6 @@
     navButtons.forEach(button => button.addEventListener("click", () => openView(button.dataset.view)));
     document.querySelectorAll("[data-open]").forEach(button => button.addEventListener("click", () => openView(button.dataset.open)));
 
-    const SHEET_ID = "1HmcqFHIQDiWZ2CWtxBC4XJjzp4cXTd3hZOrGunwA8tw";
     const toast = document.getElementById("toast");
     const identityRows = document.getElementById("identityRows");
     const identityModal = document.getElementById("identityModal");
@@ -306,6 +313,76 @@
       }).format(date);
     }
 
+    function genderAcademicYear(value) {
+      const date = new Date(value || 0);
+      if (Number.isNaN(date.getTime())) return 0;
+      return date.getFullYear() + (date.getMonth() >= 4 ? 543 : 542);
+    }
+
+    function genderPeriodBounds() {
+      const year = Number(document.getElementById("genderPeriodYear").value || 2569) - 543;
+      const term = document.getElementById("genderPeriodTerm").value || "2";
+      if (term === "1") return [new Date(year, 4, 1), new Date(year, 9, 31, 23, 59, 59, 999)];
+      if (term === "2") return [new Date(year, 10, 1), new Date(year + 1, 3, 30, 23, 59, 59, 999)];
+      return [new Date(year + 1, 2, 1), new Date(year + 1, 4, 15, 23, 59, 59, 999)];
+    }
+
+    function genderInSelectedPeriod(value) {
+      const date = new Date(value || 0);
+      if (Number.isNaN(date.getTime())) return false;
+      const [start, end] = genderPeriodBounds();
+      return date >= start && date <= end;
+    }
+
+    function scopedGenderRecords() {
+      return [...genderRecords.values()].filter(record => genderInSelectedPeriod(record.effectiveDate || record.createdAt));
+    }
+
+    function refreshGenderPeriodOptions() {
+      const select = document.getElementById("genderPeriodYear");
+      const current = select.value || "2569";
+      const years = [...new Set([
+        2568, 2569, 2570,
+        ...[...genderRecords.values()].map(record => genderAcademicYear(record.effectiveDate || record.createdAt)).filter(Boolean)
+      ])].sort((a, b) => a - b);
+      select.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join("");
+      select.value = years.includes(Number(current)) ? current : "2569";
+      const term = document.getElementById("genderPeriodTerm").value;
+      const label = `${term === "summer" ? "ภาคฤดูร้อน" : `ภาคเรียนที่ ${term}`} ปีการศึกษา ${select.value}`;
+      document.getElementById("genderPeriodLabel").textContent = label;
+      document.getElementById("genderInsightPeriod").textContent = label;
+    }
+
+    function setNavCount(id, value) {
+      const target = document.getElementById(id);
+      if (target) target.textContent = Number(value || 0).toLocaleString("th-TH");
+    }
+
+    function genderTeacherCount() {
+      const names = new Set();
+      [...identityRows.querySelectorAll("tr")].filter(row => !row.hidden).forEach(row => {
+        const recorder = row.dataset.recorder || row.children[5]?.textContent.trim();
+        const approver = row.dataset.approver || row.children[6]?.textContent.trim();
+        [recorder, approver].forEach(name => {
+          if (name && name !== "-") names.add(name);
+        });
+      });
+      return names.size;
+    }
+
+    function updateGenderNavCounts() {
+      const rowItems = [...identityRows.querySelectorAll("tr")];
+      const visibleRequests = rowItems.filter(row => !row.hidden).length;
+      const scopedRecords = scopedGenderRecords();
+      const lgbtq = scopedRecords.filter(record => String(record.identityGroup || "").includes("LGBTQ")).length;
+      setNavCount("navGenderOverview", scopedRecords.length);
+      setNavCount("navGenderRequests", rowItems.length ? visibleRequests : scopedRecords.length);
+      setNavCount("navGenderTeachers", genderTeacherCount());
+      setNavCount("navGenderRecord", students.length);
+      setNavCount("navGenderInsights", lgbtq);
+      setNavCount("navGenderReport", rowItems.length ? visibleRequests : scopedRecords.length);
+    }
+
     function escapeHtml(value) {
       return String(value || "").replace(/[&<>"']/g, char => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
@@ -338,6 +415,7 @@
       row.dataset.permissions = (record.permissions || []).join("|");
       row.dataset.decisions = (record.decisions || []).join("|");
       row.dataset.consent = hasConsent ? "แนบแล้ว" : "";
+      row.dataset.effectiveTime = String(new Date(record.effectiveDate || record.createdAt || 0).getTime() || 0);
       row.innerHTML = `
         <td>${escapeHtml(record.requestId)}</td>
         <td class="student"><strong>${escapeHtml(record.studentName)}</strong><small>${escapeHtml(record.studentId)} · ${escapeHtml(record.room || "-")}</small></td>
@@ -370,7 +448,8 @@
     }
 
     function refreshGenderDerivedUi() {
-      const records = [...genderRecords.values()];
+      refreshGenderPeriodOptions();
+      const records = scopedGenderRecords();
       const completed = record => /อนุมัติแล้ว|อนุมัติบางส่วน|ไม่อนุมัติ|ใช้งานแล้ว|ยกเลิกสิทธิ/.test(record.status || "");
       const lgbtq = records.filter(record => String(record.identityGroup || "").includes("LGBTQ")).length;
       document.getElementById("lgbtqStudents").textContent = lgbtq.toLocaleString("th-TH");
@@ -485,6 +564,7 @@
       document.getElementById("lgbtqFemaleRatio").textContent = pct(lgbtq, female);
       document.getElementById("lgbtqMaleNote").textContent = `${fmt(lgbtq)} ต่อ ${fmt(male)} คน`;
       document.getElementById("lgbtqFemaleNote").textContent = `${fmt(lgbtq)} ต่อ ${fmt(female)} คน`;
+      updateGenderNavCounts();
     }
 
     function renderStudentOptions(query = "") {
@@ -572,108 +652,15 @@
       if (!document.getElementById("approverPicker").contains(event.target)) approverOptions.classList.remove("open");
     });
 
-    function loadGviz({ sheet, gid, query, headers = 1 }) {
-      return new Promise((resolve, reject) => {
-        const callback = `masterCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-        const script = document.createElement("script");
-        const timeout = setTimeout(() => {
-          cleanup();
-          reject(new Error("Google Sheet timeout"));
-        }, 12000);
-        function cleanup() {
-          clearTimeout(timeout);
-          script.remove();
-          delete window[callback];
-        }
-        window[callback] = payload => {
-          cleanup();
-          if (payload.status === "error") reject(new Error("Google Sheet error"));
-          else resolve(payload.table);
-        };
-        const params = new URLSearchParams({
-          tqx: `responseHandler:${callback}`,
-          headers: String(headers)
-        });
-        if (sheet) params.set("sheet", sheet);
-        if (gid) params.set("gid", gid);
-        if (query) params.set("tq", query);
-        script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?${params.toString()}`;
-        script.onerror = () => {
-          cleanup();
-          reject(new Error("Google Sheet network error"));
-        };
-        document.head.append(script);
-      });
-    }
-
-    function applyMasterData(data, message) {
-      if (data.students?.length) students = data.students;
-      if (data.teachers?.length) teachers = data.teachers;
-      updatePopulationStats();
-      masterStatus.textContent = message;
-      populateIdentityApprovers();
-    }
-
     async function loadMasterData() {
-      let fallbackMaster = null;
-      const cached = sessionStorage.getItem("spvc-master-data");
-      if (cached) {
-        fallbackMaster = JSON.parse(cached);
-        students = fallbackMaster.students || [];
-        teachers = fallbackMaster.teachers || [];
-        masterStatus.textContent = "เตรียมข้อมูลค้นหาสำรองแล้ว · กำลังดึง Master Student จาก Google Sheet...";
-        populateIdentityApprovers();
-      } else {
-        try {
-          fallbackMaster = await fetch("data/master-data.json", { cache: "force-cache" }).then(response => response.json());
-          students = fallbackMaster.students || [];
-          teachers = fallbackMaster.teachers || [];
-          masterStatus.textContent = "เตรียมข้อมูลค้นหาสำรองแล้ว · กำลังดึง Master Student จาก Google Sheet...";
-          populateIdentityApprovers();
-          sessionStorage.setItem("spvc-master-data", JSON.stringify(fallbackMaster));
-        } catch (error) {
-          masterStatus.textContent = "กำลังเชื่อมข้อมูล Master ล่าสุด...";
-        }
-      }
-
       try {
-        const [studentTable, teacherTable] = await Promise.all([
-          loadGviz({
-            sheet: "Students",
-            query: "select A,C,D,E,F,G,H,I,J where J = 'Active'",
-            headers: 1
-          }),
-          loadGviz({
-            gid: "667370291",
-            query: "select C offset 3",
-            headers: 0
-          })
-        ]);
-        const cellValue = (row, index) => row.c[index]?.v == null ? "" : String(row.c[index].v);
-        const liveStudents = studentTable.rows.map(row => ({
-          id: cellValue(row, 0),
-          prefix: cellValue(row, 1),
-          firstName: cellValue(row, 2),
-          lastName: cellValue(row, 3),
-          fullName: cellValue(row, 4),
-          grade: cellValue(row, 5),
-          room: cellValue(row, 6),
-          homeroomTeacher: cellValue(row, 7),
-          status: cellValue(row, 8)
-        })).filter(student => student.id);
-        const liveTeachers = teacherTable.rows.map(row => cellValue(row, 0).trim()).filter(Boolean);
-        if (liveStudents.length) students = liveStudents;
-        if (liveTeachers.length) teachers = liveTeachers;
-        sessionStorage.setItem("spvc-master-data", JSON.stringify({ students, teachers }));
+        const master=await genderApi.request("master.bootstrap");
+        students=master.students||[];
+        teachers=master.teachers||[];
         refreshGenderDerivedUi();
-        masterStatus.textContent = `เชื่อม Google Sheet แล้ว · นักเรียน ${students.length.toLocaleString("th-TH")} คน · ครู ${teachers.length} คน · ดึงล่าสุด ${sheetSyncTime()}`;
+        masterStatus.textContent = `เชื่อม Master Student แล้ว · นักเรียน ${students.length.toLocaleString("th-TH")} คน · ครู ${teachers.length} คน · ดึงล่าสุด ${sheetSyncTime()}`;
       } catch (error) {
-        if (fallbackMaster) {
-          applyMasterData(fallbackMaster, `Google Sheet ไม่ตอบกลับ · ใช้ Master สำรอง ${students.length.toLocaleString("th-TH")} คน · ${sheetSyncTime()}`);
-          refreshGenderDerivedUi();
-        } else {
-          masterStatus.textContent = "โหลด Master Student ไม่สำเร็จ";
-        }
+        masterStatus.textContent = `โหลด Master Student ไม่สำเร็จ: ${error.message}`;
       }
     }
 
@@ -694,7 +681,7 @@
 
     function renderIdentityTeacherKpi() {
       const stats = new Map();
-      const rows = [...identityRows.querySelectorAll("tr")];
+      const rows = [...identityRows.querySelectorAll("tr")].filter(row => genderInSelectedPeriod(Number(row.dataset.effectiveTime || 0)));
       const completedPattern = /อนุมัติแล้ว|อนุมัติบางส่วน|ไม่อนุมัติ|ใช้งานแล้ว|ยกเลิกสิทธิ/;
       const ensure = name => {
         if (!name) return null;
@@ -724,6 +711,7 @@
       document.getElementById("identityTeacherKpiRows").innerHTML = entries.length ? entries.map(([name, item]) => `
         <tr><td><strong>${escapeHtml(name)}</strong></td><td>${item.recorded}</td><td>${item.assigned}</td><td>${item.completed}</td><td>${item.pending}</td><td>${item.assigned ? Math.round(item.completed / item.assigned * 100) : 0}%</td></tr>`).join("")
         : `<tr><td colspan="6">ยังไม่มีข้อมูลการดำเนินงาน</td></tr>`;
+      updateGenderNavCounts();
     }
 
     function renderIdentityDecisions() {
@@ -786,9 +774,11 @@
         const matches = (!keyword || row.textContent.toLocaleLowerCase("th").includes(keyword))
           && (!status || cells[7].textContent.includes(status))
           && (!permission || cells[2].textContent.includes(permission))
-          && (!approver || row.dataset.approver === approver);
+          && (!approver || row.dataset.approver === approver)
+          && genderInSelectedPeriod(Number(row.dataset.effectiveTime || 0));
         row.hidden = !matches;
       });
+      updateGenderNavCounts();
     }
 
     function updateIdentityReport() {
@@ -801,7 +791,7 @@
       document.getElementById("reportFemaleStudents").textContent = fmt(female);
       document.getElementById("reportIdentityCount").textContent = fmt(rows.length);
       const reportDate = new Intl.DateTimeFormat("th-TH", { dateStyle: "long" }).format(new Date());
-      document.getElementById("identityReportPeriod").textContent = `ข้อมูล ณ วันที่ ${reportDate}`;
+      document.getElementById("identityReportPeriod").textContent = `${document.getElementById("genderPeriodLabel").textContent} · ข้อมูล ณ วันที่ ${reportDate}`;
       document.getElementById("identityReportSignedDate").textContent = reportDate;
       document.getElementById("identityReportRows").innerHTML = rows.length ? rows.map(row => {
         const cells = row.children;
@@ -1051,15 +1041,35 @@
     ["identityFilterSearch", "identityFilterStatus", "identityFilterPermission", "identityFilterApprover"].forEach(id => {
       document.getElementById(id).addEventListener(id === "identityFilterSearch" ? "input" : "change", filterIdentityRows);
     });
+    ["genderPeriodTerm", "genderPeriodYear"].forEach(id => {
+      document.getElementById(id).addEventListener("change", () => {
+        refreshGenderPeriodOptions();
+        refreshGenderDerivedUi();
+      });
+    });
     [...identityRows.querySelectorAll("tr")].forEach(row => {
       row.children[2].innerHTML = permissionDisplay(row);
     });
-    setCurrentDateTime(document.getElementById("identityUpdateDate"));
-    populateIdentityApprovers();
-    filterIdentityRows();
-    renderIdentityTeacherKpi();
-    loadMasterData();
-    loadGenderRecords();
+    async function bootGenderSystem() {
+      refreshGenderPeriodOptions();
+      setCurrentDateTime(document.getElementById("identityUpdateDate"));
+      populateIdentityApprovers();
+      filterIdentityRows();
+      renderIdentityTeacherKpi();
+      try {
+        await window.StudentAffairsAuth.require({
+          systemId: "gender",
+          systemName: "ระบบข้อมูลเพศภาพและการดูแลที่เท่าเทียม"
+        });
+      } catch (error) {
+        genderApiStatus.textContent = `รอเข้าสู่ระบบ Gmail · ${error.message}`;
+        return;
+      }
+      loadMasterData();
+      loadGenderRecords();
+    }
+
+    bootGenderSystem();
   </script>
 </body>
 </html>
