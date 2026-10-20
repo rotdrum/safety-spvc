@@ -2213,7 +2213,7 @@
             <article class="overview-card late">
               <span class="overview-card-label"><i class="overview-dot gold"></i>มาสาย 3 ครั้งขึ้นไป</span>
               <strong id="lateFrequentCount">-</strong>
-              <small>นับจากข้อมูลมาสายที่บันทึกแล้ว</small>
+              <small id="lateFrequentLabel">กำลังตรวจสอบข้อมูลภาคเรียนปัจจุบัน</small>
             </article>
             <article class="overview-card identity">
               <span class="overview-card-label"><i class="overview-dot rainbow"></i>ขึ้นทะเบียน LGBTQ</span>
@@ -2512,6 +2512,7 @@
       lateDaily: "lateDailyCount",
       lateDailyLabel: "lateDailyLabel",
       lateFrequent: "lateFrequentCount",
+      lateFrequentLabel: "lateFrequentLabel",
       genderRegistered: "genderRegisteredCount",
       studentReports: "studentReportCountPublic",
       offCampusApproved: "offCampusApprovedCount",
@@ -2716,15 +2717,29 @@
       })).filter(record => record.date);
     }
 
+    function currentAcademicTerm(date = new Date()) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      if (month >= 10) {
+        return { label: `ภาคเรียนที่ 2/${year + 543}`, start: `${year}-10-01`, end: `${year + 1}-04-30` };
+      }
+      if (month <= 4) {
+        return { label: `ภาคเรียนที่ 2/${year + 542}`, start: `${year - 1}-10-01`, end: `${year}-04-30` };
+      }
+      return { label: `ภาคเรียนที่ 1/${year + 543}`, start: `${year}-05-01`, end: `${year}-09-30` };
+    }
+
     function summarizeLate(rows) {
       const recorded = normalizeLateRows(rows).filter(record => String(record.status || "Recorded").trim() === "Recorded");
       const todayKey = toDateKey(new Date());
       const latestKey = recorded.map(record => record.date).sort().pop() || "";
       const focusKey = recorded.some(record => record.date === todayKey) ? todayKey : latestKey;
       const dailyCount = focusKey ? recorded.filter(record => record.date === focusKey).length : 0;
+      const term = currentAcademicTerm();
+      const termRecorded = recorded.filter(record => record.date >= term.start && record.date <= term.end);
       const byStudent = new Map();
 
-      recorded.forEach((record) => {
+      termRecorded.forEach((record) => {
         if (!record.studentKey) return;
         byStudent.set(record.studentKey, (byStudent.get(record.studentKey) || 0) + 1);
       });
@@ -2732,6 +2747,7 @@
       return {
         dailyCount,
         frequentCount: [...byStudent.values()].filter(count => count >= 3).length,
+        termLabel: term.label,
         focusKey,
         isToday: focusKey === todayKey
       };
@@ -2802,10 +2818,12 @@
         setOverviewText("lateDaily", formatThaiNumber(late.dailyCount));
         setOverviewText("lateFrequent", formatThaiNumber(late.frequentCount));
         setOverviewText("lateDailyLabel", `${late.isToday ? "วันนี้" : "ข้อมูลล่าสุด"} ${formatThaiDateKey(late.focusKey)}`);
+        setOverviewText("lateFrequentLabel", `นับเฉพาะ ${late.termLabel}`);
       } else {
         setOverviewText("lateDaily", "-");
         setOverviewText("lateFrequent", "-");
         setOverviewText("lateDailyLabel", "ยังดึงข้อมูลระบบมาสายไม่ได้");
+        setOverviewText("lateFrequentLabel", "ยังดึงข้อมูลระบบมาสายไม่ได้");
       }
 
       const affairs = results[1].status === "fulfilled" ? results[1].value : null;
